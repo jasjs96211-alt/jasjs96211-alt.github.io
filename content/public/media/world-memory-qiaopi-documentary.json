@@ -1,0 +1,36 @@
+{
+  "id": "media-world-memory-qiaopi-documentary",
+  "slug": "world-memory-qiaopi-documentary",
+  "type": "media",
+  "status": "public",
+  "title": "纪录片《世界记忆：中国回响·侨批档案》",
+  "eyebrow": "纪实影像 · 档案纪录片",
+  "summary": "纪录片以入选《世界记忆名录》的侨批档案为基础，沿着家族通信线索进入海外华人的迁移与家庭生活。",
+  "body": [
+    "纪录片把侨批原件作为叙事起点，循着蔡天保一家四代人的通信轨迹，呈现正史之外的海外华人移民经历。家书、汇款与家庭关系被放在同一条时间线上，观众可以看到宏大历史如何落到普通人的生活选择。",
+    "这类档案纪录片的重要性，在于它不只借用“侨批”作为象征，而是让原始文献、家族记忆与历史解释相互印证。对本网站而言，它也是学习“如何把一张旧纸讲清楚”的公开范例。",
+    "央视纪录频道在2026年电影《给阿嬷的情书》引发关注后再次推荐该片，并说明节目依托入选《世界记忆名录》的侨批档案展开。现阶段未检索到可可靠核对的奖项记录，因此不列奖项。"
+  ],
+  "date": null,
+  "dateLabel": "央视纪录片",
+  "places": ["广东", "福建", "南洋"],
+  "people": ["蔡天保家族"],
+  "tags": ["侨批传媒", "纪录片", "世界记忆", "家族史", "档案影像"],
+  "cover": null,
+  "verification": "verified",
+  "rightsNote": "本页仅作节目导览；节目影像、截图及相关权利归中央广播电视总台和相应权利人所有。",
+  "externalUrl": "https://news.cctv.com/2026/05/17/ARTI8qfcQtnZYVYXAgacuY9I260517.shtml",
+  "mediaMeta": {
+    "kind": "档案纪录片",
+    "creators": "中央广播电视总台纪录频道相关节目",
+    "platform": "CCTV-9 / 央视网",
+    "awardNote": "以世界记忆档案与家族通信轨迹为基础；暂无可靠奖项资料，页面不作推定。"
+  },
+  "sources": [
+    {
+      "label": "央视网：真实版《给阿嬷的情书》与侨批纪录片导览",
+      "locator": "https://news.cctv.com/2026/05/17/ARTI8qfcQtnZYVYXAgacuY9I260517.shtml",
+      "sourceId": "WEB-CCTV-WORLD-MEMORY-QIAOPI-2026"
+    }
+  ]
+}
