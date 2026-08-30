@@ -231,3 +231,112 @@ body[data-site-mode="portal"] input { font-family: inherit; }
 @media (prefers-reduced-motion: reduce) {
   *, *:before, *:after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
 }
+
+/* Image reading, media collection, venue map and team story */
+.archiveImage { object-fit: contain !important; background: #e8e1d6; }
+.contentCardImage, .archiveRecordThumb { position: relative; }
+.contentCardImage img.archiveImage.rotatedCCW, .archiveRecordThumb img.archiveImage.rotatedCCW { width: 60%; height: auto; max-width: none; max-height: none; position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%) rotate(-90deg); }
+.contentCard:hover .contentCardImage img.archiveImage.rotatedCCW, .archiveRecordCard:hover .archiveRecordThumb img.archiveImage.rotatedCCW { transform: translate(-50%, -50%) rotate(-90deg) scale(1.025); }
+
+.detailArticle > .detailArchiveFigure, .detailArticle > .detailCoverFigure { margin: 50px 0; }
+.detailImageCanvas { min-height: 520px; padding: 28px; display: grid; place-items: center; overflow: hidden; background: #e8e1d5; border: 1px solid var(--portal-line); }
+.detailImageCanvas img { width: auto !important; max-width: 100%; max-height: 680px; display: block; object-fit: contain; }
+.detailImageCanvas img.rotatedCCW { width: min(68%, 620px) !important; max-width: none; max-height: none; transform: rotate(-90deg); }
+.detailArchiveFigure > figcaption { padding: 22px 0 0; display: grid; grid-template-columns: .85fr 1.15fr; gap: 34px; color: #596863; font-size: 13px; line-height: 1.75; }
+.detailArchiveFigure figcaption > div:first-child > span { display: block; color: var(--portal-cinnabar); font: 700 10px Arial, sans-serif; letter-spacing: .08em; }
+.detailArchiveFigure figcaption > div:first-child > b { display: block; margin: 8px 0; color: var(--portal-ink); font-size: 22px; }
+.detailArchiveFigure figcaption p { margin: 0; }
+.imageReadingNotes { padding-left: 28px; border-left: 1px solid var(--portal-line); }
+.imageReadingNotes p + p { margin-top: 14px; }
+.imageReadingNotes strong, .archiveImageGallery figcaption strong { display: block; margin-bottom: 4px; color: var(--portal-cinnabar); font-size: 11px; }
+.imageReadingNotes small, .archiveImageGallery figcaption small { display: block; margin-top: 14px; color: #78827d; line-height: 1.6; }
+
+.archiveImageGallery .archiveGalleryCanvas { aspect-ratio: 4 / 3; display: grid; place-items: center; position: relative; }
+.archiveImageGallery .archiveGalleryCanvas img.rotatedCCW { width: 59%; height: auto; max-width: none; max-height: none; position: absolute; transform: rotate(-90deg); }
+.archiveImageGallery .archiveGalleryCanvas:hover img.rotatedCCW { transform: rotate(-90deg) scale(1.018); }
+.archiveImageGallery figcaption { padding: 18px; display: block; font-size: 12px; line-height: 1.7; }
+.archiveImageGallery figcaption > div { display: grid; grid-template-columns: auto 1fr; gap: 10px; }
+.archiveImageGallery figcaption > p { margin: 13px 0 0; padding-top: 12px; border-top: 1px solid rgba(25,44,40,.1); }
+
+.mediaCollectionIntro { margin: 38px 0 8px; padding: 24px; display: grid; grid-template-columns: repeat(3, 1fr) 1.6fr; gap: 1px; background: var(--portal-line); border: 1px solid var(--portal-line); }
+.mediaCollectionIntro > div, .mediaCollectionIntro > p { min-height: 105px; margin: 0; padding: 20px; background: #fbf8f1; }
+.mediaCollectionIntro > div { display: flex; flex-direction: column; justify-content: center; }
+.mediaCollectionIntro span { color: var(--portal-cinnabar); font: 700 10px Arial, sans-serif; }
+.mediaCollectionIntro b { margin: 8px 0 3px; font-size: 19px; }
+.mediaCollectionIntro small { color: #71807a; }
+.mediaCollectionIntro > p { display: flex; align-items: center; color: #5d6d67; font-size: 12px; line-height: 1.75; }
+.mediaMetaGrid { grid-template-columns: repeat(2, 1fr); }
+.achievementNote { margin: 18px 0 22px; padding: 18px 20px; background: #f7f3e9; border-left: 3px solid var(--portal-cinnabar); }
+.achievementNote strong { color: var(--portal-cinnabar); }
+.achievementNote p { margin: 7px 0 0; }
+.sourceBox a { color: var(--portal-cinnabar); text-decoration: underline; text-underline-offset: 3px; }
+
+.venueMapSection { margin-top: 45px; }
+.venueMapToolbar { padding: 18px 20px; display: flex; align-items: center; justify-content: space-between; gap: 20px; background: #eee8dc; border: 1px solid var(--portal-line); }
+.venueMapToolbar .filterPills { flex: none; }
+.venueMapToolbar .mapLegend { color: #61706b; }
+.venueMapToolbar .mapLegend b { color: var(--portal-cinnabar); }
+.interactiveVenueMap { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(300px, .75fr); background: #153b37; }
+.venueMapCanvas { min-height: 620px; position: relative; overflow: hidden; background: radial-gradient(circle at 78% 25%, rgba(222,190,145,.13), transparent 32%), linear-gradient(160deg,#153b37,#0f2c29); }
+.venueMapCanvas > svg { width: 100%; height: 100%; position: absolute; inset: 0; }
+.provinceShape { fill: rgba(223,215,195,.16); stroke: rgba(226,190,142,.55); stroke-width: 2; }
+.provinceShape.fujian { fill: rgba(208,224,216,.14); }
+.coastLine { fill: none; stroke: #ddb987; stroke-width: 3; stroke-dasharray: 7 10; }
+.venueMapCanvas svg text { fill: rgba(255,255,255,.2); font: 700 58px serif; letter-spacing: .14em; }
+.venueMapCanvas svg .seaLabel { fill: rgba(190,211,204,.35); font: 500 15px Arial, sans-serif; letter-spacing: .2em; }
+.venueMarker { padding: 0; display: grid; justify-items: center; gap: 5px; position: absolute; z-index: 3; transform: translate(-50%, -50%); color: #fff; border: 0; background: transparent; cursor: pointer; }
+.venueMarker i { width: 13px; height: 13px; display: block; border-radius: 50%; background: #153b37; border: 2px solid #dcb685; box-shadow: 0 0 0 6px rgba(220,182,133,.12); transition: .2s ease; }
+.venueMarker.visited i { background: #dcb685; }
+.venueMarker span { padding: 3px 6px; background: rgba(10,31,29,.75); font-size: 10px; white-space: nowrap; }
+.venueMarker:hover i, .venueMarker.active i { transform: scale(1.25); box-shadow: 0 0 0 9px rgba(220,182,133,.2); }
+.venueMarker.active span { color: #142e2b; background: #e3bd8d; font-weight: 700; }
+.venueSpotlight { padding: 46px 38px; color: #fff; border-left: 1px solid rgba(255,255,255,.12); background: rgba(7,26,24,.48); }
+.venueSpotlight > span { color: #dcb685; font: 700 10px Arial, sans-serif; letter-spacing: .13em; }
+.venueSpotlight h2 { margin: 16px 0 9px; color: #fff; font-size: clamp(30px, 3vw, 45px); line-height: 1.2; }
+.venueSpotlight > b { color: #9fb6af; font-size: 12px; }
+.venueSpotlight p { margin: 32px 0; color: #c0d0cb; line-height: 1.9; }
+.venueSpotlight > div { width: max-content; padding: 7px 9px; color: #183633; background: #e3bd8d; font-size: 10px; font-weight: 700; }
+.venueSpotlight a { margin-top: 24px; display: flex; align-items: center; gap: 8px; color: #e3bd8d; font-size: 12px; }
+.venueDirectory { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; margin-top: 1px; background: var(--portal-line); border: 1px solid var(--portal-line); }
+.venueDirectory button { min-height: 135px; padding: 20px; display: flex; flex-direction: column; align-items: flex-start; color: inherit; border: 0; background: #fbf8f1; text-align: left; cursor: pointer; }
+.venueDirectory button:hover, .venueDirectory button.active { background: #e7eee9; }
+.venueDirectory small { color: var(--portal-cinnabar); }
+.venueDirectory b { margin: 9px 0 7px; font-size: 16px; line-height: 1.4; }
+.venueDirectory span { margin-top: auto; color: #71807a; font-size: 10px; }
+.mapCaution { padding: 17px 20px; display: flex; align-items: center; gap: 10px; color: #5f6e68; background: #eee8dc; font-size: 11px; }
+
+.aboutManifesto { padding: 80px 0; display: grid; grid-template-columns: 170px minmax(0, 820px); gap: clamp(45px, 8vw, 120px); justify-content: center; }
+.aboutSeal { width: 150px; height: 150px; display: grid; place-items: center; color: var(--portal-cinnabar); border: 2px solid var(--portal-cinnabar); border-radius: 50%; font-size: 29px; font-weight: 800; transform: rotate(-7deg); }
+.aboutManifesto h2 { margin: 18px 0 32px; font-size: clamp(45px, 6vw, 74px); line-height: 1.12; }
+.aboutManifesto article > p { color: #4f605a; font-size: 18px; line-height: 2.05; }
+.aboutManifesto footer { margin-top: 45px; padding-top: 25px; display: flex; flex-direction: column; gap: 8px; border-top: 1px solid var(--portal-line); }
+.aboutManifesto footer b { color: var(--portal-cinnabar); font-size: 18px; }
+.aboutManifesto footer time { color: #72807b; font: 500 11px Arial, sans-serif; letter-spacing: .06em; }
+.aboutPrinciples { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--portal-line); border: 1px solid var(--portal-line); }
+.aboutPrinciples article { min-height: 250px; padding: 28px; background: #faf7f0; }
+.aboutPrinciples span { color: var(--portal-cinnabar); font: 700 11px Arial, sans-serif; }
+.aboutPrinciples h3 { margin: 55px 0 12px; font-size: 26px; }
+.aboutPrinciples p { color: #60706a; line-height: 1.8; }
+.aboutTimeline { margin: 75px 0 35px; display: grid; grid-template-columns: repeat(4, 1fr); position: relative; }
+.aboutTimeline:before { content: ""; height: 1px; position: absolute; left: 0; right: 0; top: 31px; background: var(--portal-line); }
+.aboutTimeline > div { padding-right: 30px; position: relative; }
+.aboutTimeline > div:before { content: ""; width: 11px; height: 11px; display: block; margin: 26px 0 28px; position: relative; z-index: 1; border-radius: 50%; background: var(--portal-cinnabar); box-shadow: 0 0 0 6px #f4f0e7; }
+.aboutTimeline span { color: var(--portal-cinnabar); font: 700 10px Arial, sans-serif; }
+.aboutTimeline b { display: block; font-size: 23px; }
+.aboutTimeline p { color: #697771; font-size: 12px; line-height: 1.7; }
+.aboutDisclaimer { margin-bottom: 25px; padding: 22px; display: flex; gap: 15px; color: #e9f0ed; background: var(--portal-pine); }
+.aboutDisclaimer p { margin: 0; line-height: 1.75; }
+
+@media (max-width: 900px) {
+  .detailArchiveFigure > figcaption { grid-template-columns: 1fr; gap: 20px; }.imageReadingNotes { padding: 20px 0 0; border-left: 0; border-top: 1px solid var(--portal-line); }
+  .mediaCollectionIntro { grid-template-columns: repeat(3, 1fr); }.mediaCollectionIntro > p { grid-column: 1 / -1; min-height: auto; }
+  .interactiveVenueMap { grid-template-columns: 1fr; }.venueMapCanvas { min-height: 560px; }.venueSpotlight { border-left: 0; border-top: 1px solid rgba(255,255,255,.12); }.venueDirectory { grid-template-columns: repeat(2, 1fr); }
+  .aboutManifesto { grid-template-columns: 110px 1fr; gap: 38px; }.aboutSeal { width: 105px; height: 105px; font-size: 21px; }.aboutPrinciples { grid-template-columns: 1fr; }.aboutPrinciples article { min-height: 190px; }.aboutPrinciples h3 { margin-top: 28px; }.aboutTimeline { grid-template-columns: repeat(2, 1fr); row-gap: 35px; }.aboutTimeline:before { display: none; }
+}
+
+@media (max-width: 620px) {
+  .detailImageCanvas { min-height: 340px; padding: 16px; }.detailImageCanvas img { max-height: 460px; }.detailImageCanvas img.rotatedCCW { width: 62% !important; }.detailArchiveFigure figcaption > div:first-child > b { font-size: 19px; }
+  .mediaCollectionIntro { grid-template-columns: 1fr; padding: 1px; }.mediaCollectionIntro > p { grid-column: auto; }.mediaMetaGrid { grid-template-columns: 1fr; }
+  .venueMapToolbar { align-items: stretch; flex-direction: column; }.venueMapToolbar .mapLegend { flex-direction: row; flex-wrap: wrap; }.venueMapCanvas { min-height: 430px; }.venueMapCanvas svg text { font-size: 38px; }.venueSpotlight { padding: 34px 24px; }.venueDirectory { grid-template-columns: 1fr; }
+  .aboutManifesto { padding: 55px 0; grid-template-columns: 1fr; }.aboutSeal { width: 86px; height: 86px; }.aboutManifesto h2 { font-size: 42px; }.aboutManifesto article > p { font-size: 16px; }.aboutTimeline { grid-template-columns: 1fr; }.aboutTimeline > div:before { margin-bottom: 15px; }
+}
