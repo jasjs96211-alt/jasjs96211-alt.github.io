@@ -258,6 +258,20 @@ body[data-site-mode="portal"] input { font-family: inherit; }
 .archiveImageGallery figcaption > div { display: grid; grid-template-columns: auto 1fr; gap: 10px; }
 .archiveImageGallery figcaption > p { margin: 13px 0 0; padding-top: 12px; border-top: 1px solid rgba(25,44,40,.1); }
 
+.archiveLearning { margin: 55px 0; padding: 42px; color: #edf3f0; background: #153b37; }
+.archiveLearning > header { max-width: 880px; }
+.archiveLearning .overline { color: #dfb983; }
+.archiveLearning h2 { margin: 14px 0 17px; color: #fff; font-size: clamp(34px, 4vw, 54px); line-height: 1.18; }
+.archiveLearning > header > p { margin: 0; color: #c2d1cc; font-size: 16px; line-height: 1.9; }
+.archiveLearningGrid { margin-top: 34px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 1px; background: rgba(255,255,255,.16); border: 1px solid rgba(255,255,255,.16); }
+.archiveLearningGrid article { min-height: 220px; padding: 28px; background: rgba(8,31,28,.64); }
+.archiveLearningGrid article > span { color: #dfb983; font: 700 11px Arial, sans-serif; letter-spacing: .12em; }
+.archiveLearningGrid h3 { margin: 45px 0 12px; color: #fff; font-size: 24px; }
+.archiveLearningGrid p { margin: 0; color: #bdcec8; font-size: 13px; line-height: 1.85; }
+.archiveLearningSources { margin-top: 26px; padding-top: 23px; display: flex; align-items: center; flex-wrap: wrap; gap: 12px 24px; border-top: 1px solid rgba(255,255,255,.18); }
+.archiveLearningSources b { color: #fff; font-size: 12px; }
+.archiveLearningSources a { display: inline-flex; align-items: center; gap: 6px; color: #dfb983; font-size: 11px; text-decoration: underline; text-underline-offset: 4px; }
+
 .mediaCollectionIntro { margin: 38px 0 8px; padding: 24px; display: grid; grid-template-columns: repeat(3, 1fr) 1.6fr; gap: 1px; background: var(--portal-line); border: 1px solid var(--portal-line); }
 .mediaCollectionIntro > div, .mediaCollectionIntro > p { min-height: 105px; margin: 0; padding: 20px; background: #fbf8f1; }
 .mediaCollectionIntro > div { display: flex; flex-direction: column; justify-content: center; }
@@ -336,6 +350,7 @@ body[data-site-mode="portal"] input { font-family: inherit; }
 
 @media (max-width: 620px) {
   .detailImageCanvas { min-height: 340px; padding: 16px; }.detailImageCanvas img { max-height: 460px; }.detailImageCanvas img.rotatedCCW { width: 62% !important; }.detailArchiveFigure figcaption > div:first-child > b { font-size: 19px; }
+  .archiveLearning { margin: 40px 0; padding: 30px 22px; }.archiveLearningGrid { grid-template-columns: 1fr; }.archiveLearningGrid article { min-height: auto; }.archiveLearningGrid h3 { margin-top: 27px; }.archiveLearningSources { align-items: flex-start; flex-direction: column; }
   .mediaCollectionIntro { grid-template-columns: 1fr; padding: 1px; }.mediaCollectionIntro > p { grid-column: auto; }.mediaMetaGrid { grid-template-columns: 1fr; }
   .venueMapToolbar { align-items: stretch; flex-direction: column; }.venueMapToolbar .mapLegend { flex-direction: row; flex-wrap: wrap; }.venueMapCanvas { min-height: 430px; }.venueMapCanvas svg text { font-size: 38px; }.venueSpotlight { padding: 34px 24px; }.venueDirectory { grid-template-columns: 1fr; }
   .aboutManifesto { padding: 55px 0; grid-template-columns: 1fr; }.aboutSeal { width: 86px; height: 86px; }.aboutManifesto h2 { font-size: 42px; }.aboutManifesto article > p { font-size: 16px; }.aboutTimeline { grid-template-columns: 1fr; }.aboutTimeline > div:before { margin-bottom: 15px; }
