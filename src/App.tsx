@@ -10,8 +10,9 @@ const navItems = [
   ["/archives", "侨批档案"],
   ["/fieldwork", "实践足迹"],
   ["/research", "研究成果"],
-  ["/media", "影像档案"],
+  ["/media", "侨批传媒"],
   ["/creative", "文创实验室"],
+  ["/about", "关于我们"],
 ] as const;
 
 const pageIntros: Partial<Record<ContentType, { eyebrow: string; title: string; lead: string }>> = {
@@ -31,9 +32,9 @@ const pageIntros: Partial<Record<ContentType, { eyebrow: string; title: string; 
     lead: "项目简介、研究方法与阶段性文献综述在这里形成可追溯的研究脉络；申报原件中的个人信息不会进入公共页面。",
   },
   media: {
-    eyebrow: "Media · 影像与传播记录",
-    title: "当一封旧信进入今天的屏幕",
-    lead: "这里整理团队短视频、调研影像和公共传播成果，并逐项注明作品规格、公开入口与成果依据。",
+    eyebrow: "Media · 侨批传媒作品总集",
+    title: "当一封旧信进入银幕、舞台与今天的屏幕",
+    lead: "从歌仔戏、潮剧、电影与纪录片，到团队自己的短视频实践；每件作品都说明创作背景、传播成绩与可核对来源。",
   },
 };
 
@@ -109,7 +110,7 @@ function PortalFooter() {
       </div>
       <div className="footerLinks">
         <div><b>浏览</b><SiteLink to="/learn">认识侨批</SiteLink><SiteLink to="/archives">侨批档案</SiteLink><SiteLink to="/routes">侨路地图</SiteLink><SiteLink to="/timeline">时间轴</SiteLink></div>
-        <div><b>项目</b><SiteLink to="/fieldwork">实践足迹</SiteLink><SiteLink to="/research">研究成果</SiteLink><SiteLink to="/media">影像档案</SiteLink><SiteLink to="/creative">文创实验室</SiteLink></div>
+        <div><b>项目</b><SiteLink to="/fieldwork">实践足迹</SiteLink><SiteLink to="/research">研究成果</SiteLink><SiteLink to="/media">侨批传媒总集</SiteLink><SiteLink to="/creative">文创实验室</SiteLink><SiteLink to="/about">关于我们</SiteLink></div>
         <div><b>参观指南</b><span>按场馆浏览资料</span><span>按主题认识侨批</span><span>查看团队实践成果</span><span>体验青年文创项目</span></div>
       </div>
       <div className="footerBottom"><span>侨批文化数字展陈与研究平台</span><span>研究、展陈与青年文创并行</span></div>
@@ -127,9 +128,10 @@ function Breadcrumbs({ items }: { items: { label: string; to?: string }[] }) {
 }
 
 function ContentCard({ entry, featured = false }: { entry: ContentEntry; featured?: boolean }) {
+  const coverArchiveId = archiveIdFromPath(entry.cover);
   return (
     <article className={`contentCard ${featured ? "featured" : ""}`}>
-      {entry.cover ? <div className="contentCardImage"><img src={entry.cover} alt={entry.coverAlt ?? ""} loading="lazy" decoding="async"/></div> : <div className={`contentCardGraphic type-${entry.type}`}><Icon name={entry.type === "fieldwork" ? "fieldwork" : entry.type === "research" ? "research" : entry.type === "media" ? "media" : entry.type === "creative" ? "creative" : "learn"} size={30}/><span>{contentTypeLabels[entry.type]}</span></div>}
+      {entry.cover ? <div className="contentCardImage"><img className={archiveImageClass(coverArchiveId)} src={entry.cover} alt={entry.coverAlt ?? ""} loading="lazy" decoding="async"/></div> : <div className={`contentCardGraphic type-${entry.type}`}><Icon name={entry.type === "fieldwork" ? "fieldwork" : entry.type === "research" ? "research" : entry.type === "media" ? "media" : entry.type === "creative" ? "creative" : "learn"} size={30}/><span>{entry.mediaMeta?.kind ?? contentTypeLabels[entry.type]}</span></div>}
       <div className="contentCardBody">
         <div className="cardMeta"><span>{entry.dateLabel ?? contentTypeLabels[entry.type]}</span><VerificationBadge entry={entry}/></div>
         <h3><SiteLink to={entryPath(entry)}>{entry.title}</SiteLink></h3>
@@ -198,7 +200,7 @@ function HomePage() {
           <SiteLink to="/research" className="moduleCard"><Icon name="research" size={26}/><span>04</span><h3>研究成果</h3><p>项目问题、方法、报告与文献脉络。</p></SiteLink>
           <SiteLink to="/routes" className="moduleCard"><Icon name="map" size={26}/><span>05</span><h3>侨路地图</h3><p>先呈现调研节点，逐步关联真实档案路径。</p></SiteLink>
           <SiteLink to="/timeline" className="moduleCard"><Icon name="timeline" size={26}/><span>06</span><h3>双轨时间轴</h3><p>侨批历史与我们的研究历程彼此对照。</p></SiteLink>
-          <SiteLink to="/media" className="moduleCard"><Icon name="media" size={26}/><span>07</span><h3>影像档案</h3><p>观看团队短视频，浏览调研图像与传播成果。</p></SiteLink>
+          <SiteLink to="/media" className="moduleCard"><Icon name="media" size={26}/><span>07</span><h3>侨批传媒总集</h3><p>从舞台、电影、纪录片到我们的青年传播实践。</p></SiteLink>
         </div>
       </section>
 
@@ -256,6 +258,7 @@ function CollectionPage({ type }: { type: "learn" | "fieldwork" | "research" | "
   return (
     <main className="portalMain">
       <section className={`pageHero ${type}`}><Breadcrumbs items={[{ label: contentTypeLabels[type] }]}/><div><span className="overline">{intro.eyebrow}</span><h1>{intro.title}</h1><p>{intro.lead}</p></div><aside><strong>{entries.length}</strong><span>条展陈内容</span><small>按来源与主题持续补充</small></aside></section>
+      {type === "media" && <section className="mediaCollectionIntro"><div><span>01</span><b>舞台</b><small>歌仔戏 · 潮剧</small></div><div><span>02</span><b>银幕</b><small>故事片 · 纪录片</small></div><div><span>03</span><b>青年传播</b><small>团队短视频实践</small></div><p>“取得成就”只记录能够由权威页面核对的奖项、入选、播出或市场数据；尚无可靠信息时会明确写明，不补造荣誉。</p></section>}
       <section className="collectionToolbar"><label className="searchField"><Icon name="search" size={18}/><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder={`搜索${contentTypeLabels[type]}…`}/></label>{type === "fieldwork" && <div className="filterPills" aria-label="按地区筛选">{places.map((item) => <button type="button" key={item} className={place === item ? "active" : ""} aria-pressed={place === item} onClick={() => setPlace(item)}>{item}</button>)}</div>}<span className="resultCount">显示 {filtered.length} / {entries.length}</span></section>
       <section className={`collectionGrid ${type}`}>{filtered.map((entry) => <ContentCard key={entry.id} entry={entry}/>)}</section>
       {filtered.length === 0 && <EmptyState title="没有找到匹配内容" body="换一个关键词或地区试试。"/>}
@@ -282,12 +285,55 @@ function archiveContext(record: ArchiveIndexRecord) {
   return record.context.replaceAll("桥批", "侨批").replace("（上下图片）", "（两张相关图像）").replace("（上下两张图片）", "（两张相关图像）");
 }
 
+const rotatedArchiveIds = new Set(["QP-060", "QP-062", "QP-063", "QP-064", "QP-065"]);
+
+function archiveIdFromPath(path: string | null | undefined) {
+  return path?.match(/(QP-\d{3})/i)?.[1].toUpperCase() ?? null;
+}
+
+function archiveImageClass(id: string | null | undefined) {
+  return id && rotatedArchiveIds.has(id) ? "archiveImage rotatedCCW" : "archiveImage";
+}
+
+function findArchiveRecord(id: string | null | undefined) {
+  if (!id) return undefined;
+  return publicContent.find((item) => item.slug === "qiaopi-index-v1")?.archiveRecords?.find((record) => record.id === id);
+}
+
+function archiveReadingGuide(record: ArchiveIndexRecord) {
+  const title = archiveTitle(record);
+  const visual = record.materialType
+    ? `这是一张由团队在${record.sourceInstitution ?? "侨批场馆"}拍摄的${record.materialType}图像，主题为“${title}”。`
+    : `这张图像由团队在${record.sourceInstitution ?? "侨批场馆"}采集，记录“${title}”相关展品与展陈信息。`;
+
+  let readable = `现阶段能够稳定辨识的主题是“${title}”。受玻璃反光、拍摄角度与手写体影响，正文不作未经馆方校核的逐字转录。`;
+  if (record.id === "QP-013") readable = "展签主题可辨识为“白刃先生的回忆信”。画面中包括回忆材料、手写信页、印章与相关出版物；正文仍需结合馆方编目逐字核对。";
+  if (record.id === "QP-035") readable = "展陈表格与器具共同指向侨批递送、计费和业务管理。表格小字受分辨率限制，不据此抄录具体数字。";
+  if (record.id === "QP-060") readable = "图中多张凭单可辨识到英文银行名称、签章和手写项目，其中包括 Overseas-Chinese Banking Corporation Limited 等字样；金额、日期与姓名不作低置信度转录。";
+  if (record.id === "QP-066") readable = "展板集中解释侨批的信款合一属性与流转方式。页面以团队原有编目为主，细小展板文字不作机器识别式全文复制。";
+
+  let significance = "它让抽象的侨批制度落到具体纸张、印记、器具或生活物件上，适合与同主题资料对读。";
+  if (/家书|叮嘱|读书|祖国|回忆/.test(title + record.subcategory)) significance = "这类材料把宏大的迁移史还原为家庭生活：称谓、叮嘱、教育期待与情感表达，都是理解侨乡社会的重要线索。";
+  if (/汇|银|银行|计费|经营|批局|水客/.test(title + record.subcategory)) significance = "这类材料显示侨批不仅是信，也是一套依靠信用、经手人、票据与结算维持的民间跨境汇兑网络。";
+  if (/出洋|海外|路线|批筒/.test(title + record.subcategory)) significance = "这类材料帮助理解一封银信如何经过海外侨居地、批局与侨乡递送者，被多人接力送到家中。";
+
+  return { visual, readable, significance };
+}
+
+function ArchiveFigure({ src, alt }: { src: string; alt: string }) {
+  const id = archiveIdFromPath(src);
+  const record = findArchiveRecord(id);
+  if (!record) return <figure className="detailCoverFigure"><div className="detailImageCanvas"><img src={src} alt={alt}/></div>{alt && <figcaption>{alt}</figcaption>}</figure>;
+  const guide = archiveReadingGuide(record);
+  return <figure className="detailArchiveFigure"><div className="detailImageCanvas"><img className={archiveImageClass(id)} src={src} alt={alt}/></div><figcaption><div><span>{record.id} · {record.sourceInstitution}</span><b>{archiveTitle(record)}</b><p>{guide.visual}</p></div><div className="imageReadingNotes"><p><strong>可辨识文字</strong>{guide.readable}</p><p><strong>为什么值得看</strong>{guide.significance}</p><small>图像识别只作辅助；馆藏名称、年代与全文释读以馆方正式资料为准。</small></div></figcaption></figure>;
+}
+
 function ArchiveRecordCard({ records }: { records: ArchiveIndexRecord[] }) {
   const record = records[0];
   const idLabel = records.length > 1 ? `${records[0].id}—${records[records.length - 1].id}` : record.id;
   return (
     <article className="archiveRecordCard">
-      <div className="archiveRecordThumb"><img src={`/archive/${record.id}.webp`} alt={`${record.sourceInstitution ?? "侨批场馆"}采集的${archiveTitle(record)}`} loading="lazy" decoding="async"/></div>
+      <div className="archiveRecordThumb"><img className={archiveImageClass(record.id)} src={`/archive/${record.id}.webp`} alt={`${record.sourceInstitution ?? "侨批场馆"}采集的${archiveTitle(record)}`} loading="lazy" decoding="async"/></div>
       <div className="archiveRecordTop"><span className="archiveRecordId">{idLabel}</span><span className="archiveSource">{record.sourceInstitution}</span></div>
       <h3>{archiveTitle(record)}</h3>
       <p>{record.category} · {record.subcategory}</p>
@@ -348,29 +394,42 @@ function ArchiveRecordPage({ record }: { record: ArchiveIndexRecord }) {
   return (
     <main className="portalMain archiveRecordPage">
       <Breadcrumbs items={[{ label: "侨批档案", to: "/archives" }, { label: record.id }]}/>
-      <article className="archiveRecordArticle"><header><div className="archiveRecordTop"><span className="archiveRecordId">{idLabel}</span><span className="archiveSource">{record.sourceInstitution}</span></div><span className="overline">团队采集 · 场馆图像资料</span><h1>{archiveTitle(record)}</h1><p>{archiveContext(record) !== archiveTitle(record) ? archiveContext(record) : `本组共收录 ${relatedRecords.length} 件相关图像资料。`}</p></header><section className="archiveImageGallery" aria-label="图像资料">{relatedRecords.map((item) => <figure key={item.id}><a href={`/archive/${item.id}.webp`} target="_blank" rel="noreferrer"><img src={`/archive/${item.id}.webp`} alt={`${item.sourceInstitution ?? "侨批场馆"}采集的${archiveTitle(item)}`} decoding="async"/></a><figcaption><b>{item.id}</b><span>{archiveContext(item)}</span></figcaption></figure>)}</section><section className="recordFacts"><div><small>采集来源</small><b>{record.sourceInstitution ?? "来源待补充"}</b></div><div><small>内容类别</small><b>{record.category}</b></div><div><small>主题</small><b>{record.subcategory}</b></div><div><small>索引编号</small><b>{idLabel}</b></div><div><small>资料数量</small><b>{relatedRecords.length} 件</b></div><div><small>材料形式</small><b>{record.materialType ?? "图像资料"}</b></div></section><aside className="sourceBox"><div><Icon name="shield" size={24}/><h2>资料来源</h2></div><p><b>采集场馆</b><span>{record.sourceInstitution ?? "来源待补充"}</span><small>团队在场馆调研过程中拍摄并整理；图片用于侨批文化学习与项目成果展示，展品权利归相应场馆或权利人所有。</small></p><p><b>整理编号</b><span>{idLabel}</span><small>编号用于保持同组图片、说明文字及后续研究材料之间的对应关系。</small></p></aside><SiteLink to="/archives" className="underLink">返回资料浏览 <Icon name="arrow" size={17}/></SiteLink></article>
+      <article className="archiveRecordArticle"><header><div className="archiveRecordTop"><span className="archiveRecordId">{idLabel}</span><span className="archiveSource">{record.sourceInstitution}</span></div><span className="overline">团队采集 · 场馆图像资料</span><h1>{archiveTitle(record)}</h1><p>{archiveContext(record) !== archiveTitle(record) ? archiveContext(record) : `本组共收录 ${relatedRecords.length} 件相关图像资料。`}</p></header><section className="archiveImageGallery" aria-label="图像资料">{relatedRecords.map((item) => { const guide = archiveReadingGuide(item); return <figure key={item.id}><a className="archiveGalleryCanvas" href={`/archive/${item.id}.webp`} target="_blank" rel="noreferrer"><img className={archiveImageClass(item.id)} src={`/archive/${item.id}.webp`} alt={`${item.sourceInstitution ?? "侨批场馆"}采集的${archiveTitle(item)}`} decoding="async"/></a><figcaption><div><b>{item.id}</b><span>{guide.visual}</span></div><p><strong>可辨识文字</strong>{guide.readable}</p><p><strong>观看要点</strong>{guide.significance}</p><small>OCR与人工观察仅用于辅助说明；正式题名、年代和全文释读以馆方资料为准。</small></figcaption></figure>; })}</section><section className="recordFacts"><div><small>采集来源</small><b>{record.sourceInstitution ?? "来源待补充"}</b></div><div><small>内容类别</small><b>{record.category}</b></div><div><small>主题</small><b>{record.subcategory}</b></div><div><small>索引编号</small><b>{idLabel}</b></div><div><small>资料数量</small><b>{relatedRecords.length} 件</b></div><div><small>材料形式</small><b>{record.materialType ?? "图像资料"}</b></div></section><aside className="sourceBox"><div><Icon name="shield" size={24}/><h2>资料来源</h2></div><p><b>采集场馆</b><span>{record.sourceInstitution ?? "来源待补充"}</span><small>团队在场馆调研过程中拍摄并整理；图片用于侨批文化学习与项目成果展示，展品权利归相应场馆或权利人所有。</small></p><p><b>整理编号</b><span>{idLabel}</span><small>编号用于保持同组图片、说明文字及后续研究材料之间的对应关系。</small></p></aside><SiteLink to="/archives" className="underLink">返回资料浏览 <Icon name="arrow" size={17}/></SiteLink></article>
     </main>
   );
 }
 
+const qiaopiVenues = [
+  { id: "fujian-archives", province: "福建", city: "福州", name: "福建省档案馆“侨批馆”互动空间", kind: "档案馆互动空间", x: 73, y: 18, visited: false, summary: "以“海这边 / 海那边”双线叙事和轻解谜、雕版印刷等互动方式，让观众体验写批与寄批。", source: "https://www.saac.gov.cn/daj/c100211/202601/a671a73d15414e8286e01023bda1b73a.shtml" },
+  { id: "xiamen-qiaopi", province: "福建", city: "厦门", name: "厦门侨批馆", kind: "侨批专题馆", x: 59, y: 49, visited: false, summary: "位于思明区大同路7号，以“一层一主题、一信一情境”解释侨批的跨海递送、诚信与家国记忆。", source: "https://www.saac.gov.cn/daj/c100214/202511/60d4a730ebe0477f8934d849c790a00e.shtml" },
+  { id: "quanzhou-qiaopi", province: "福建", city: "泉州", name: "泉州侨批馆", kind: "侨批专题馆", x: 65, y: 38, visited: true, summary: "福建侨批展示基地之一，团队已到访并记录其建筑、展陈与侨批图像资料。", source: "https://www.saac.gov.cn/daj/c100214/202111/ed1c3f0b140d4a2c82b60cc8dd6b15c3.shtml", related: "/fieldwork/quanzhou-qiaopi-museum" },
+  { id: "quanzhou-overseas", province: "福建", city: "泉州", name: "泉州华侨历史博物馆", kind: "华侨历史博物馆", x: 69, y: 42, visited: true, summary: "从华侨迁移史进入侨批制度与家书实物；本网站首批档案图像的一处团队采集来源。", source: "https://www.ocmuseum.cn/", related: "/fieldwork/quanzhou-overseas-chinese-museum" },
+  { id: "nanfeng", province: "福建", city: "漳州", name: "南风侨批馆", kind: "公益性私人展馆", x: 52, y: 53, visited: true, summary: "位于漳州古城，展示侨批、货币和海外寄回物件，并通过水客、批局故事解释诚信网络。", source: "https://www.br-cn.com/static/content/home/focus/2022-06-13/985876777119657984.html", related: "/fieldwork/nanfeng-qiaopi-museum" },
+  { id: "shantou-qiaopi", province: "广东", city: "汕头", name: "汕头市档案馆侨批分馆（侨批文物馆）", kind: "侨批专题馆 / 档案馆", x: 45, y: 58, visited: false, summary: "中国较早建立的侨批专题馆之一，系统保存与展示潮汕侨批和过番历史。", source: "https://www.eguangzhou.gov.cn/gzlatest/content/post_43198.html" },
+  { id: "meizhou-archives", province: "广东", city: "梅州", name: "梅州市档案馆", kind: "档案机构", x: 37, y: 40, visited: false, summary: "广东侨批档案的重要征集与保管机构之一；是否有临时展览与参观安排，出发前需查阅馆方最新公告。", source: "https://www.da.gd.gov.cn/portal_home/content/10846" },
+  { id: "guangdong-overseas", province: "广东", city: "广州", name: "广东华侨博物馆", kind: "华侨历史博物馆", x: 22, y: 61, visited: false, summary: "从广东华侨华人历史与中外文化交流的整体脉络理解侨批，适合作为潮汕、梅州和五邑专题的上位参照。", source: "https://www.qb.gd.gov.cn/qwdt/content/post_1331390.html" },
+  { id: "jiangmen-overseas", province: "广东", city: "江门", name: "中国侨都华侨华人博物馆", kind: "华侨历史博物馆", x: 18, y: 70, visited: false, summary: "收藏五邑银信（侨批）等华侨实物，以“根在侨乡”固定陈列呈现江门华侨华人的迁移与贡献。", source: "https://www.jiangmen.gov.cn/bmpd/jmswhgdlytyj/ztzl/lyzx/ajjq/content/post_2993480.html" },
+] as const;
+
 function RoutesPage() {
+  const [province, setProvince] = useState<"全部" | "福建" | "广东">("全部");
+  const [activeVenueId, setActiveVenueId] = useState<string>(qiaopiVenues[0].id);
+  const visibleVenues = qiaopiVenues.filter((venue) => province === "全部" || venue.province === province);
+  const activeVenue = visibleVenues.find((venue) => venue.id === activeVenueId) ?? visibleVenues[0];
   return (
     <main className="portalMain">
-      <section className="pageHero routes"><Breadcrumbs items={[{ label: "侨路地图" }]}/><div><span className="overline">ROUTES · 第一版概念节点</span><h1>山海不是空白，而是一段段由人接力的路</h1><p>当前数据足以确认团队在厦门、泉州、漳州的调研节点；具体海外城市与每封侨批的真实路径，等原件和编目信息补齐后再关联。</p></div><aside><strong>3</strong><span>座已调研城市</span><small>海外节点暂不做未经来源支持的精确连线</small></aside></section>
-      <section className="routeMapPanel">
-        <div className="mapLegend"><span><i className="researchNode"></i>项目调研节点</span><span><i className="futureNode"></i>待档案补充节点</span><b>概念示意 · 非精确地理路线</b></div>
-        <svg className="routeMapSvg" viewBox="0 0 1000 520" role="img" aria-label="南洋侨居地至厦门、漳州、泉州的概念节点图">
-          <path className="seaWave" d="M20 415 C160 365 255 460 390 410 S630 355 780 410 940 440 1010 385"/>
-          <path className="seaWave second" d="M-10 455 C150 405 255 495 410 450 S655 398 810 450 930 465 1020 430"/>
-          <path className="routeArc" d="M180 350 C320 175 480 195 625 245"/>
-          <path className="routeArc delay" d="M180 350 C365 305 520 310 745 185"/>
-          <path className="routeArc delay2" d="M180 350 C390 390 565 350 820 295"/>
-          <g className="mapNode future"><circle cx="180" cy="350" r="12"/><circle cx="180" cy="350" r="22"/><text x="180" y="315" textAnchor="middle">南洋侨居地</text><text className="nodeNote" x="180" y="392" textAnchor="middle">具体城市随档案补充</text></g>
-          <g className="mapNode"><circle cx="625" cy="245" r="11"/><text x="625" y="215" textAnchor="middle">厦门</text><text className="nodeNote" x="625" y="275" textAnchor="middle">海沧区档案馆</text></g>
-          <g className="mapNode"><circle cx="745" cy="185" r="11"/><text x="745" y="155" textAnchor="middle">泉州</text><text className="nodeNote" x="745" y="215" textAnchor="middle">两处场馆</text></g>
-          <g className="mapNode"><circle cx="820" cy="295" r="11"/><text x="820" y="265" textAnchor="middle">漳州</text><text className="nodeNote" x="820" y="325" textAnchor="middle">三处文化现场</text></g>
-        </svg>
-        <div className="mapCards"><article><b>泉州</b><span>华侨迁移 · 展陈转译</span><SiteLink to="/fieldwork/quanzhou-overseas-chinese-museum">查看实践记录</SiteLink></article><article><b>漳州</b><span>月港 · 南风 · 天一信局</span><SiteLink to="/fieldwork/tianyi-credit-bureau">查看实践记录</SiteLink></article><article><b>厦门</b><span>档案编目 · 数字保护</span><SiteLink to="/fieldwork/haicang-archives">查看实践记录</SiteLink></article></div>
+      <section className="pageHero routes"><Breadcrumbs items={[{ label: "侨路地图" }]}/><div><span className="overline">MAP · 闽粤侨批文化现场</span><h1>去哪里，能真正看见侨批？</h1><p>这张互动地图把福建、广东的侨批专题馆、档案机构与华侨历史博物馆放在同一张导览中；团队到访点与网络核验点使用不同标记。</p></div><aside><strong>{qiaopiVenues.length}</strong><span>处首批场馆节点</span><small>城市级定位 · 持续核验更新</small></aside></section>
+      <section className="venueMapSection">
+        <div className="venueMapToolbar"><div className="filterPills" aria-label="按省份筛选">{(["全部", "福建", "广东"] as const).map((item) => <button type="button" key={item} className={province === item ? "active" : ""} aria-pressed={province === item} onClick={() => setProvince(item)}>{item}</button>)}</div><div className="mapLegend"><span><i className="researchNode"></i>团队到访</span><span><i className="futureNode"></i>公开资料核验</span><b>点位为城市级示意，不代表场馆精确经纬度</b></div></div>
+        <div className="interactiveVenueMap">
+          <div className="venueMapCanvas" aria-label="福建与广东侨批相关场馆城市级示意地图">
+            <svg viewBox="0 0 1000 620" aria-hidden="true"><path className="provinceShape guangdong" d="M70 370 C135 300 245 275 325 295 C390 315 430 350 500 365 L455 455 C365 455 330 510 250 525 C180 538 110 495 70 430 Z"/><path className="provinceShape fujian" d="M500 95 C585 70 680 102 760 145 C820 180 860 250 825 330 C795 395 735 448 665 475 L505 375 C550 305 535 235 500 95 Z"/><path className="coastLine" d="M250 525 C330 510 365 455 455 455 C520 455 570 495 665 475 C735 448 795 395 825 330"/><text x="250" y="440">广东</text><text x="665" y="260">福建</text><text className="seaLabel" x="760" y="535">南海 · 台湾海峡</text></svg>
+            {visibleVenues.map((venue) => <button key={venue.id} type="button" className={`venueMarker ${venue.visited ? "visited" : "verified"} ${activeVenue.id === venue.id ? "active" : ""}`} style={{ left: `${venue.x}%`, top: `${venue.y}%` }} aria-pressed={activeVenue.id === venue.id} aria-label={`${venue.city}：${venue.name}`} onClick={() => setActiveVenueId(venue.id)}><i></i><span>{venue.city}</span></button>)}
+          </div>
+          <aside className="venueSpotlight"><span>{activeVenue.province} · {activeVenue.city}</span><h2>{activeVenue.name}</h2><b>{activeVenue.kind}</b><p>{activeVenue.summary}</p><div>{activeVenue.visited ? "团队已到访" : "公开资料已核验"}</div><a href={activeVenue.source} target="_blank" rel="noreferrer">查看核验来源 <Icon name="arrow" size={17}/></a>{"related" in activeVenue && activeVenue.related && <SiteLink to={activeVenue.related}>查看我们的实践记录 <Icon name="arrow" size={17}/></SiteLink>}</aside>
+        </div>
+        <div className="venueDirectory">{visibleVenues.map((venue) => <button type="button" key={venue.id} className={activeVenue.id === venue.id ? "active" : ""} onClick={() => setActiveVenueId(venue.id)}><small>{venue.province} · {venue.city}</small><b>{venue.name}</b><span>{venue.kind}</span></button>)}</div>
+        <p className="mapCaution"><Icon name="shield" size={18}/> 开放时间、预约方式和临时展览会变化，出发前请以场馆或主管单位最新公告为准。</p>
       </section>
     </main>
   );
@@ -393,6 +452,18 @@ function TimelinePage() {
     <main className="portalMain"><section className="pageHero timeline"><Breadcrumbs items={[{ label: "时间轴" }]}/><div><span className="overline">TIMELINE · 两条时间线</span><h1>一条属于侨批，一条属于我们如何走近它</h1><p>历史节点只采用现有资料能够支持的表述；团队成果与未来计划分开记录，预期成果不写成已经完成。</p></div><aside><strong>2</strong><span>条并行线索</span><small>侨批历史 / 项目历程</small></aside></section>
       <section className="dualTimeline"><div><div className="timelineHead"><span>HISTORY</span><h2>侨批历史</h2></div>{history.map(([date, title, body]) => <article key={date}><time>{date}</time><div><h3>{title}</h3><p>{body}</p></div></article>)}</div><div><div className="timelineHead project"><span>OUR PATH</span><h2>研究历程</h2></div>{project.map(([date, title, body]) => <article key={date}><time>{date}</time><div><h3>{title}</h3><p>{body}</p></div></article>)}</div></section>
       <section className="timelineNote"><Icon name="shield" size={26}/><p>仍需进一步核实的数量、日期与奖项信息，待依据补充后再纳入时间轴。</p></section>
+    </main>
+  );
+}
+
+function AboutPage() {
+  return (
+    <main className="portalMain aboutPage">
+      <section className="pageHero about"><Breadcrumbs items={[{ label: "关于我们" }]}/><div><span className="overline">ABOUT US · 一群仍在学习的年轻人</span><h1>因为好奇走近，因为热爱留下</h1><p>我们来自厦门大学嘉庚学院。侨批让我们看见：一张薄纸可以同时装下远行、谋生、家庭、信用与家国记忆。</p></div><aside><strong>2+</strong><span>年持续走近侨批</span><small>从学习、田野到数字展陈</small></aside></section>
+      <section className="aboutManifesto"><div className="aboutSeal">我们</div><article><span className="overline">A LETTER FROM THE TEAM</span><h2>这个网站，是我们的又一次出发</h2><p>大约两年前，我们因为好奇开始接触侨批。那时并不知道一封旧信会把我们带到多远：从书本走进厦门、泉州、漳州的文化现场，从听讲解、看原件，到整理报告、拍摄短视频、设计校园课程，再到尝试把研究变成可以浏览、检索和参与的网站。</p><p>我们是一群来自厦门大学嘉庚学院的大学生。专业背景、观察角度各不相同，但都愿意为同一件事多走一步：让侨批不只是橱窗里安静的纸，也成为今天的人能够听懂、愿意靠近、还能继续追问的故事。</p><p>这里保存的不只是“成果”，也保存我们的笨拙、修正和成长。图片方向会改正，说明文字会补充，来源会继续核验；尚未确认的内容不会被包装成确定事实。我们希望网站像一封不断续写的回批，记录我们如何理解过去，也把这份热情交给下一位读者。</p><footer><b>一位热爱侨批的同学</b><time dateTime="2026-08-30T21:27:44+08:00">公元 2026 年 8 月 30 日 21:27:44 · 东八区（UTC+8）</time></footer></article></section>
+      <section className="aboutPrinciples"><article><span>01</span><h3>从现场出发</h3><p>把场馆观察、档案图像、研究材料和实践课程放回真实语境。</p></article><article><span>02</span><h3>对来源负责</h3><p>公开材料逐条标注；隐私原件、冲突数据和未授权素材不进入公共页面。</p></article><article><span>03</span><h3>让传播可参与</h3><p>用影像、地图、游戏与交互设计，把“看过”变成“想继续了解”。</p></article></section>
+      <section className="aboutTimeline"><div><span>两年前</span><b>好奇</b><p>从“侨批是什么”开始查资料、听故事。</p></div><div><span>2025</span><b>走访</b><p>在厦门、泉州、漳州开展场馆调研与校园实践。</p></div><div><span>2026</span><b>连接</b><p>把研究、影像、档案与青年创作整理为开放网站。</p></div><div><span>继续</span><b>回批</b><p>补充释读、修正错误，让更多人参与侨批文化传播。</p></div></section>
+      <aside className="aboutDisclaimer"><Icon name="shield" size={24}/><p>本网站为学生团队的学习、研究与公共传播成果，不代表学校或相关场馆的官方发布。馆藏题名、年代、权利与释读信息以权利方正式资料为准。</p></aside>
     </main>
   );
 }
@@ -428,7 +499,30 @@ function ContentDetailPage({ entry }: { entry: ContentEntry }) {
   const bilibiliId = entry.externalUrl?.match(/(BV[0-9A-Za-z]+)/)?.[1];
   const videoEmbedUrl = bilibiliId ? `https://player.bilibili.com/player.html?bvid=${bilibiliId}&page=1&high_quality=1` : null;
   return (
-    <main className="portalMain detailPage"><Breadcrumbs items={[{ label: contentTypeLabels[entry.type], to: entry.type === "archive" ? "/archives" : `/${entry.type}` }, { label: entry.title }]}/><article className="detailArticle"><header><span className="overline">{entry.eyebrow ?? contentTypeLabels[entry.type]}</span><h1>{entry.title}</h1><p>{entry.summary}</p><div className="detailMeta"><span>{entry.dateLabel ?? "时间暂无资料"}</span><span>{entry.places.length ? entry.places.join(" · ") : "地点暂无资料"}</span><VerificationBadge entry={entry}/></div></header>{entry.cover && <figure><img src={entry.cover} alt={entry.coverAlt ?? ""}/>{entry.coverAlt && <figcaption>{entry.coverAlt}</figcaption>}</figure>}{entry.archiveStats && <section className="archiveDetailStats"><div><strong>{entry.archiveStats.total}</strong><span>条图像资料</span></div><div><strong>{new Set(entry.archiveRecords?.map((record) => record.sourceInstitution)).size}</strong><span>采集场馆</span></div><div><strong>{new Set(entry.archiveRecords?.map((record) => record.category)).size}</strong><span>内容类别</span></div><div><strong>{new Set(entry.archiveRecords?.map((record) => record.subcategory)).size}</strong><span>主题方向</span></div></section>}<div className="articleBody">{entry.body.map((paragraph, paragraphIndex) => <p key={`${entry.id}-${paragraphIndex}`}>{paragraph}</p>)}</div>{entry.externalUrl && entry.mediaMeta && <section className="mediaMetaPanel"><div className="mediaMetaHead"><span className="overline">WATCH · VIDEO RECORD</span><h2>影像记录</h2></div>{videoEmbedUrl && <div className="videoEmbed"><iframe src={videoEmbedUrl} title={entry.title} allow="autoplay; fullscreen; picture-in-picture" allowFullScreen loading="lazy"></iframe></div>}<div className="mediaMetaGrid"><div><small>片长</small><b>{entry.mediaMeta.duration ?? "暂无资料"}</b></div><div><small>规格</small><b>{entry.mediaMeta.resolution ?? "暂无资料"}</b></div><div><small>平台</small><b>{entry.mediaMeta.platform ?? "暂无资料"}</b></div></div><p>{entry.mediaMeta.awardNote}</p><a className="portalPrimary" href={entry.externalUrl} target="_blank" rel="noreferrer">在 Bilibili 打开 <Icon name="arrow" size={17}/></a></section>}<div className="articleTags">{entry.tags.map((tag) => <span key={tag}>{tag}</span>)}</div><aside className="sourceBox"><div><Icon name="shield" size={24}/><h2>资料来源</h2></div>{entry.sources.map((source) => <p key={`${entry.id}-${source.sourceId}`}><b>采集来源</b><span>{source.label}</span><small>{source.locator}</small></p>)}</aside></article>
+    <main className="portalMain detailPage">
+      <Breadcrumbs items={[{ label: contentTypeLabels[entry.type], to: entry.type === "archive" ? "/archives" : `/${entry.type}` }, { label: entry.title }]}/>
+      <article className="detailArticle">
+        <header><span className="overline">{entry.eyebrow ?? contentTypeLabels[entry.type]}</span><h1>{entry.title}</h1><p>{entry.summary}</p><div className="detailMeta"><span>{entry.dateLabel ?? "时间暂无资料"}</span><span>{entry.places.length ? entry.places.join(" · ") : "地点暂无资料"}</span><VerificationBadge entry={entry}/></div></header>
+        {entry.cover && <ArchiveFigure src={entry.cover} alt={entry.coverAlt ?? ""}/>} 
+        {entry.archiveStats && <section className="archiveDetailStats"><div><strong>{entry.archiveStats.total}</strong><span>条图像资料</span></div><div><strong>{new Set(entry.archiveRecords?.map((record) => record.sourceInstitution)).size}</strong><span>采集场馆</span></div><div><strong>{new Set(entry.archiveRecords?.map((record) => record.category)).size}</strong><span>内容类别</span></div><div><strong>{new Set(entry.archiveRecords?.map((record) => record.subcategory)).size}</strong><span>主题方向</span></div></section>}
+        <div className="articleBody">{entry.body.map((paragraph, paragraphIndex) => <p key={`${entry.id}-${paragraphIndex}`}>{paragraph}</p>)}</div>
+        {entry.externalUrl && entry.mediaMeta && <section className="mediaMetaPanel">
+          <div className="mediaMetaHead"><span className="overline">MEDIA WORK · 创作与传播</span><h2>{entry.mediaMeta.kind ? "作品档案" : "影像记录"}</h2></div>
+          {videoEmbedUrl && <div className="videoEmbed"><iframe src={videoEmbedUrl} title={entry.title} allow="autoplay; fullscreen; picture-in-picture" allowFullScreen loading="lazy"></iframe></div>}
+          <div className="mediaMetaGrid">
+            <div><small>作品类型</small><b>{entry.mediaMeta.kind ?? "团队影像"}</b></div>
+            <div><small>主创 / 制作</small><b>{entry.mediaMeta.creators ?? "项目团队"}</b></div>
+            <div><small>时间</small><b>{entry.mediaMeta.releaseYear ?? entry.dateLabel ?? "暂无资料"}</b></div>
+            <div><small>平台 / 场域</small><b>{entry.mediaMeta.platform ?? "暂无资料"}</b></div>
+            {entry.mediaMeta.duration && <div><small>片长</small><b>{entry.mediaMeta.duration}</b></div>}
+            {entry.mediaMeta.resolution && <div><small>规格</small><b>{entry.mediaMeta.resolution}</b></div>}
+          </div>
+          {entry.mediaMeta.awardNote && <div className="achievementNote"><strong>阶段成就</strong><p>{entry.mediaMeta.awardNote}</p></div>}
+          <a className="portalPrimary" href={entry.externalUrl} target="_blank" rel="noreferrer">{bilibiliId ? "在 Bilibili 打开" : "查看公开来源"} <Icon name="arrow" size={17}/></a>
+        </section>}
+        <div className="articleTags">{entry.tags.map((tag) => <span key={tag}>{tag}</span>)}</div>
+        <aside className="sourceBox"><div><Icon name="shield" size={24}/><h2>资料来源</h2></div>{entry.sources.map((source) => <p key={`${entry.id}-${source.sourceId}`}><b>来源</b><span>{source.label}</span><small>{source.locator.startsWith("http") ? <a href={source.locator} target="_blank" rel="noreferrer">打开公开来源</a> : source.locator}</small></p>)}</aside>
+      </article>
       <nav className="entryPager">{previous ? <SiteLink to={entryPath(previous)}><small>上一篇</small><b>{previous.title}</b></SiteLink> : <span></span>}{next ? <SiteLink to={entryPath(next)}><small>下一篇</small><b>{next.title}</b></SiteLink> : <span></span>}</nav>
       {related.length > 0 && <section className="relatedSection"><span className="overline">RELATED</span><h2>相关阅读</h2><div className="relatedGrid">{related.map((item) => <ContentCard key={item.id} entry={item}/>)}</div></section>}
     </main>
@@ -472,6 +566,7 @@ function resolvePage(path: string) {
   if (path === "/research") return <CollectionPage type="research"/>;
   if (path === "/media") return <CollectionPage type="media"/>;
   if (path === "/creative") return <CreativePage/>;
+  if (path === "/about") return <AboutPage/>;
   if (path === "/creative/yinxin-fenghuo") return <YinxinDetailPage/>;
   if (path === "/search") return <SearchPage/>;
   const archiveRecordMatch = path.match(/^\/archives\/(QP-\d{3})$/i);
@@ -507,6 +602,7 @@ function pageMetadata(path: string) {
     "/research": ["研究成果｜纸短情长", "侨批、海丝记忆与闽南侨乡文化认同的项目研究。"],
     "/media": ["影像档案｜纸短情长", "侨批主题影像与传播成果的来源化整理。"],
     "/creative": ["文创实验室｜纸短情长", "让侨批文化进入当代青年生活的互动与视觉实验。"],
+    "/about": ["关于我们｜纸短情长", "来自厦门大学嘉庚学院的学生团队，记录两年来走近侨批、开展田野调研与数字传播的历程。"],
     "/creative/yinxin-fenghuo/play": ["《银信烽火》在线体验｜纸短情长", "进入五人侨批主题阵营推理体验，在信、款与人的流转中理解批局信用。"],
     "/search": ["全站搜索｜纸短情长", "检索侨批知识、场馆实践、研究成果、影像档案与青年文创。"],
   };
