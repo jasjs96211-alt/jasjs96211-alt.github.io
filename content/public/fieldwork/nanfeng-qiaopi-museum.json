@@ -1,0 +1,43 @@
+{
+  "id": "fieldwork-nanfeng-qiaopi-museum",
+  "slug": "nanfeng-qiaopi-museum",
+  "type": "fieldwork",
+  "status": "public",
+  "title": "南风侨批馆调研",
+  "eyebrow": "漳州 · 民间收藏与公共传播",
+  "summary": "一次围绕民间馆运营、地方材料整理与侨批传播方式的访谈式调研。",
+  "body": [
+    "团队与馆方围绕侨批的概念、历史脉络、传播与保护展开交流，并关注民间收藏如何进入公共展览和地方文化叙事。",
+    "调研记录提出了校园传播、地方史料整理与公共文化空间等方向。它也提醒我们：人物观点、采访内容与原件影像必须在授权边界内使用。",
+    "当前页面只发布经实践报告概括的调研主题，不公开原始访谈文本、联系方式或未确认授权的个人信息。"
+  ],
+  "date": null,
+  "dateLabel": "实践报告记载 · 具体年份待核验",
+  "places": [
+    "漳州"
+  ],
+  "people": [],
+  "tags": [
+    "场馆调研",
+    "民间收藏",
+    "访谈",
+    "传播"
+  ],
+  "cover": "/fieldwork-nanfeng.webp",
+  "coverAlt": "漳州古城南风侨批馆展厅与侨批陈列",
+  "featured": false,
+  "verification": "partial",
+  "rightsNote": "原始访谈与可识别个人信息不公开；地点图来自中新网公开报道并保留来源说明。",
+  "sources": [
+    {
+      "sourceId": "NANFENG-QIAOPI",
+      "label": "南风侨批馆",
+      "locator": "团队现场调研与访谈获取；相关观察整理写入项目《实践报告》。"
+    },
+    {
+      "sourceId": "NANFENG-PHOTO",
+      "label": "中新网《走进南风侨批馆》",
+      "locator": "2022-06-13 公开报道；地点图用于场馆识别与项目教育展示。"
+    }
+  ]
+}

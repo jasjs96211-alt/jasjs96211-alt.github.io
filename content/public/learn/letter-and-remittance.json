@@ -1,0 +1,43 @@
+{
+  "id": "learn-letter-and-remittance",
+  "slug": "letter-and-remittance",
+  "type": "learn",
+  "status": "public",
+  "title": "信与款，为什么写在一起",
+  "eyebrow": "一纸两用",
+  "summary": "侨批的独特之处，在于它把家庭通信与经济支持放进了同一次跨海传递。",
+  "body": [
+    "对许多远赴海外谋生的人而言，寄回家乡的不只是问候，也包括维持家庭生活的款项。书信说明近况与嘱托，汇款凭证记录金额与流转，两者共同构成“信款合一”的侨批。",
+    "这种双重属性让侨批同时进入书信史、移民史、社会史与金融史的研究视野。纸上的家常话能够呈现跨海家庭如何维系关系，印章、编号与回批又留下民间信用网络的运行痕迹。",
+    "平台展示时会区分原文、释读、摘要与研究备注，避免把后人的解释误当作侨批原文。"
+  ],
+  "date": null,
+  "dateLabel": "基础知识",
+  "places": [
+    "闽南",
+    "南洋"
+  ],
+  "people": [],
+  "tags": [
+    "信款合一",
+    "银信",
+    "家庭",
+    "金融"
+  ],
+  "cover": null,
+  "featured": true,
+  "verification": "partial",
+  "rightsNote": "依据项目实践报告与文献综述整理。",
+  "sources": [
+    {
+      "sourceId": "QZ-QIAOPI-MUSEUM",
+      "label": "泉州侨批馆",
+      "locator": "团队场馆调研与展陈记录。"
+    },
+    {
+      "sourceId": "NANFENG-QIAOPI",
+      "label": "南风侨批馆",
+      "locator": "团队场馆调研与访谈记录。"
+    }
+  ]
+}

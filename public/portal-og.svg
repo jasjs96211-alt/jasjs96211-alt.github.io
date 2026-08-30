@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="paper" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#fbf8f1"/>
+      <stop offset="1" stop-color="#e8dfcf"/>
+    </linearGradient>
+    <pattern id="grid" width="54" height="54" patternUnits="userSpaceOnUse">
+      <path d="M54 0H0V54" fill="none" stroke="#173f3a" stroke-opacity=".06"/>
+    </pattern>
+  </defs>
+  <rect width="1200" height="630" fill="url(#paper)"/>
+  <rect width="1200" height="630" fill="url(#grid)"/>
+  <rect x="0" y="0" width="325" height="630" fill="#143b37"/>
+  <path d="M72 480C225 355 420 455 577 370S878 285 1103 248" fill="none" stroke="#a6402f" stroke-width="4" stroke-dasharray="13 14"/>
+  <circle cx="72" cy="480" r="10" fill="#f4f0e7" stroke="#a6402f" stroke-width="4"/>
+  <circle cx="577" cy="370" r="10" fill="#f4f0e7" stroke="#a6402f" stroke-width="4"/>
+  <circle cx="1103" cy="248" r="10" fill="#f4f0e7" stroke="#a6402f" stroke-width="4"/>
+  <rect x="715" y="252" width="350" height="235" rx="2" fill="#eee3cb" stroke="#b9a98c" transform="rotate(-3 890 369)"/>
+  <path d="m718 261 170 120 181-138" fill="none" stroke="#8e7b5d" stroke-width="3" opacity=".75"/>
+  <circle cx="1010" cy="438" r="42" fill="none" stroke="#a6402f" stroke-width="5"/>
+  <circle cx="1010" cy="438" r="33" fill="none" stroke="#a6402f" stroke-width="2"/>
+  <text x="1010" y="443" text-anchor="middle" fill="#a6402f" font-size="10" font-family="Arial, sans-serif" font-weight="700" letter-spacing="1">LETTER</text>
+  <text x="66" y="84" fill="#d8b584" font-size="16" font-family="Arial, sans-serif" font-weight="700" letter-spacing="4">QIAOPI</text>
+  <text x="66" y="142" fill="#ffffff" font-size="25" font-family="Arial, sans-serif" font-weight="700" letter-spacing="4">CULTURAL</text>
+  <text x="66" y="178" fill="#ffffff" font-size="25" font-family="Arial, sans-serif" font-weight="700" letter-spacing="4">HERITAGE</text>
+  <text x="66" y="226" fill="#ffffff" font-size="22" font-family="Arial, sans-serif" font-weight="700" letter-spacing="3">RESEARCH</text>
+  <text x="66" y="260" fill="#ffffff" font-size="22" font-family="Arial, sans-serif" font-weight="700" letter-spacing="3">PLATFORM</text>
+  <text x="390" y="142" fill="#a6402f" font-size="51" font-family="Georgia, serif" font-weight="700" letter-spacing="3">PAPER · LETTERS</text>
+  <text x="390" y="197" fill="#a6402f" font-size="51" font-family="Georgia, serif" font-weight="700" letter-spacing="3">· HOMELAND</text>
+  <text x="395" y="245" fill="#30433e" font-size="19" font-family="Arial, sans-serif" letter-spacing="2">QIAOPI CULTURE ACROSS OCEANS AND GENERATIONS</text>
+  <text x="395" y="545" fill="#596762" font-size="17" font-family="Arial, sans-serif" letter-spacing="2">DIGITAL ARCHIVE · FIELDWORK · RESEARCH · CREATIVE LAB</text>
+  <g transform="translate(65 508) rotate(-8)">
+    <circle cx="42" cy="42" r="40" fill="none" stroke="#d8b584" stroke-width="4"/>
+    <circle cx="42" cy="42" r="32" fill="none" stroke="#d8b584" stroke-width="2"/>
+    <text x="42" y="54" text-anchor="middle" fill="#d8b584" font-size="32" font-family="Georgia, serif" font-weight="700">Q</text>
+  </g>
+</svg>

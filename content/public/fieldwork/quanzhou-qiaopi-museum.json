@@ -1,0 +1,46 @@
+{
+  "id": "fieldwork-quanzhou-qiaopi-museum",
+  "slug": "quanzhou-qiaopi-museum",
+  "type": "fieldwork",
+  "status": "public",
+  "title": "泉州侨批馆调研",
+  "eyebrow": "泉州 · 展陈与文创转译",
+  "summary": "团队重点观察侨批的地域分类展示、互动展陈与当代文创表达。",
+  "body": [
+    "调研记录关注了复古信箱、抽拉式档案柜、悬挂复制品等展示方式，思考观众如何从名称、地域与视觉触感进入侨批知识。",
+    "团队也记录了以批脚、侨眷为灵感的文创形象，以及笔记本、冰箱贴和明信片等日常化产品。它们为后来的青年文创实验提供了参照。",
+    "场馆联动机制与传播数据在原报告中已有描述，但第一版不公开尚未交叉核验的统计数字。"
+  ],
+  "date": null,
+  "dateLabel": "实践报告记载 · 具体年份待核验",
+  "places": [
+    "泉州"
+  ],
+  "people": [
+    "批脚",
+    "侨眷"
+  ],
+  "tags": [
+    "场馆调研",
+    "展陈",
+    "文创",
+    "青年传播"
+  ],
+  "cover": "/fieldwork-quanzhou-qiaopi.webp",
+  "coverAlt": "泉州侨批馆所在的陈光纯故居建筑",
+  "featured": true,
+  "verification": "partial",
+  "rightsNote": "地点图来自泉州市档案馆侨批分馆公开报道，用于地点识别与非商业教育展示；馆内展品图片采用团队调研采集资料。",
+  "sources": [
+    {
+      "sourceId": "QZ-QIAOPI-MUSEUM",
+      "label": "泉州侨批馆",
+      "locator": "团队现场调研获取；相关观察整理写入项目《实践报告》。"
+    },
+    {
+      "sourceId": "QZ-QIAOPI-PHOTO",
+      "label": "泉州市档案馆侨批分馆公开报道",
+      "locator": "地点图片用于识别侨批馆所在历史建筑，原图来源：搜狐转载页面（2023-07-31）。"
+    }
+  ]
+}

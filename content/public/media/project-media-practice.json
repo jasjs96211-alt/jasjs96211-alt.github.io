@@ -1,0 +1,58 @@
+{
+  "id": "media-project-media-practice",
+  "slug": "project-media-practice",
+  "type": "media",
+  "status": "public",
+  "title": "《纸短情长：穿越时空的侨批》",
+  "eyebrow": "短视频成果 · Paper Trails of Love",
+  "summary": "一部 4 分 55.78 秒、1080p 的侨批主题短视频，把家书、汇款与跨海记忆转译为面向公众的影像叙事。",
+  "body": [
+    "《纸短情长：穿越时空的侨批》（Paper Trails of Love）是一部 4 分 55.78 秒的侨批主题短视频，画面规格为 1920×1080、30 fps。作品以团队在厦门、泉州与漳州的场馆调研为基础展开影像叙事。",
+    "作品报名记录对应第八届“外教社杯”全国高校学生跨文化能力大赛“讲述中国 传播中国”短视频大赛省赛，盖章报名表显示学校和指导教师信息。公开视频入口暂以报名记录中的 Bilibili 链接提供。",
+    "现有成果认定材料记载该作品获省（区域）级二等奖（银奖）；正式证书或赛事公示补充后，页面将同步更新更完整的获奖依据。"
+  ],
+  "date": "2025-09-23",
+  "dateLabel": "2025 · 省赛报名与传播成果",
+  "places": [
+    "厦门",
+    "泉州",
+    "漳州"
+  ],
+  "people": [],
+  "tags": [
+    "短视频",
+    "纸短情长",
+    "侨批传播",
+    "Bilibili",
+    "省赛材料记载"
+  ],
+  "cover": "/media-project-cover.webp",
+  "coverAlt": "团队场馆调研图像组成的侨批影像成果封面",
+  "featured": true,
+  "verification": "partial",
+  "externalUrl": "https://www.bilibili.com/video/BV1fUnzzyE9C?t=21.4",
+  "mediaMeta": {
+    "duration": "4 分 55.78 秒",
+    "resolution": "1920×1080 · 30 fps",
+    "platform": "Bilibili",
+    "awardNote": "现有成果认定材料记载：省（区域）级二等奖（银奖）；正式证书或赛事公示待补充。"
+  },
+  "rightsNote": "原片与参赛证明保留在用户本地项目源素材；公开视频链接来自报名记录。参赛成员姓名、学号和联系方式不进入公开页面；正式奖项证书或公示待补。",
+  "sources": [
+    {
+      "sourceId": "PUBLIC-VIDEO",
+      "label": "公开视频《纸短情长：穿越时空的侨批》",
+      "locator": "团队影像成果及其公开播放页面。"
+    },
+    {
+      "sourceId": "COMPETITION-RECORD",
+      "label": "“外教社杯”参赛与成果认定材料",
+      "locator": "用于说明作品参赛与阶段性获奖记录。"
+    },
+    {
+      "sourceId": "FIELDWORK-RECORD",
+      "label": "厦门、泉州、漳州场馆调研记录",
+      "locator": "视频内容所依据的团队实践资料。"
+    }
+  ]
+}

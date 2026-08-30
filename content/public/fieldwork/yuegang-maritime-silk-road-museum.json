@@ -1,0 +1,47 @@
+{
+  "id": "fieldwork-yuegang-maritime-silk-road-museum",
+  "slug": "yuegang-maritime-silk-road-museum",
+  "type": "fieldwork",
+  "status": "public",
+  "title": "月港海丝馆调研",
+  "eyebrow": "漳州 · 信局历史与信用印章",
+  "summary": "团队从天一信局、信用印章与早期华工汇款线索理解侨批的制度与金融属性。",
+  "body": [
+    "团队围绕馆内侨批信局相关展区，记录天一信局、创办者诚信实践与侨批印章等线索，尝试理解民间银信网络为何能够跨越地域运转。",
+    "其中，印章并非单纯装饰；它连接经手节点、责任确认与信用承诺。团队也由此把“信”理解为书信与信任的双重结构。",
+    "原报告中的具体汇额与占比尚需回到馆方展签或可靠史料复核，因此本页不直接采用这些数字。"
+  ],
+  "date": null,
+  "dateLabel": "实践报告记载 · 具体年份待核验",
+  "places": [
+    "漳州",
+    "月港"
+  ],
+  "people": [
+    "郭有品",
+    "水客"
+  ],
+  "tags": [
+    "场馆调研",
+    "天一信局",
+    "信用印章",
+    "海丝"
+  ],
+  "cover": "/fieldwork-yuegang.webp",
+  "coverAlt": "由旧船厂改造的漳州月港海丝馆外观",
+  "featured": false,
+  "verification": "partial",
+  "rightsNote": "具体史实数字待馆方展签或研究文献复核；地点图来自东南网公开报道并保留来源说明。",
+  "sources": [
+    {
+      "sourceId": "YUEGANG-MUSEUM",
+      "label": "月港海丝馆",
+      "locator": "团队现场调研获取；相关观察整理写入项目《实践报告》。"
+    },
+    {
+      "sourceId": "YUEGANG-PHOTO",
+      "label": "东南网《漳州月港海丝馆》",
+      "locator": "2026-01-05 公开报道；地点图用于场馆识别与项目教育展示。"
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "id": "fieldwork-quanzhou-overseas-chinese-museum",
+  "slug": "quanzhou-overseas-chinese-museum",
+  "type": "fieldwork",
+  "status": "public",
+  "title": "泉州华侨历史博物馆调研",
+  "eyebrow": "泉州 · 华侨迁移与家国记忆",
+  "summary": "团队从南洋谋生、职业分布与侨胞反哺家乡等线索，观察侨批与华侨精神的关系。",
+  "body": [
+    "团队围绕馆内华侨迁移与奉献主题展区开展观察，记录泉籍华侨在东南亚的谋生轨迹，以及他们与家乡在教育、公益和家庭生活上的持续联系。",
+    "这次调研让“侨批”不再只是孤立的纸面文物：它被放回华侨迁移、海外劳动与侨乡建设的关系网络中理解。",
+    "人物事迹与馆藏细节仍需对应展签、馆方资料和授权图片后再拆成独立故事条目。当前页面只公开团队调研主题，不替代场馆的正式说明。"
+  ],
+  "date": null,
+  "dateLabel": "实践报告记载 · 具体年份待核验",
+  "places": [
+    "泉州"
+  ],
+  "people": [],
+  "tags": [
+    "场馆调研",
+    "华侨迁移",
+    "南洋",
+    "家国记忆"
+  ],
+  "cover": "/archive/QP-001.webp",
+  "coverAlt": "团队在泉州华侨历史博物馆拍摄的侨批展陈资料",
+  "featured": true,
+  "verification": "partial",
+  "rightsNote": "图片由团队在泉州华侨历史博物馆调研时拍摄，用于非商业教育与项目成果展示；展品权利归场馆或相应权利人所有。",
+  "sources": [
+    {
+      "sourceId": "QZ-HISTORY-MUSEUM",
+      "label": "泉州华侨历史博物馆",
+      "locator": "团队现场调研获取；相关观察整理写入项目《实践报告》。"
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "$schema": "https://static.cloudbase.net/cli/cloudbaserc.schema.json",
+  "version": "2.1",
+  "envId": "yinxin-fenghuo-beta-d7bm0cd14d29",
+  "region": "ap-shanghai",
+  "hosting": [
+    {
+      "name": "yinxin-fenghuo-beta",
+      "root": ".",
+      "framework": "vite-react",
+      "installCommand": "npm install",
+      "buildCommand": "npm run build",
+      "outputDir": "dist",
+      "deployPath": "/",
+      "ignore": [
+        "node_modules",
+        ".git",
+        "*.log",
+        "source-assets"
+      ]
+    }
+  ]
+}

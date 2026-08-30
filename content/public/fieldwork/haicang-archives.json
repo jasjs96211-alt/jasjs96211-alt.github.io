@@ -1,0 +1,46 @@
+{
+  "id": "fieldwork-haicang-archives",
+  "slug": "haicang-archives",
+  "type": "fieldwork",
+  "status": "public",
+  "title": "厦门市海沧区档案馆调研",
+  "eyebrow": "厦门 · 编目、征集与数字化",
+  "summary": "团队从档案进馆编号、内容辨识和数字化难题，重新理解“建立档案库”意味着什么。",
+  "body": [
+    "团队围绕侨批档案的分类、整理、征集、研究与数字化保护，同档案馆工作人员交流工作流程与现实困难。",
+    "调研记录显示，进馆时间可以成为稳定编号依据；而年代、寄收人、地区与标题仍需在整理和释读中逐步补齐。繁体字、旧时书写与纸张脆化，又让扫描和内容辨识彼此牵制。",
+    "这次调研也影响了本站的整理方式：为资料保留稳定编号，未知信息不随意补写，采集来源清晰可查，并把原件、释读与研究说明分别呈现。"
+  ],
+  "date": null,
+  "dateLabel": "实践报告记载 · 具体年份待核验",
+  "places": [
+    "厦门",
+    "海沧"
+  ],
+  "people": [],
+  "tags": [
+    "档案馆",
+    "数字化",
+    "编目",
+    "释读",
+    "隐私"
+  ],
+  "cover": "/fieldwork-haicang.webp",
+  "coverAlt": "参访者在厦门市海沧区档案馆馆藏精华陈列展厅听取讲解",
+  "featured": true,
+  "verification": "partial",
+  "rightsNote": "封面采用厦门市海沧区档案馆官网公开工作影像；未公开团队持有的馆内工作资料和原始访谈。",
+  "sources": [
+    {
+      "sourceId": "HAICANG-ARCHIVES",
+      "label": "厦门市海沧区档案馆",
+      "locator": "团队现场调研获取；相关观察整理写入项目《实践报告》。"
+    },
+    {
+      "sourceId": "HAICANG-ARCHIVES-OFFICIAL-PHOTO",
+      "label": "厦门市海沧区档案馆官网：扬州市60名档案工作者走进海沧区档案馆参观交流",
+      "url": "https://xmhcda.haicang.gov.cn/shtml/10429/632/detail_1.shtml",
+      "locator": "2023-03-08，官网工作动态；封面为馆藏精华陈列展厅公开影像。"
+    }
+  ]
+}

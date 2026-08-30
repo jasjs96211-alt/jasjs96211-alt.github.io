@@ -1,0 +1,59 @@
+{
+  "id": "research-research-methods",
+  "slug": "research-methods",
+  "type": "research",
+  "status": "public",
+  "title": "从场馆到课堂：四种研究方法",
+  "eyebrow": "方法不是附录，而是资料如何产生",
+  "summary": "实地调研、访谈、行动研究与文献研究共同构成项目现阶段的方法框架。",
+  "body": [
+    "实地调研用于观察侨批原件、信局印章、展陈方式与文创转化；访谈用于补充收藏、保护和传播中的经验，但原始记录需单独处理授权与隐私。",
+    "行动研究落实在校园侨批手工课中，用实际教学检验青少年如何理解侨批；文献研究则负责梳理历史脉络、概念争议与数字化研究。",
+    "四种方法也对应网站的四类证据：实物与展签、访谈与观察、实践过程、学术文献。任何结论都应标出它来自哪一层，而不是混写成无来源的“常识”。"
+  ],
+  "date": null,
+  "dateLabel": "研究方法",
+  "places": [
+    "厦门",
+    "泉州",
+    "漳州"
+  ],
+  "people": [],
+  "tags": [
+    "实地调研",
+    "访谈",
+    "行动研究",
+    "文献研究"
+  ],
+  "cover": null,
+  "featured": true,
+  "verification": "verified",
+  "rightsNote": "方法名称与用途来自项目实践报告。",
+  "sources": [
+    {
+      "sourceId": "HAICANG-ARCHIVES",
+      "label": "厦门市海沧区档案馆",
+      "locator": "档案整理与数字化保护调研。"
+    },
+    {
+      "sourceId": "QZ-HISTORY-MUSEUM",
+      "label": "泉州华侨历史博物馆",
+      "locator": "华侨史与展陈调研。"
+    },
+    {
+      "sourceId": "QZ-QIAOPI-MUSEUM",
+      "label": "泉州侨批馆",
+      "locator": "侨批制度、实物与文创调研。"
+    },
+    {
+      "sourceId": "NANFENG-QIAOPI",
+      "label": "南风侨批馆",
+      "locator": "民间馆运营与侨批保护访谈。"
+    },
+    {
+      "sourceId": "YUEGANG-MUSEUM",
+      "label": "月港海丝馆",
+      "locator": "信局历史与海丝文化调研。"
+    }
+  ]
+}
