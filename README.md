@@ -4,11 +4,11 @@
 
 ## 当前公开地址
 
-[https://yinxin-fenghuo-beta-d7bm0cd14d29-1473844298.tcloudbaseapp.com](https://yinxin-fenghuo-beta-d7bm0cd14d29-1473844298.tcloudbaseapp.com)
+[https://jasjs96211-alt.github.io/](https://jasjs96211-alt.github.io/)
 
-当前站点由腾讯云 CloudBase 静态托管，环境 ID 为 `yinxin-fenghuo-beta-d7bm0cd14d29`，区域为上海。
+当前站点由 GitHub Pages 公开托管；推送到 `main` 后，GitHub Actions 会自动完成内容校验、构建与发布。
 
-项目正在迁移到 GitHub Pages。目标仓库为 `jasjs96211-alt.github.io`，发布成功后的默认地址为 `https://jasjs96211-alt.github.io/`；腾讯云旧站在新站验收前继续保留。
+腾讯云 CloudBase 旧地址暂作备份：`https://yinxin-fenghuo-beta-d7bm0cd14d29-1473844298.tcloudbaseapp.com/`。
 
 ## 主要结构
 
