@@ -1,0 +1,53 @@
+{
+  "id": "media-gei-ama-de-qingshu",
+  "slug": "gei-ama-de-qingshu",
+  "type": "media",
+  "status": "public",
+  "title": "电影《给阿嬷的情书》",
+  "eyebrow": "银幕作品 · 潮汕方言电影",
+  "summary": "影片以侨批为线索，让一场赴泰寻亲逐渐显出两位女性、两个家庭和半个世纪的守望。",
+  "body": [
+    "故事从孙子带着阿嬷珍藏多年的家书赴泰国寻亲开始。他发现“阿公”早已离世，十几年间代为寄信汇款的，是一位素昧平生的异乡女子。侨批在这里不只是推动情节的线索，也是远隔山海的人维持家庭责任、善意与记忆的具体方式。",
+    "影片由蓝鸿春编剧、导演，是其“潮汕三部曲”的收官之作。创作以近代潮汕人下南洋的历史为背景，导演表示曾进行三年田野调查，影片约九成情节有现实原型；作品大量使用潮汕方言和非职业演员，以生活细节承载移民史。",
+    "影片于2026年春由潮汕地区逐步扩映全国，形成显著的口碑传播。新华网2026年8月15日报道称，影片全球票房已突破21亿元人民币，并陆续在多个国家和地区上映。此处记录的是经权威报道核对的传播成绩，不将市场成绩等同于专业奖项。"
+  ],
+  "date": null,
+  "dateLabel": "2026 · 院线电影",
+  "places": ["潮汕", "泰国", "南洋"],
+  "people": ["蓝鸿春"],
+  "tags": ["侨批传媒", "电影", "潮汕方言", "下南洋", "女性守望"],
+  "cover": null,
+  "featured": true,
+  "verification": "verified",
+  "rightsNote": "本页不使用未经授权的电影海报与剧照；影片及相关影像权利归出品方和相应权利人所有。",
+  "externalUrl": "https://www.news.cn/20260520/6c470fb4baec476c8c4a60ade456ea5a/c.html",
+  "mediaMeta": {
+    "kind": "潮汕方言故事片",
+    "creators": "编剧、导演：蓝鸿春",
+    "releaseYear": "2026",
+    "platform": "院线电影 / 海外发行",
+    "awardNote": "截至2026年8月15日，权威报道记录其全球票房突破21亿元；传播成绩与专业奖项分开表述。"
+  },
+  "sources": [
+    {
+      "label": "国家电影局：影片备案公示",
+      "locator": "https://www.chinafilm.gov.cn/dybalxgs/202312/t20231221_823053.html",
+      "sourceId": "WEB-CFA-AMA-2023"
+    },
+    {
+      "label": "新华网：世界记忆遗产侨批感动海内外",
+      "locator": "https://www.news.cn/20260520/6c470fb4baec476c8c4a60ade456ea5a/c.html",
+      "sourceId": "WEB-XINHUA-AMA-2026-05"
+    },
+    {
+      "label": "光明日报：影片创作与三年田野调查",
+      "locator": "https://www.news.cn/ent/20260520/8c4b5542d7c843af835c7df33ce9afbe/c.html",
+      "sourceId": "WEB-GMRB-AMA-2026"
+    },
+    {
+      "label": "新华网：影片在台首映与全球传播数据",
+      "locator": "https://www.news.cn/tw/20260815/c7d01d0c02fe4721a1b4992373efd320/c.html",
+      "sourceId": "WEB-XINHUA-AMA-2026-08"
+    }
+  ]
+}
