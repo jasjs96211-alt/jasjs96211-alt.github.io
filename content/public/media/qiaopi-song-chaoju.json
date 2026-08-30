@@ -1,0 +1,37 @@
+{
+  "id": "media-qiaopi-song-chaoju",
+  "slug": "qiaopi-song-chaoju",
+  "type": "media",
+  "status": "public",
+  "title": "潮剧《侨批颂》",
+  "eyebrow": "舞台作品 · 潮剧",
+  "summary": "中国戏曲学院首届全日制潮剧本科班毕业大戏，以侨批串联潮汕、七洲洋与马来西亚三地叙事。",
+  "body": [
+    "作品把潮汕地区、七洲洋海域与马来西亚设置为三重叙事空间，以侨批作为贯穿全剧的情感纽带，表现百年前潮汕人漂洋过海、艰苦创业与心系故土的经历。",
+    "该剧是中国戏曲学院首届全日制潮剧本科班的毕业大戏。创作吸收潮汕音乐、歌谣、婚俗以及方言俚语，让侨批故事由纸本文献转化为可听、可看的地方戏表达。",
+    "2026年6月8日，《侨批颂》在中央广播电视总台戏曲频道、央视频与央视网同步播出。这里将“进入国家级戏曲媒体播出”记录为阶段性传播成果，不延伸为未经来源支持的获奖信息。"
+  ],
+  "date": "2026-06-08",
+  "dateLabel": "2026 · 央视播出",
+  "places": ["潮汕", "马来西亚", "七洲洋"],
+  "people": ["中国戏曲学院首届全日制潮剧本科班"],
+  "tags": ["侨批传媒", "潮剧", "戏曲教育", "潮汕文化", "家国情怀"],
+  "cover": null,
+  "verification": "verified",
+  "rightsNote": "本页仅作作品导览；舞台影像、剧照和录播权利归创演、播出单位及相应权利人所有。",
+  "externalUrl": "https://www.shantou.gov.cn/cnst/ywdt/tpxw/content/post_2543424.html",
+  "mediaMeta": {
+    "kind": "潮剧",
+    "creators": "中国戏曲学院首届全日制潮剧本科班毕业大戏",
+    "releaseYear": "2026",
+    "platform": "CCTV-11 / 央视频 / 央视网",
+    "awardNote": "2026年6月8日在中央广播电视总台戏曲频道等平台同步播出。"
+  },
+  "sources": [
+    {
+      "label": "汕头市人民政府：潮剧《侨批颂》在央视戏曲频道播出",
+      "locator": "https://www.shantou.gov.cn/cnst/ywdt/tpxw/content/post_2543424.html",
+      "sourceId": "WEB-SHANTOU-QIAOPISONNG-2026"
+    }
+  ]
+}
