@@ -60,6 +60,9 @@ export type ContentEntry = {
   archiveRecords?: ArchiveIndexRecord[];
   externalUrl?: string;
   mediaMeta?: {
+    kind?: string;
+    creators?: string;
+    releaseYear?: string;
     duration?: string;
     resolution?: string;
     platform?: string;
@@ -73,6 +76,6 @@ export const contentTypeLabels: Record<ContentType, string> = {
   story: "人物故事",
   fieldwork: "实践足迹",
   research: "研究成果",
-  media: "影像档案",
+  media: "侨批传媒",
   creative: "文创实验",
 };
