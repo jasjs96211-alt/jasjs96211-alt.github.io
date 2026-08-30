@@ -355,3 +355,152 @@ body[data-site-mode="portal"] input { font-family: inherit; }
   .venueMapToolbar { align-items: stretch; flex-direction: column; }.venueMapToolbar .mapLegend { flex-direction: row; flex-wrap: wrap; }.venueMapCanvas { min-height: 430px; }.venueMapCanvas svg text { font-size: 38px; }.venueSpotlight { padding: 34px 24px; }.venueDirectory { grid-template-columns: 1fr; }
   .aboutManifesto { padding: 55px 0; grid-template-columns: 1fr; }.aboutSeal { width: 86px; height: 86px; }.aboutManifesto h2 { font-size: 42px; }.aboutManifesto article > p { font-size: 16px; }.aboutTimeline { grid-template-columns: 1fr; }.aboutTimeline > div:before { margin-bottom: 15px; }
 }
+
+/* Reading-comfort revision: light surfaces, larger type and roomier archive records */
+body[data-site-mode="portal"] { color: #24312d; background: #f6f2e9; }
+.portalSite { font-size: 16px; line-height: 1.65; }
+.portalNav a { color: #3f4d48; font-size: 15px; }
+.portalBrand small { color: #53615c; font-size: 11px; }
+.breadcrumbs, .resultCount { color: #56635f; font-size: 13px; }
+.overline, .sectionLabel, .kicker { font-size: 12px; }
+.underLink, .cardLink { min-height: 38px; font-size: 15px; line-height: 1.5; }
+.contentCard h3 { font-size: 25px; }
+.contentCardBody > p { min-height: 84px; color: #43524d; font-size: 15px; line-height: 1.85; }
+.cardMeta { color: #596661; font-size: 13px; }
+.verificationBadge { font-size: 11px; }
+.tagRow span, .articleTags span, .schemaChips span { font-size: 12px; }
+.archiveRecordCard h3 { font-size: 22px; }
+.archiveRecordCard > p { color: #46544f; font-size: 14px; line-height: 1.75; }
+.archiveRecordMeta { color: #58645f; font-size: 12px; }
+.archiveRecordId { font-size: 12px; }
+.archiveSource { color: #24433d; font-size: 11px; }
+.archiveIndexNotice p, .mediaMetaPanel p, .mediaCollectionIntro > p, .aboutTimeline p { color: #45534e; font-size: 15px; line-height: 1.85; }
+.recordFacts small, .archiveDetailStats span, .mediaMetaGrid small { color: #56635e; font-size: 12px; }
+.recordFacts b, .mediaMetaGrid b { font-size: 17px; }
+.heroAssurance, .definitionStack p, .moduleCard p, .journeySteps small { font-size: 15px; }
+.detailArticle figcaption, .sourceBox p small, .sourceBox em, .projectSources small { font-size: 14px; }
+.searchHero > p, .recordFooterNote, .footerBottom, .archiveFilterGroup small { font-size: 13px; }
+.contentCardGraphic span, .creativeLeadCard > div > span { color: var(--portal-cinnabar); font-size: 13px; }
+
+.skipLink, .portalPrimary, .portalPrimary.pale { color: #7b2f24 !important; background: #f0ddd6; border: 1px solid #b86757; box-shadow: none; }
+.portalPrimary:hover, .portalPrimary.pale:hover { color: #67271e !important; background: #e8cec5; }
+.portalSecondary:hover, .portalSecondary.dark, .portalSecondary.dark:hover, .iconButton:hover, .menuButton:hover { color: #24312d; background: #e5ece7; border-color: #71817b; }
+.filterPills button.active, .archiveFilters button.active, .viewToggle button.active { color: #24312d; background: #dfe9e3; border-color: #789088; }
+
+.dataBand, .routeStory, .projectJourney, .creativeSpotlight, .creativeLeadCard, .yinxinProjectHero,
+.archiveStatsBand, .accessPolicy, .timelineNote, .finalPlayCall, .aboutDisclaimer,
+.routeMapPanel, .archiveLearning, .interactiveVenueMap, .portalFooter { color: #24312d; background: #ece5d9; }
+.dataBand { border-block: 1px solid var(--portal-line); }
+.dataBand > div { border-color: var(--portal-line); }
+.dataBand strong, .archiveStatsBand strong { color: var(--portal-cinnabar); }
+.dataBand small, .archiveStatsBand small { color: #52615c; font-size: 13px; }
+.routeStoryCopy, .journeyCopy, .creativeCopy { color: #24312d; background: #edf1ec; }
+.routeStoryCopy p, .routeSteps p, .journeyCopy > p, .journeySteps small,
+.creativeCopy > p, .creativeLeadCard p, .yinxinProjectHero p, .accessPolicy p,
+.finalPlayCall p, .aboutDisclaimer p { color: #43524d; font-size: 16px; }
+.routeSteps article, .journeySteps, .journeySteps li { border-color: var(--portal-line); }
+.routeSteps span, .journeySteps li > span { color: var(--portal-cinnabar); }
+.routeSteps b, .journeySteps b, .creativeCopy h3, .yinxinProjectHero h2,
+.accessPolicy h3, .finalPlayCall h2 { color: #24312d; }
+.lightLink, .journeyCopy .underLink { color: var(--portal-cinnabar) !important; }
+.overline.light { color: var(--portal-cinnabar); }
+.moduleCard:hover { color: #24312d; background: #e3ebe6; }
+.moduleCard:hover p, .moduleCard:hover span { color: #45534e; }
+.moduleCard:hover svg, .moduleCard:hover b { color: var(--portal-cinnabar); }
+.contentCardGraphic, .contentCardGraphic.type-fieldwork, .contentCardGraphic.type-research,
+.contentCardGraphic.type-media, .contentCardGraphic.type-learn { color: #24312d; background: #e4ece7; }
+.contentCardGraphic.type-research { background: #eee4d8; }
+.contentCardGraphic.type-media { background: #e4ebed; }
+.contentCardGraphic.type-learn { background: #f0e1dc; }
+.creativeCopy h2, .creativeLeadCard h2, .yinxinProjectHero h1 { color: var(--portal-cinnabar); }
+.creativeFacts span { color: #35433e; border-color: #9aa8a3; background: #f7f4ed; }
+.creativeImage span, .journeyVisual > span { color: #24312d; background: rgba(250,247,240,.94); }
+.journeyVisual, .heroImageButton, .videoEmbed { background: #e5ddd0; }
+.journeyVisual > span { padding: 10px 13px; }
+.journeyVisual > span b { color: #24312d; }
+.journeyVisual:after { display: none; }
+
+.pageHero.archive { color: #24312d; background: linear-gradient(135deg, #f4efe6, #e4ece7); }
+.pageHero.archive > div > p, .pageHero.archive aside small,
+.pageHero.archive .breadcrumbs, .pageHero.archive .breadcrumbs a { color: #4d5c56; }
+.pageHero.archive aside { border-color: var(--portal-line); }
+.archiveStatsBand > div { color: #24312d; background: #f2ede4; }
+.accessPolicy, .timelineNote, .aboutDisclaimer { border: 1px solid var(--portal-line); }
+.accessPolicy b { color: var(--portal-cinnabar); }
+
+.archiveRecordArticle { width: min(1280px, 100%); }
+.archiveImageGallery { grid-template-columns: 1fr; gap: 28px; }
+.archiveImageGallery figure { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(360px, .7fr); align-items: stretch; background: #fbf8f1; }
+.archiveImageGallery .archiveGalleryCanvas { min-height: 500px; aspect-ratio: 4 / 3; background: #e6dfd3; border-right: 1px solid var(--portal-line); }
+.archiveImageGallery figcaption { padding: 34px; display: flex; flex-direction: column; justify-content: center; color: #35433e; font-size: 16px; line-height: 1.85; }
+.archiveImageGallery figcaption > div { grid-template-columns: auto 1fr; gap: 14px; }
+.archiveImageGallery figcaption > p { margin-top: 22px; padding-top: 20px; }
+.archiveImageGallery figcaption strong { margin-bottom: 8px; font-size: 14px; }
+.archiveImageGallery figcaption small { color: #52605b; font-size: 13px; line-height: 1.75; }
+
+.archiveLearning { padding: 46px; border: 1px solid #c9c0b2; background: #efe9de; }
+.archiveLearning .overline { color: var(--portal-cinnabar); }
+.archiveLearning h2 { color: #24312d; font-size: clamp(38px, 4vw, 54px); }
+.archiveLearning > header > p { max-width: 950px; color: #3e4c47; font-size: 18px; line-height: 1.95; }
+.archiveLearningGrid { gap: 14px; background: transparent; border: 0; }
+.archiveLearningGrid article { min-height: 230px; padding: 31px; background: #fbf8f1; border: 1px solid #cec5b7; }
+.archiveLearningGrid article > span { color: var(--portal-cinnabar); font-size: 13px; }
+.archiveLearningGrid h3 { margin-top: 36px; color: #24312d; font-size: 27px; }
+.archiveLearningGrid p { color: #3f4e49; font-size: 16px; line-height: 1.9; }
+.archiveLearningSources { border-color: #c9c0b2; }
+.archiveLearningSources b { color: #24312d; font-size: 14px; }
+.archiveLearningSources a { color: #8d3427; font-size: 14px; }
+
+.routeMapPanel { border: 1px solid var(--portal-line); }
+.mapLegend { color: #42514c; font-size: 13px; }
+.mapLegend b, .mapCards b, .mapCards a { color: var(--portal-cinnabar); }
+.mapNode text { fill: #24312d; }
+.mapNode .nodeNote { fill: #53635d; }
+.mapNode.future circle:first-child { fill: #f4f0e7; }
+.mapCards { border-color: var(--portal-line); }
+.mapCards article { border-color: var(--portal-line); }
+.mapCards span { color: #46554f; }
+.mapCards a { font-size: 14px; }
+.venueMapCanvas { background: radial-gradient(circle at 78% 25%, rgba(166,64,47,.08), transparent 32%), #e7eee9; }
+.provinceShape { fill: #eee7dc; stroke: #aa7569; }
+.provinceShape.fujian { fill: #dce8e1; }
+.coastLine { stroke: #a6402f; }
+.venueMapCanvas svg text { fill: rgba(36,49,45,.2); }
+.venueMapCanvas svg .seaLabel { fill: #667670; }
+.venueMarker { color: #24312d; }
+.venueMarker i { background: #fbf8f1; border-color: #a6402f; box-shadow: 0 0 0 6px rgba(166,64,47,.1); }
+.venueMarker.visited i { background: #a6402f; }
+.venueMarker span, .venueMarker.active span { color: #24312d; background: rgba(251,248,241,.94); }
+.venueSpotlight { color: #24312d; background: #f3eee5; border-color: var(--portal-line); }
+.venueSpotlight > span, .venueSpotlight a { color: var(--portal-cinnabar); }
+.venueSpotlight h2 { color: #24312d; }
+.venueSpotlight > b, .venueSpotlight p { color: #46554f; }
+.venueSpotlight p { font-size: 16px; }
+.venueSpotlight > div { color: #6f2a21; background: #efdcd4; }
+.venueDirectory span, .mapCaution { font-size: 13px; }
+
+.footerBrand, .footerBottom { border-color: var(--portal-line); }
+.footerBrand .portalBrandSeal, .footerLinks b { color: var(--portal-cinnabar); border-color: var(--portal-cinnabar); }
+.footerBrand p, .footerLinks a, .footerLinks span, .footerBottom { color: #475650; }
+.footerLinks a, .footerLinks span { font-size: 14px; }
+.footerLinks a:hover { color: var(--portal-cinnabar); }
+.portalLightbox { background: rgba(246,242,233,.97); }
+.portalLightbox button { color: #24312d; border-color: #66736e; background: #fbf8f1; }
+
+@media (max-width: 900px) {
+  .archiveImageGallery figure { grid-template-columns: 1fr; }
+  .archiveImageGallery .archiveGalleryCanvas { min-height: 0; border-right: 0; border-bottom: 1px solid var(--portal-line); }
+  .archiveImageGallery figcaption { padding: 28px; }
+}
+
+@media (max-width: 620px) {
+  .portalSite { font-size: 16px; }
+  .portalNav a { font-size: 15px; }
+  .contentCardBody > p { min-height: 0; }
+  .archiveImageGallery { gap: 20px; }
+  .archiveImageGallery figcaption { padding: 23px 20px; font-size: 16px; }
+  .archiveLearning { padding: 30px 20px; }
+  .archiveLearning > header > p { font-size: 16px; }
+  .archiveLearningGrid { gap: 10px; }
+  .archiveLearningGrid article { min-height: auto; padding: 25px 22px; }
+}
