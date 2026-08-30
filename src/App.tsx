@@ -272,6 +272,8 @@ function archiveTitle(record: ArchiveIndexRecord) {
 
 function archiveContext(record: ArchiveIndexRecord) {
   const title = archiveTitle(record);
+  if (record.id === "QP-001") return "建大信局支票详细列有帮号、寄款人、金额、取款地、取款人等；取款后加盖“付讫”印章，表示款项已经领取。";
+  if (record.id === "QP-004") return "早期出洋过番的泉州人大都是迫于生计、战乱或天灾人祸的农民，他们的海外闯荡之路一开始就布满荆棘坎坷。";
   if (title === "水客") return "水客是往返海内外、受托携带银信与家乡物产的个体中介；随着业务发展，部分递送职能逐渐由批局承担。";
   if (title === "侨批业经营理念") return "侨批行业强调顾客至上、公平诚信的经营理念（两张相关图像）。";
   if (title === "侨批寄件计费工具") return "用于计算侨批寄件费用的工具（两张相关图像）。";
@@ -303,10 +305,19 @@ function findArchiveRecord(id: string | null | undefined) {
 function archiveReadingGuide(record: ArchiveIndexRecord) {
   const title = archiveTitle(record);
   const visual = record.materialType
-    ? `这是一张由团队在${record.sourceInstitution ?? "侨批场馆"}拍摄的${record.materialType}图像，主题为“${title}”。`
-    : `这张图像由团队在${record.sourceInstitution ?? "侨批场馆"}采集，记录“${title}”相关展品与展陈信息。`;
+    ? `图片呈现${record.sourceInstitution ?? "侨批场馆"}馆内关于“${title}”的${record.materialType}与相关展陈。`
+    : `图片呈现${record.sourceInstitution ?? "侨批场馆"}馆内关于“${title}”的展品与说明。`;
 
+  let readableLabel = "图片文字";
   let readable = `现阶段能够稳定辨识的主题是“${title}”。受玻璃反光、拍摄角度与手写体影响，正文不作未经馆方校核的逐字转录。`;
+  if (record.id === "QP-001") {
+    readableLabel = "馆内介绍";
+    readable = "建大信局支票，详细列有帮号、寄款人、金额、取款地、取款人等，取款后并盖“付讫”印章表示已取款完成。";
+  }
+  if (record.id === "QP-004") {
+    readableLabel = "馆内介绍";
+    readable = "早期出洋过番的泉州人大都是迫于生计、战乱或天灾人祸的农民，他们的海外闯荡之路一开始就布满荆棘坎坷。";
+  }
   if (record.id === "QP-013") readable = "展签主题可辨识为“白刃先生的回忆信”。画面中包括回忆材料、手写信页、印章与相关出版物；正文仍需结合馆方编目逐字核对。";
   if (record.id === "QP-035") readable = "展陈表格与器具共同指向侨批递送、计费和业务管理。表格小字受分辨率限制，不据此抄录具体数字。";
   if (record.id === "QP-060") readable = "图中多张凭单可辨识到英文银行名称、签章和手写项目，其中包括 Overseas-Chinese Banking Corporation Limited 等字样；金额、日期与姓名不作低置信度转录。";
@@ -316,8 +327,30 @@ function archiveReadingGuide(record: ArchiveIndexRecord) {
   if (/家书|叮嘱|读书|祖国|回忆/.test(title + record.subcategory)) significance = "这类材料把宏大的迁移史还原为家庭生活：称谓、叮嘱、教育期待与情感表达，都是理解侨乡社会的重要线索。";
   if (/汇|银|银行|计费|经营|批局|水客/.test(title + record.subcategory)) significance = "这类材料显示侨批不仅是信，也是一套依靠信用、经手人、票据与结算维持的民间跨境汇兑网络。";
   if (/出洋|海外|路线|批筒/.test(title + record.subcategory)) significance = "这类材料帮助理解一封银信如何经过海外侨居地、批局与侨乡递送者，被多人接力送到家中。";
+  if (record.id === "QP-001") significance = "支票上的栏目与“付讫”印章，把寄款、领取和确认三个环节留在同一张凭证上，直观反映信局汇兑如何完成闭环。";
+  if (record.id === "QP-004") significance = "这段说明把泉州人早期出洋放回生计压力、战乱和灾害的历史背景中，强调“过番”并非轻松远游，而常是被现实推动的艰难选择。";
 
-  return { visual, readable, significance };
+  return { visual, readable, readableLabel, significance };
+}
+
+function archiveLearningNote(record: ArchiveIndexRecord) {
+  if (record.id !== "QP-004") return null;
+  return {
+    eyebrow: "EXTENDED READING · 延伸学习",
+    title: "“过番”，为什么是一条艰难的路？",
+    intro: "在闽南侨乡语境中，“过番”通常指漂洋过海到南洋谋生。它既包含离乡的地理移动，也包含进入陌生社会、重新寻找生计的长期过程。",
+    points: [
+      { title: "为什么离开", body: "近代闽南人稠地狭、耕地有限，加上贫困、战乱和灾害，不少农民、渔民与手工业者只能向海寻找生路。对许多家庭而言，出洋首先是生存选择。" },
+      { title: "怎样出洋", body: "出洋者中既有投靠亲友、自己谋生的自由移民，也有被招募甚至诱骗的契约华工。后者常以未来工资抵偿旅费，在殖民地矿山、种植园和工程中承担艰苦劳动。" },
+      { title: "去往哪里", body: "泉州及闽南移民的重要目的地包括菲律宾、新加坡、马来西亚、印度尼西亚、泰国、越南和缅甸等东南亚地区，逐渐形成跨海亲缘、乡缘和商业网络。" },
+      { title: "侨批为何重要", body: "长期分离之后，海外谋生者需要把收入和消息一同送回家乡。家书与汇款相伴而行，侨批由此成为家庭维持生活、确认平安和延续关系的重要通道。" },
+    ],
+    sources: [
+      { label: "新华网：侨乡泉州的“过番谋生”历史", url: "https://fj.news.cn/20231020/208be8bb92854a8aa82f44f3b6bbaddd/c.html" },
+      { label: "福建省人民政府：福建侨批与下南洋", url: "https://www.fujian.gov.cn/zwgk/ztzl/sczl/zhxx/202307/t20230714_6207180.htm" },
+      { label: "人民日报海外版：晚清契约华工的艰辛历史", url: "https://paper.people.com.cn/rmrbhwb/html/2016-03/24/content_1663651.htm" },
+    ],
+  };
 }
 
 function ArchiveFigure({ src, alt }: { src: string; alt: string }) {
@@ -325,7 +358,7 @@ function ArchiveFigure({ src, alt }: { src: string; alt: string }) {
   const record = findArchiveRecord(id);
   if (!record) return <figure className="detailCoverFigure"><div className="detailImageCanvas"><img src={src} alt={alt}/></div>{alt && <figcaption>{alt}</figcaption>}</figure>;
   const guide = archiveReadingGuide(record);
-  return <figure className="detailArchiveFigure"><div className="detailImageCanvas"><img className={archiveImageClass(id)} src={src} alt={alt}/></div><figcaption><div><span>{record.id} · {record.sourceInstitution}</span><b>{archiveTitle(record)}</b><p>{guide.visual}</p></div><div className="imageReadingNotes"><p><strong>可辨识文字</strong>{guide.readable}</p><p><strong>为什么值得看</strong>{guide.significance}</p><small>图像识别只作辅助；馆藏名称、年代与全文释读以馆方正式资料为准。</small></div></figcaption></figure>;
+  return <figure className="detailArchiveFigure"><div className="detailImageCanvas"><img className={archiveImageClass(id)} src={src} alt={alt}/></div><figcaption><div><span>{record.id} · {record.sourceInstitution}</span><b>{archiveTitle(record)}</b><p>{guide.visual}</p></div><div className="imageReadingNotes"><p><strong>{guide.readableLabel}</strong>{guide.readable}</p><p><strong>内容说明</strong>{guide.significance}</p>{guide.readableLabel !== "馆内介绍" && <small>仅在文字模糊、反光或手写正文难辨时保留核验提示；馆藏题名与全文释读以馆方正式资料为准。</small>}</div></figcaption></figure>;
 }
 
 function ArchiveRecordCard({ records }: { records: ArchiveIndexRecord[] }) {
@@ -391,10 +424,72 @@ function ArchiveRecordPage({ record }: { record: ArchiveIndexRecord }) {
   const entry = publicContent.find((item) => item.slug === "qiaopi-index-v1");
   const relatedRecords = entry?.archiveRecords?.filter((item) => archiveTitle(item) === archiveTitle(record) && item.sourceInstitution === record.sourceInstitution) ?? [record];
   const idLabel = relatedRecords.length > 1 ? `${relatedRecords[0].id}—${relatedRecords[relatedRecords.length - 1].id}` : record.id;
+  const learningNote = archiveLearningNote(record);
   return (
     <main className="portalMain archiveRecordPage">
       <Breadcrumbs items={[{ label: "侨批档案", to: "/archives" }, { label: record.id }]}/>
-      <article className="archiveRecordArticle"><header><div className="archiveRecordTop"><span className="archiveRecordId">{idLabel}</span><span className="archiveSource">{record.sourceInstitution}</span></div><span className="overline">团队采集 · 场馆图像资料</span><h1>{archiveTitle(record)}</h1><p>{archiveContext(record) !== archiveTitle(record) ? archiveContext(record) : `本组共收录 ${relatedRecords.length} 件相关图像资料。`}</p></header><section className="archiveImageGallery" aria-label="图像资料">{relatedRecords.map((item) => { const guide = archiveReadingGuide(item); return <figure key={item.id}><a className="archiveGalleryCanvas" href={`/archive/${item.id}.webp`} target="_blank" rel="noreferrer"><img className={archiveImageClass(item.id)} src={`/archive/${item.id}.webp`} alt={`${item.sourceInstitution ?? "侨批场馆"}采集的${archiveTitle(item)}`} decoding="async"/></a><figcaption><div><b>{item.id}</b><span>{guide.visual}</span></div><p><strong>可辨识文字</strong>{guide.readable}</p><p><strong>观看要点</strong>{guide.significance}</p><small>OCR与人工观察仅用于辅助说明；正式题名、年代和全文释读以馆方资料为准。</small></figcaption></figure>; })}</section><section className="recordFacts"><div><small>采集来源</small><b>{record.sourceInstitution ?? "来源待补充"}</b></div><div><small>内容类别</small><b>{record.category}</b></div><div><small>主题</small><b>{record.subcategory}</b></div><div><small>索引编号</small><b>{idLabel}</b></div><div><small>资料数量</small><b>{relatedRecords.length} 件</b></div><div><small>材料形式</small><b>{record.materialType ?? "图像资料"}</b></div></section><aside className="sourceBox"><div><Icon name="shield" size={24}/><h2>资料来源</h2></div><p><b>采集场馆</b><span>{record.sourceInstitution ?? "来源待补充"}</span><small>团队在场馆调研过程中拍摄并整理；图片用于侨批文化学习与项目成果展示，展品权利归相应场馆或权利人所有。</small></p><p><b>整理编号</b><span>{idLabel}</span><small>编号用于保持同组图片、说明文字及后续研究材料之间的对应关系。</small></p></aside><SiteLink to="/archives" className="underLink">返回资料浏览 <Icon name="arrow" size={17}/></SiteLink></article>
+      <article className="archiveRecordArticle">
+        <header>
+          <div className="archiveRecordTop"><span className="archiveRecordId">{idLabel}</span><span className="archiveSource">{record.sourceInstitution}</span></div>
+          <span className="overline">馆内展陈 · 图像资料</span>
+          <h1>{archiveTitle(record)}</h1>
+          <p>{archiveContext(record) !== archiveTitle(record) ? archiveContext(record) : `本组共收录 ${relatedRecords.length} 件相关图像资料。`}</p>
+        </header>
+        <section className="archiveImageGallery" aria-label="图像资料">
+          {relatedRecords.map((item) => {
+            const guide = archiveReadingGuide(item);
+            return (
+              <figure key={item.id}>
+                <a className="archiveGalleryCanvas" href={`/archive/${item.id}.webp`} target="_blank" rel="noreferrer">
+                  <img className={archiveImageClass(item.id)} src={`/archive/${item.id}.webp`} alt={`${item.sourceInstitution ?? "侨批场馆"}的${archiveTitle(item)}`} decoding="async"/>
+                </a>
+                <figcaption>
+                  <div><b>{item.id}</b><span>{guide.visual}</span></div>
+                  <p><strong>{guide.readableLabel}</strong>{guide.readable}</p>
+                  <p><strong>内容说明</strong>{guide.significance}</p>
+                  {guide.readableLabel !== "馆内介绍" && <small>文字模糊、反光或手写正文难辨时不作低置信度转录；正式题名与全文释读以馆方资料为准。</small>}
+                </figcaption>
+              </figure>
+            );
+          })}
+        </section>
+        {learningNote && (
+          <section className="archiveLearning" aria-labelledby="archive-learning-title">
+            <header>
+              <span className="overline">{learningNote.eyebrow}</span>
+              <h2 id="archive-learning-title">{learningNote.title}</h2>
+              <p>{learningNote.intro}</p>
+            </header>
+            <div className="archiveLearningGrid">
+              {learningNote.points.map((point, index) => (
+                <article key={point.title}>
+                  <span>{String(index + 1).padStart(2, "0")}</span>
+                  <h3>{point.title}</h3>
+                  <p>{point.body}</p>
+                </article>
+              ))}
+            </div>
+            <div className="archiveLearningSources">
+              <b>延伸阅读来源</b>
+              {learningNote.sources.map((source) => <a key={source.url} href={source.url} target="_blank" rel="noreferrer">{source.label} <Icon name="arrow" size={14}/></a>)}
+            </div>
+          </section>
+        )}
+        <section className="recordFacts">
+          <div><small>资料来源</small><b>{record.sourceInstitution ?? "来源待补充"}</b></div>
+          <div><small>内容类别</small><b>{record.category}</b></div>
+          <div><small>主题</small><b>{record.subcategory}</b></div>
+          <div><small>索引编号</small><b>{idLabel}</b></div>
+          <div><small>资料数量</small><b>{relatedRecords.length} 件</b></div>
+          <div><small>材料形式</small><b>{record.materialType ?? "图像资料"}</b></div>
+        </section>
+        <aside className="sourceBox">
+          <div><Icon name="shield" size={24}/><h2>资料来源</h2></div>
+          <p><b>馆藏场馆</b><span>{record.sourceInstitution ?? "来源待补充"}</span><small>图片用于侨批文化学习与项目成果展示；展品名称、权利与正式释读以相应场馆资料为准。</small></p>
+          <p><b>整理编号</b><span>{idLabel}</span><small>编号用于保持同组图片、馆内说明与后续研究材料之间的对应关系。</small></p>
+        </aside>
+        <SiteLink to="/archives" className="underLink">返回资料浏览 <Icon name="arrow" size={17}/></SiteLink>
+      </article>
     </main>
   );
 }
