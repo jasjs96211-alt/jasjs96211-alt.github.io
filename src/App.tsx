@@ -302,35 +302,18 @@ function findArchiveRecord(id: string | null | undefined) {
   return publicContent.find((item) => item.slug === "qiaopi-index-v1")?.archiveRecords?.find((record) => record.id === id);
 }
 
-function archiveReadingGuide(record: ArchiveIndexRecord) {
+function archiveSummary(record: ArchiveIndexRecord) {
   const title = archiveTitle(record);
-  const visual = record.materialType
-    ? `图片呈现${record.sourceInstitution ?? "侨批场馆"}馆内关于“${title}”的${record.materialType}与相关展陈。`
-    : `图片呈现${record.sourceInstitution ?? "侨批场馆"}馆内关于“${title}”的展品与说明。`;
-
-  let readableLabel = "图片文字";
-  let readable = `现阶段能够稳定辨识的主题是“${title}”。受玻璃反光、拍摄角度与手写体影响，正文不作未经馆方校核的逐字转录。`;
-  if (record.id === "QP-001") {
-    readableLabel = "馆内介绍";
-    readable = "建大信局支票，详细列有帮号、寄款人、金额、取款地、取款人等，取款后并盖“付讫”印章表示已取款完成。";
-  }
-  if (record.id === "QP-004") {
-    readableLabel = "馆内介绍";
-    readable = "早期出洋过番的泉州人大都是迫于生计、战乱或天灾人祸的农民，他们的海外闯荡之路一开始就布满荆棘坎坷。";
-  }
-  if (record.id === "QP-013") readable = "展签主题可辨识为“白刃先生的回忆信”。画面中包括回忆材料、手写信页、印章与相关出版物；正文仍需结合馆方编目逐字核对。";
-  if (record.id === "QP-035") readable = "展陈表格与器具共同指向侨批递送、计费和业务管理。表格小字受分辨率限制，不据此抄录具体数字。";
-  if (record.id === "QP-060") readable = "图中多张凭单可辨识到英文银行名称、签章和手写项目，其中包括 Overseas-Chinese Banking Corporation Limited 等字样；金额、日期与姓名不作低置信度转录。";
-  if (record.id === "QP-066") readable = "展板集中解释侨批的信款合一属性与流转方式。页面以团队原有编目为主，细小展板文字不作机器识别式全文复制。";
-
-  let significance = "它让抽象的侨批制度落到具体纸张、印记、器具或生活物件上，适合与同主题资料对读。";
-  if (/家书|叮嘱|读书|祖国|回忆/.test(title + record.subcategory)) significance = "这类材料把宏大的迁移史还原为家庭生活：称谓、叮嘱、教育期待与情感表达，都是理解侨乡社会的重要线索。";
-  if (/汇|银|银行|计费|经营|批局|水客/.test(title + record.subcategory)) significance = "这类材料显示侨批不仅是信，也是一套依靠信用、经手人、票据与结算维持的民间跨境汇兑网络。";
-  if (/出洋|海外|路线|批筒/.test(title + record.subcategory)) significance = "这类材料帮助理解一封银信如何经过海外侨居地、批局与侨乡递送者，被多人接力送到家中。";
-  if (record.id === "QP-001") significance = "支票上的栏目与“付讫”印章，把寄款、领取和确认三个环节留在同一张凭证上，直观反映信局汇兑如何完成闭环。";
-  if (record.id === "QP-004") significance = "这段说明把泉州人早期出洋放回生计压力、战乱和灾害的历史背景中，强调“过番”并非轻松远游，而常是被现实推动的艰难选择。";
-
-  return { visual, readable, readableLabel, significance };
+  if (record.id === "QP-001") return "建大信局支票列有帮号、寄款人、金额、取款地和取款人；盖上“付讫”印章，表示款项已经领取。";
+  if (record.id === "QP-004") return "早期泉州人多因生计、战乱或灾害出洋谋生，海外闯荡之路充满艰辛。";
+  if (title === "华侨书信") return "华侨写给家乡亲友的书信，记录生活近况、牵挂与跨海联系。";
+  if (title === "海外货币") return "华侨在海外生活和工作中使用的货币。";
+  if (title === "白刃先生回忆信") return "白刃先生的回忆材料，包括手写信页、印章和相关出版物。";
+  if (title === "侨批寄件计费工具") return "批局计算侨批寄送费用时使用的工具。";
+  if (title === "侨批家书例页") return "侨批家书实页，可见手写文字、信笺版式和印记。";
+  const context = archiveContext(record).trim();
+  if (context && context !== title && !/^(例图|[（(]\d)/.test(context)) return context;
+  return `这是一件关于“${title}”的${record.materialType ?? "馆内展陈资料"}。`;
 }
 
 function archiveLearningNote(record: ArchiveIndexRecord) {
@@ -357,8 +340,7 @@ function ArchiveFigure({ src, alt }: { src: string; alt: string }) {
   const id = archiveIdFromPath(src);
   const record = findArchiveRecord(id);
   if (!record) return <figure className="detailCoverFigure"><div className="detailImageCanvas"><img src={src} alt={alt}/></div>{alt && <figcaption>{alt}</figcaption>}</figure>;
-  const guide = archiveReadingGuide(record);
-  return <figure className="detailArchiveFigure"><div className="detailImageCanvas"><img className={archiveImageClass(id)} src={src} alt={alt}/></div><figcaption><div><span>{record.id} · {record.sourceInstitution}</span><b>{archiveTitle(record)}</b><p>{guide.visual}</p></div><div className="imageReadingNotes"><p><strong>{guide.readableLabel}</strong>{guide.readable}</p><p><strong>内容说明</strong>{guide.significance}</p>{guide.readableLabel !== "馆内介绍" && <small>仅在文字模糊、反光或手写正文难辨时保留核验提示；馆藏题名与全文释读以馆方正式资料为准。</small>}</div></figcaption></figure>;
+  return <figure className="detailArchiveFigure"><div className="detailImageCanvas"><img className={archiveImageClass(id)} src={src} alt={alt}/></div><figcaption className="archiveSimpleCaption"><span>{record.id} · {record.sourceInstitution}</span><b>{archiveTitle(record)}</b><p>{archiveSummary(record)}</p></figcaption></figure>;
 }
 
 function ArchiveRecordCard({ records }: { records: ArchiveIndexRecord[] }) {
@@ -369,9 +351,9 @@ function ArchiveRecordCard({ records }: { records: ArchiveIndexRecord[] }) {
       <div className="archiveRecordThumb"><img className={archiveImageClass(record.id)} src={`/archive/${record.id}.webp`} alt={`${record.sourceInstitution ?? "侨批场馆"}采集的${archiveTitle(record)}`} loading="lazy" decoding="async"/></div>
       <div className="archiveRecordTop"><span className="archiveRecordId">{idLabel}</span><span className="archiveSource">{record.sourceInstitution}</span></div>
       <h3>{archiveTitle(record)}</h3>
-      <p>{record.category} · {record.subcategory}</p>
-      <div className="archiveRecordMeta"><span>{records.length} 件相关图像</span><span>{record.materialType ?? "图像资料"}</span></div>
-      <SiteLink to={`/archives/${record.id}`} className="cardLink">查看资料说明 <Icon name="arrow" size={17}/></SiteLink>
+      <p>{archiveSummary(record)}</p>
+      <div className="archiveRecordMeta"><span>{records.length} 张图片</span></div>
+      <SiteLink to={`/archives/${record.id}`} className="cardLink">查看 <Icon name="arrow" size={17}/></SiteLink>
     </article>
   );
 }
@@ -379,7 +361,6 @@ function ArchiveRecordCard({ records }: { records: ArchiveIndexRecord[] }) {
 function ArchivesPage() {
   const entry = publicContent.find((item) => item.slug === "qiaopi-index-v1");
   const records = entry?.archiveRecords ?? [];
-  const stats = entry?.archiveStats;
   const [query, setQuery] = useState("");
   const [source, setSource] = useState("全部来源");
   const [category, setCategory] = useState("全部类别");
@@ -404,18 +385,24 @@ function ArchivesPage() {
     items.set(key, group);
     return items;
   }, new Map<string, ArchiveIndexRecord[]>()).values());
-  const total = stats?.total ?? records.length;
+  const total = entry?.archiveStats?.total ?? records.length;
+  const activeFilterCount = [source !== "全部来源", category !== "全部类别", subcategory !== "全部主题"].filter(Boolean).length;
   return (
     <main className="portalMain archivePage">
-      <section className="pageHero archive"><Breadcrumbs items={[{ label: "侨批档案" }]}/><div><span className="overline">ARCHIVES · 场馆资料导览</span><h1>按场馆、内容类别与主题浏览侨批资料</h1><p>本页整理团队在泉州华侨历史博物馆与泉州侨批馆获取的 68 条图像资料。成组图片合并展示，避免同一标题重复出现；每组仍保留原有索引编号。</p></div><aside><strong>{total}</strong><span>条图像资料</span><small>来自泉州两处场馆</small></aside></section>
-      {stats && <section className="archiveStatsBand"><div><strong>{stats.total}</strong><span>图像资料</span><small>QP-001—QP-068</small></div><div><strong>{sources.length - 1}</strong><span>采集场馆</span><small>来源清晰可查</small></div><div><strong>{categories.length - 1}</strong><span>内容类别</span><small>华侨史料 · 侨批档案</small></div><div><strong>{new Set(records.map((record) => record.subcategory)).size}</strong><span>主题方向</span><small>从出洋到家书与汇兑</small></div></section>}
-      <section className="archiveIndexNotice"><Icon name="archive" size={25}/><div><span className="overline">COLLECTION GUIDE · 档案导览</span><h2>两馆资料，按来源与主题重新编目</h2><p>同一说明下的多张图片合并为一组，长段落改为简明标题；访客可先选场馆，再按内容类别和主题逐层筛选。</p></div><SiteLink to={entry ? entryPath(entry) : "/archives"} className="underLink">了解资料整理方式 <Icon name="arrow" size={17}/></SiteLink></section>
+      <section className="pageHero archive"><Breadcrumbs items={[{ label: "侨批档案" }]}/><div><span className="overline">ARCHIVES · 侨批档案</span><h1>浏览侨批资料</h1><p>搜索名称，或按场馆、类别和主题逐步筛选。</p></div><aside><strong>{total}</strong><span>张图像资料</span><small>来自泉州两处场馆</small></aside></section>
       <section className="archiveWorkbench">
         <div className="archiveSearchRow"><label className="searchField"><Icon name="search" size={18}/><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="搜索编号、标题、场馆或主题…"/></label><div className="viewToggle"><button type="button" className={view === "card" ? "active" : ""} onClick={() => setView("card")}>卡片</button><button type="button" className={view === "list" ? "active" : ""} onClick={() => setView("list")}>列表</button></div></div>
-        <div className="archiveFilters"><div className="archiveFilterGroup"><small>采集场馆</small>{sources.map((item) => <button type="button" key={item} className={source === item ? "active" : ""} onClick={() => setSource(item)}>{item}</button>)}</div><div className="archiveFilterGroup"><small>内容类别</small>{categories.map((item) => <button type="button" key={item} className={category === item ? "active" : ""} onClick={() => setCategory(item)}>{item}</button>)}</div><div className="archiveFilterGroup"><small>主题</small>{subcategories.map((item) => <button type="button" key={item} className={subcategory === item ? "active" : ""} onClick={() => setSubcategory(item)}>{item}</button>)}</div><span className="resultCount">显示 {groups.length} 组 / {filtered.length} 件</span></div>
+        <details className="archiveFilterDisclosure">
+          <summary><span>筛选资料</span><small>{activeFilterCount ? `已选择 ${activeFilterCount} 项` : "按场馆、类别或主题查找"}</small></summary>
+          <div className="archiveSelectGrid">
+            <label><span>1 · 场馆</span><select value={source} onChange={(event) => setSource(event.target.value)}>{sources.map((item) => <option key={item}>{item}</option>)}</select></label>
+            <label><span>2 · 内容类别</span><select value={category} onChange={(event) => setCategory(event.target.value)}>{categories.map((item) => <option key={item}>{item}</option>)}</select></label>
+            <label><span>3 · 主题</span><select value={subcategory} onChange={(event) => setSubcategory(event.target.value)}>{subcategories.map((item) => <option key={item}>{item}</option>)}</select></label>
+          </div>
+        </details>
+        <div className="archiveResultBar"><span>找到 {groups.length} 组资料</span>{activeFilterCount > 0 && <button type="button" onClick={() => { setSource("全部来源"); setCategory("全部类别"); setSubcategory("全部主题"); }}>清除筛选</button>}</div>
       </section>
       {filtered.length ? <section className={view === "card" ? "archiveRecordGrid" : "archiveRecordList"}>{groups.map((group) => <ArchiveRecordCard key={group[0].id} records={group}/>)}</section> : <EmptyState title="没有找到匹配资料" body="换一个编号、场馆或主题试试。"/>}
-      <section className="accessPolicy"><Icon name="shield" size={28}/><div><h3>浏览说明</h3><p>本页已接入团队在两处场馆采集的 68 张图像，并保留原始整理编号、主题和来源。图片用于侨批文化学习与项目成果展示；场馆正式馆藏名称、权利与释读信息仍以馆方资料为准。</p></div></section>
     </main>
   );
 }
@@ -433,61 +420,38 @@ function ArchiveRecordPage({ record }: { record: ArchiveIndexRecord }) {
           <div className="archiveRecordTop"><span className="archiveRecordId">{idLabel}</span><span className="archiveSource">{record.sourceInstitution}</span></div>
           <span className="overline">馆内展陈 · 图像资料</span>
           <h1>{archiveTitle(record)}</h1>
-          <p>{archiveContext(record) !== archiveTitle(record) ? archiveContext(record) : `本组共收录 ${relatedRecords.length} 件相关图像资料。`}</p>
+          <p>{archiveSummary(record)}</p>
         </header>
         <section className="archiveImageGallery" aria-label="图像资料">
           {relatedRecords.map((item) => {
-            const guide = archiveReadingGuide(item);
             return (
               <figure key={item.id}>
                 <a className="archiveGalleryCanvas" href={`/archive/${item.id}.webp`} target="_blank" rel="noreferrer">
                   <img className={archiveImageClass(item.id)} src={`/archive/${item.id}.webp`} alt={`${item.sourceInstitution ?? "侨批场馆"}的${archiveTitle(item)}`} decoding="async"/>
                 </a>
                 <figcaption>
-                  <div><b>{item.id}</b><span>{guide.visual}</span></div>
-                  <p><strong>{guide.readableLabel}</strong>{guide.readable}</p>
-                  <p><strong>内容说明</strong>{guide.significance}</p>
-                  {guide.readableLabel !== "馆内介绍" && <small>文字模糊、反光或手写正文难辨时不作低置信度转录；正式题名与全文释读以馆方资料为准。</small>}
+                  <span className="archiveCaptionMeta">{item.id} · {item.sourceInstitution}</span>
+                  <h2>{archiveTitle(item)}</h2>
+                  <p>{archiveSummary(item)}</p>
+                  <details className="captionDetails"><summary>资料信息</summary><dl><div><dt>材料</dt><dd>{item.materialType ?? "图像资料"}</dd></div><div><dt>分类</dt><dd>{item.subcategory}</dd></div></dl></details>
                 </figcaption>
               </figure>
             );
           })}
         </section>
-        {learningNote && (
-          <section className="archiveLearning" aria-labelledby="archive-learning-title">
-            <header>
-              <span className="overline">{learningNote.eyebrow}</span>
-              <h2 id="archive-learning-title">{learningNote.title}</h2>
-              <p>{learningNote.intro}</p>
-            </header>
-            <div className="archiveLearningGrid">
-              {learningNote.points.map((point, index) => (
-                <article key={point.title}>
-                  <span>{String(index + 1).padStart(2, "0")}</span>
-                  <h3>{point.title}</h3>
-                  <p>{point.body}</p>
-                </article>
-              ))}
-            </div>
-            <div className="archiveLearningSources">
-              <b>延伸阅读来源</b>
-              {learningNote.sources.map((source) => <a key={source.url} href={source.url} target="_blank" rel="noreferrer">{source.label} <Icon name="arrow" size={14}/></a>)}
-            </div>
+        {learningNote && <details className="archiveLearningDisclosure"><summary><span>延伸阅读</span><b>{learningNote.title}</b></summary><div><p>{learningNote.intro}</p><p>{learningNote.points[0].body} {learningNote.points[1].body}</p><p>{learningNote.points[2].body} {learningNote.points[3].body}</p><nav>{learningNote.sources.map((source) => <a key={source.url} href={source.url} target="_blank" rel="noreferrer">{source.label} <Icon name="arrow" size={14}/></a>)}</nav></div></details>}
+        <details className="recordDetails">
+          <summary><span>资料信息</span><small>来源、分类与编号</small></summary>
+          <section className="recordFacts">
+            <div><small>资料来源</small><b>{record.sourceInstitution ?? "来源待补充"}</b></div>
+            <div><small>内容类别</small><b>{record.category}</b></div>
+            <div><small>主题</small><b>{record.subcategory}</b></div>
+            <div><small>索引编号</small><b>{idLabel}</b></div>
+            <div><small>资料数量</small><b>{relatedRecords.length} 件</b></div>
+            <div><small>材料形式</small><b>{record.materialType ?? "图像资料"}</b></div>
           </section>
-        )}
-        <section className="recordFacts">
-          <div><small>资料来源</small><b>{record.sourceInstitution ?? "来源待补充"}</b></div>
-          <div><small>内容类别</small><b>{record.category}</b></div>
-          <div><small>主题</small><b>{record.subcategory}</b></div>
-          <div><small>索引编号</small><b>{idLabel}</b></div>
-          <div><small>资料数量</small><b>{relatedRecords.length} 件</b></div>
-          <div><small>材料形式</small><b>{record.materialType ?? "图像资料"}</b></div>
-        </section>
-        <aside className="sourceBox">
-          <div><Icon name="shield" size={24}/><h2>资料来源</h2></div>
-          <p><b>馆藏场馆</b><span>{record.sourceInstitution ?? "来源待补充"}</span><small>图片用于侨批文化学习与项目成果展示；展品名称、权利与正式释读以相应场馆资料为准。</small></p>
-          <p><b>整理编号</b><span>{idLabel}</span><small>编号用于保持同组图片、馆内说明与后续研究材料之间的对应关系。</small></p>
-        </aside>
+          <p className="recordDetailsNote">图片用于侨批文化学习与成果展示；正式名称与释读以相应场馆资料为准。</p>
+        </details>
         <SiteLink to="/archives" className="underLink">返回资料浏览 <Icon name="arrow" size={17}/></SiteLink>
       </article>
     </main>
