@@ -1,5 +1,5 @@
 /* Only cache this app's public static assets. Never cache API responses or private data. */
-const CACHE = 'yuanhang-static-v2-20261010';
+const CACHE = 'yuanhang-static-v3-1-20261010';
 const ASSETS = ['./', './index.html', './manifest.webmanifest', './icon.svg'];
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)).then(() => self.skipWaiting()));

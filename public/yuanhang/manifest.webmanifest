@@ -1,7 +1,7 @@
 {
   "name": "远航 · 2027 考研工作台",
   "short_name": "远航考研",
-  "description": "学习计划、日历、DDL 和可选云端同步",
+  "description": "学习计划、日历、DDL 与本地专注记录",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
