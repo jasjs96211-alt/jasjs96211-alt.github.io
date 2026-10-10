@@ -1,6 +1,6 @@
 # 远航监测 · iPhone 原生配套工程 0.1
 
-状态：首版源码与 Xcode 工程已建立，**尚未在 Xcode 编译、签名或安装到 iPhone**。不能把本目录或网页当成已经生效的监测服务。
+状态：首版源码与 Xcode 工程已建立，**2026-10-10 已通过云端 Xcode 16.4 未签名编译，尚未签名或安装到 iPhone**。不能把本目录或网页当成已经生效的监测服务。
 
 本工程与远航网页独立，不替换网页、不迁移浏览器学习记录，不恢复 Supabase，不修改侨批项目。
 
@@ -56,7 +56,9 @@ python3 Scripts/check_macos.py
 
 执行真正的 Swift 策略检查（北京时间跨日、阈值、状态、配置序列化），随后编译未签名 iOS 工程。不会安装、签名或上传；没有 Xcode 会明确失败，不伪报通过。
 
-`.github/workflows/yuanhang-ios-check.yml` 在原生源码变更时自动使用 GitHub 的标准 `macos-15` runner 执行以上检查，也可以手动触发。仅授予仓库读取权限，不读取 Apple 凭据、不生成可安装的签名 IPA，不修改网站部署流程。首轮云端编译结果待验证。
+`.github/workflows/yuanhang-ios-check.yml` 在原生源码变更时自动使用 GitHub 的标准 `macos-15` runner 执行以上检查，也可以手动触发。仅授予仓库读取权限，不读取 Apple 凭据、不生成可安装的签名 IPA，不修改网站部署流程。
+
+首轮云端运行 [38078402405](https://github.com/jasjs96211-alt/jasjs96211-alt.github.io/actions/runs/38078402405) 成功，验证源码提交 `150918bc406f1189e39cf11a43f66745dbab40c8`：11 项工程结构检查、Swift 阈值/北京时间跨日/状态语义/配置序列化检查、App 和三个扩展的未签名 iOS 构建。编译使用 Xcode 16.4，未调用 Apple 账户或设备；没有进行真实授权、通知或小组件验收。
 
 修改 target 结构后，可用 `python3 Scripts/generate_project.py` 重建 pbxproj、Info.plist、entitlements、shared scheme。生成器不修改 Swift 文件或 Signing.xcconfig。
 
@@ -73,7 +75,7 @@ python3 Scripts/check_macos.py
 
 ## 发布门槛 / 真机验收清单
 
-- [ ] Mac 上运行 `check_macos.py`，完成 Swift 检查与四个 targets 的 iOS 编译。
+- [x] 云端 Mac 上运行 `check_macos.py`，完成 Swift 检查与四个 targets 的未签名 iOS 编译。
 - [ ] 确认 Apple 团队、标识符、共享组、开发签名及设备安装。
 - [ ] 首次授权允许/拒绝、撤销授权、通知拒绝、设置中重新开启通知。
 - [ ] 选择单个应用、多个应用、类别、网站，验证统计范围与 App 内报告一致。
@@ -83,7 +85,7 @@ python3 Scripts/check_macos.py
 - [ ] 桌面两种尺寸、深浅色、大字体、点击跳回 App，检查系统刷新延迟。
 - [ ] 长期使用与性能；应用图标/分发素材、隐私声明和发布审核单独完善。
 
-当前只有工程静态检查可在 Linux 执行；以上原生验收未完成前，不标记“已上线可用”。
+Linux 可以进行工程结构检查；真正的 Swift 检查与 iOS 编译已由云端 Mac 完成。以上签名和原生真机验收未完成前，不标记“已上线可用”。
 
 ## Apple 官方依据
 
