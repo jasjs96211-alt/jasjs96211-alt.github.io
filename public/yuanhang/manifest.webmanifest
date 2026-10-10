@@ -1,0 +1,19 @@
+{
+  "name": "远航 · 2027 考研工作台",
+  "short_name": "远航考研",
+  "description": "学习计划、日历、DDL 和可选云端同步",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f4f5f1",
+  "theme_color": "#152e33",
+  "lang": "zh-CN",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
