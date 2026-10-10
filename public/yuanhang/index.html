@@ -11,6 +11,101 @@
 @media(max-width:1060px){.sidebar{width:70px;padding:25px 10px}.app{grid-template-columns:70px minmax(0,1fr)}.brand{padding:0;justify-content:center}.brand .brand-name,.tagline,.nav-btn span,.sidebar-bottom,.side-foot{display:none}.nav-btn{justify-content:center;padding:14px}.main{padding:27px 25px 80px}.stats{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:720px){.app{display:block;padding-bottom:72px}.sidebar{position:fixed;top:auto;bottom:0;left:0;right:0;height:auto;width:auto;z-index:200;padding:7px 8px max(7px,env(safe-area-inset-bottom));border-top:1px solid #39616a}.brand,.sidebar-bottom,.side-foot{display:none}.nav{display:flex;flex-direction:row;justify-content:space-around;gap:2px}.nav-btn{flex-direction:column;gap:2px;font-size:10px;padding:6px 2px;border-radius:9px;width:16.66%;min-width:0}.nav-btn svg{height:18px;width:18px}.nav-btn span{display:inline}.main{padding:23px 14px 65px}.main-title{font-size:22px}.topbar{align-items:flex-start}.top-actions .btn{padding:8px 11px;font-size:12px}.hero{padding:22px;min-height:0}.hero h2{font-size:19px}.hero .caption{font-size:11px}.countdown{padding:10px 12px}.countdown b{font-size:32px}.stats{gap:9px;margin:12px 0 18px}.stat{min-height:102px;padding:14px}.stat b{font-size:21px}.grid-2,.grid-2.equal{grid-template-columns:1fr;gap:0}.card{padding:17px;margin-bottom:12px}.calendar{gap:3px}.day{min-height:80px;padding:5px;border-radius:7px;gap:2px}.day.selected{padding:4px}.day-tag{padding:2px 3px;font-size:9px;line-height:1.2}.day-tags .day-tag:nth-child(n+2){display:none}.month-title{font-size:17px;min-width:105px}.form-grid{grid-template-columns:1fr}.span-2{grid-column:auto}.modal{padding:20px}.course-metrics{grid-template-columns:1fr}.topbar .eyebrow{font-size:9px}}
 @media(max-width:370px){.hero{display:block}.countdown{margin-top:15px;text-align:left;width:100%}.countdown b{display:inline;margin-right:10px}}
+
+/* iPhone 14 Pro / narrow phones: calendar-first responsive refinements.
+   Keep desktop/tablet rules and all application/data behavior unchanged. */
+.calendar-mobile-hint{display:none}
+@media(max-width:720px){
+ html{-webkit-text-size-adjust:100%}
+ body{overflow-x:hidden}
+ button{-webkit-tap-highlight-color:transparent}
+ .app{padding-bottom:0}
+ .main{padding:19px 13px calc(112px + env(safe-area-inset-bottom,0px));max-width:100%;overflow-x:clip}
+ .topbar{display:grid;grid-template-columns:minmax(0,1fr);gap:11px;margin-bottom:16px}
+ .topbar>div:first-child{min-width:0}
+ .topbar .eyebrow{font-size:9px;letter-spacing:.65px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+ .main-title{font-size:24px;margin:2px 0 0}
+ .topbar .top-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));width:100%;gap:9px}
+ .topbar .top-actions .btn{min-height:42px;font-size:13px;padding:9px 10px}
+ .sidebar{padding:7px 8px max(8px,env(safe-area-inset-bottom,0px));box-shadow:0 -4px 16px rgba(15,45,48,.12)}
+ .nav{gap:3px;align-items:stretch}
+ .nav-btn{flex:1 1 0;width:0;min-width:0;min-height:53px;padding:6px 0 5px;gap:3px;font-size:10px;line-height:1.1;white-space:nowrap}
+ .nav-btn svg{width:19px;height:19px;flex-shrink:0}
+ .nav-btn[data-nav="cloud"] span{font-size:0}
+ .nav-btn[data-nav="cloud"] span::after{content:'同步';font-size:10px}
+ .hero{padding:19px 16px;gap:10px;min-height:0;align-items:start;display:grid;grid-template-columns:minmax(0,1fr) auto}
+ .hero>div:first-child{min-width:0}
+ .hero h2{font-size:18px;line-height:1.42;margin:10px 0 8px;overflow-wrap:anywhere}
+ .hero .hero-kicker{font-size:10px;letter-spacing:.8px}
+ .hero .caption{font-size:11px;line-height:1.55}
+ .countdown{padding:11px 8px;min-width:91px;max-width:104px}
+ .countdown b{font-size:37px}
+ .countdown small{font-size:9px;line-height:1.45;display:block}
+ .stats{gap:9px}
+ .stat{padding:14px 13px;min-height:105px;min-width:0}
+ .stat b{font-size:22px}
+ .stat .hint{line-height:1.35;overflow-wrap:anywhere}
+ .grid-2,.grid-2.equal{grid-template-columns:minmax(0,1fr)}
+ .grid-2>div{min-width:0}
+ .card{padding:16px 13px;margin-bottom:12px;min-width:0}
+ .card-head{gap:7px;flex-wrap:wrap}
+ .card h3{font-size:16px}
+ .toolbar{display:flex;flex-direction:column;align-items:stretch;gap:11px;margin:0 0 14px}
+ .month-nav{display:grid;grid-template-columns:44px minmax(0,1fr) 44px;gap:8px;width:100%;align-items:center}
+ .month-nav>.btn{width:44px;height:44px;min-width:44px;padding:0;font-size:20px;border-radius:12px}
+ .month-title{font-size:21px;min-width:0;text-align:center;white-space:nowrap;letter-spacing:.3px}
+ .chipline{gap:6px;align-items:center;flex-wrap:wrap}
+ .chipline .pill{padding:5px 8px;font-size:10px}
+ #todayMonth{margin-left:auto;min-height:36px;padding:7px 10px}
+ .calendar{gap:3px;grid-template-columns:repeat(7,minmax(0,1fr))}
+ .weekday{padding:5px 0 8px;font-size:11px;color:#708581}
+ .day{min-height:61px;min-width:0;border-radius:10px;padding:7px 1px 5px;gap:4px;align-items:center;justify-content:flex-start;background:#fcfdfb;border-color:#e2eae6;position:relative;touch-action:manipulation}
+ .day.off{opacity:.32}
+ .day.today{background:#f0f8f4;border-color:#9bcbbb}
+ .day.selected{background:#e4f4ed;border:2px solid var(--accent);padding:6px 0 4px;box-shadow:0 1px 3px rgba(31,101,85,.09)}
+ .daynum{display:flex;justify-content:center;align-items:center;width:100%;height:24px;gap:0;font-size:14px;font-weight:780;line-height:24px;font-variant-numeric:tabular-nums}
+ .day.today .daynum,.day.selected .daynum{color:#19665b}
+ .daynum .dot{display:none}
+ .day-tags{width:100%;min-width:0;display:flex;flex-direction:row;justify-content:center;align-items:center;gap:3px;overflow:hidden;white-space:nowrap;min-height:6px}
+ .day-tag,.day-tags .day-tag:nth-child(n+2){display:block;flex:0 0 6px;width:6px;height:6px;min-width:6px;border-radius:50%;padding:0;font-size:0;line-height:0;color:transparent;overflow:hidden;text-indent:-200px}
+ .day-tag.study{background:#429983}
+ .day-tag.ddl{background:#c77848}
+ .day-tag.registration{background:#6584b8}
+ .day-tag.exam{background:#d35d55}
+ .day-tag:not([class*="study"]):not([class*="ddl"]):not([class*="registration"]):not([class*="exam"]){background:#9dada5}
+ .calendar-mobile-hint{display:block;margin:12px 1px 0;font-size:11px;color:#76867d;line-height:1.55}
+ #selectedDateTitle{font-size:16px;min-width:0;overflow-wrap:anywhere}
+ #selectedEvents .task-row,.task-row{grid-template-columns:21px minmax(0,1fr);gap:9px;padding:14px 0;align-items:start}
+ .task-row input[type=checkbox]{width:19px;height:19px;margin-top:2px}
+ .task-row>div:nth-child(2){min-width:0}
+ .task-title{line-height:1.45;overflow-wrap:anywhere}
+ .task-actions{grid-column:2;justify-content:flex-end;align-self:center;gap:8px;max-width:100%}
+ .task-actions .btn{min-height:34px;min-width:44px}
+ .task-detail{gap:6px;line-height:1.5}
+ .task-detail span{overflow-wrap:anywhere}
+ .event-body strong{white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+ .footline{flex-wrap:wrap}
+ .footline .btn{min-height:40px}
+ .form-group input,.form-group select,.form-group textarea{font-size:16px;min-height:44px;width:100%}
+ .modal-scrim{align-items:flex-end;padding:0}
+ .modal{max-width:none;width:100%;border-radius:22px 22px 0 0;padding:24px 17px calc(23px + env(safe-area-inset-bottom,0px));max-height:calc(100vh - 22px);max-height:calc(100dvh - 22px)}
+ .modal-foot>.btn{min-height:44px}
+ .toast{bottom:calc(92px + env(safe-area-inset-bottom,0px));left:14px;right:14px;max-width:none}
+}
+@media(max-width:370px){
+ .main{padding-left:10px;padding-right:10px}
+ .card{padding:13px 10px}
+ .calendar{gap:2px}
+ .day{min-height:56px;padding-left:0;padding-right:0}
+ .day.selected{padding-left:0;padding-right:0}
+ .month-title{font-size:19px}
+ .nav-btn{font-size:9px}
+ .nav-btn[data-nav="cloud"] span::after{font-size:9px}
+ .hero{grid-template-columns:1fr}
+ .countdown{margin-top:5px;max-width:none;min-width:0;display:flex;align-items:center;gap:12px;text-align:left;width:100%}
+ .countdown b{display:inline;font-size:33px;margin:0}
+}
+@media (prefers-reduced-motion:reduce){.day{transition:none}}
 </style>
 </head>
 <body>
@@ -31,7 +126,7 @@
 <div class="card"><div class="card-head"><h3>今天的安排</h3><button class="btn btn-sm" id="addToday">＋ 添加</button></div><div id="todayTasks"></div></div></div>
 <div><div class="card"><div class="card-head"><h3>近期重要日程</h3><button class="btn btn-sm" data-goto="calendar">查看日历 →</button></div><div id="upcoming"></div></div><div class="card"><div class="card-head"><h3>最近 7 天 · 行为反馈</h3><span class="pill">小时</span></div><div id="dashboardBars"></div></div></div></div>
 </section>
-<section id="calendar" class="section"><div class="card"><div class="toolbar"><div class="month-nav"><button class="btn btn-sm" id="prevMonth">←</button><span class="month-title" id="monthLabel">—</span><button class="btn btn-sm" id="nextMonth">→</button></div><div class="chipline"><span class="pill warn">DDL</span><span class="pill blue">报名/考务</span><span class="pill green">自定义</span><button class="btn btn-sm" id="todayMonth">回到今天</button></div></div><div class="calendar" id="calendarGrid"></div></div><div class="card"><div class="card-head"><h3 id="selectedDateTitle">当日安排</h3><button class="btn btn-sm btn-primary" id="addSelectedDate">＋ 新建</button></div><div id="selectedEvents"></div></div></section>
+<section id="calendar" class="section"><div class="card"><div class="toolbar"><div class="month-nav"><button class="btn btn-sm" id="prevMonth">←</button><span class="month-title" id="monthLabel">—</span><button class="btn btn-sm" id="nextMonth">→</button></div><div class="chipline"><span class="pill warn">DDL</span><span class="pill blue">报名/考务</span><span class="pill green">自定义</span><button class="btn btn-sm" id="todayMonth">回到今天</button></div></div><div class="calendar" id="calendarGrid"></div><p class="calendar-mobile-hint">点击日期查看下方安排 · 彩色圆点表示当天有事项</p></div><div class="card"><div class="card-head"><h3 id="selectedDateTitle">当日安排</h3><button class="btn btn-sm btn-primary" id="addSelectedDate">＋ 新建</button></div><div id="selectedEvents"></div></div></section>
 <section id="tasks" class="section"><div class="card"><div class="card-head"><h3>计划与截止日期</h3><button class="btn btn-sm btn-primary" id="addTask">＋ 添加任务</button></div><div class="filter-row" id="taskFilters"><button class="filter-btn active" data-filter="all">全部</button><button class="filter-btn" data-filter="unfinished">未完成</button><button class="filter-btn" data-filter="soon">未来14天</button><button class="filter-btn" data-filter="done">已完成</button></div><div id="taskList" style="margin-top:15px"></div></div><div class="card"><div class="card-head"><h3>专业课复习现状</h3><span class="pill green">根据你此前的进度预设</span></div><div class="course-metrics"><div class="course-metric"><span>外国文学史 · 欧美部分</span><strong>已过一轮，能回忆框架和部分细节</strong></div><div class="course-metric"><span>中国古代文学史</span><strong>已到魏晋，下一步：南北朝至清代</strong></div><div class="course-metric"><span>中国现当代文学史</span><strong>五四新文学，目标10/20全书一轮</strong></div><div class="course-metric"><span>中西文论、比较文学</span><strong>抓紧首轮覆盖与闭卷回忆</strong></div></div><p class="helper">这是起始状态，不会自动推断你的真实掌握情况。你可以通过上方任务标记完成或新增章节任务。</p></div></section>
 <section id="focus" class="section"><div class="grid-2 equal"><div class="card"><div class="card-head"><h3>学习计时器</h3><span class="pill green">练习 → 反馈 → 巩固</span></div><div class="seg" id="timerPresets"><button data-min="25" class="active">25 分钟</button><button data-min="45">45 分钟</button><button data-min="60">60 分钟</button></div><div class="form-group" style="margin-top:18px"><label>本次学习科目</label><select id="timerSubject"><option>中国现当代文学史</option><option>中国古代文学史</option><option>西方文论</option><option>中国古代文论</option><option>比较文学</option><option>欧美文学史复习</option><option>政治</option><option>英语</option><option>其他</option></select></div><div class="timer-wrap"><div class="timer-ring" id="timerRing"><div class="timer-inner"><b id="timerDisplay">25:00</b><span id="timerLabel">准备开始</span></div></div><div class="timer-actions"><button class="btn btn-primary" id="timerToggle">▶ 开始专注</button><button class="btn" id="timerReset">重置</button></div><p class="helper">页面打开时正常计时；后台或手机锁屏后，计时完成不保证发出通知。建议配合 iPhone 系统计时器。</p></div></div><div class="card"><div class="card-head"><h3>补录学习时间</h3></div><form id="manualStudy" class="form-grid"><div class="form-group"><label>日期</label><input type="date" id="studyDate" required></div><div class="form-group"><label>时长（分钟）</label><input type="number" id="studyMinutes" min="1" max="1440" placeholder="例如：60" required></div><div class="form-group span-2"><label>科目</label><select id="studySubject"><option>中国现当代文学史</option><option>中国古代文学史</option><option>西方文论</option><option>中国古代文论</option><option>比较文学</option><option>欧美文学史复习</option><option>政治</option><option>英语</option><option>其他</option></select></div><div class="span-2"><button class="btn btn-primary" type="submit">＋ 记入学习时间</button></div></form><div style="height:20px"></div><div class="card-head"><h3>最近学习记录</h3><span class="pill">手动 + 计时</span></div><div class="sessions" id="recentSessions"></div><div class="footline"><button class="btn btn-soft btn-sm" id="copyReport">复制今日查岗汇报</button><small>复制后粘贴给 ChatGPT</small></div></div></div></section>
 <section id="screen" class="section"><div class="banner">📱 <strong>重要：</strong>此工作台目前不能直接读取 iPhone 的「屏幕使用时间」。这里的数据需要你输入；想实现游戏时长超限自动提醒，需要另外开发并安装获得系统授权的 iOS 原生应用。</div><div class="grid-2 equal"><div class="card"><div class="card-head"><h3>记录今天使用了多久手机</h3><span class="pill blue">手动录入</span></div><form id="screenForm" class="form-grid"><div class="form-group"><label>记录日期</label><input type="date" id="screenDate" required></div><div class="form-group"><label>全天屏幕时间（分钟）</label><input type="number" id="screenTotal" min="0" max="1440" placeholder="例如 320" required></div><div class="form-group"><label>娱乐总时长（分钟）</label><input type="number" id="screenEntertainment" min="0" max="1440" placeholder="例如 180" required></div><div class="form-group"><label>其中游戏时长（分钟）</label><input type="number" id="screenGame" min="0" max="1440" placeholder="例如 90" required></div><div class="form-group span-2"><label>备注（可选）</label><input id="screenNote" placeholder="例如：刷视频偏多；今晚11点前休息"></div><div class="span-2"><button class="btn btn-primary" type="submit">保存屏幕时间</button></div></form><p class="helper">手机查看路径：设置 → 屏幕使用时间 → 查看所有 App 与网站活动。</p></div><div class="card"><div class="card-head"><h3>行为对照</h3><span class="pill">当日</span></div><div class="screen-numbers"><div class="screen-number"><small>学习</small><b id="screenStudyStat">—</b></div><div class="screen-number"><small>娱乐</small><b id="screenEntStat">—</b></div></div><div id="screenBars"></div><p class="helper">娱乐时长是你自行记录的估算/系统读数，不会监视其他 App。屏幕时间并不等同于浪费时间。</p></div></div><div class="card"><div class="card-head"><h3>建议的 iPhone 限制</h3></div><div class="label-list"><div class="label-item"><span>设置 → 屏幕使用时间 → App 限额</span><em>给《三角洲行动》、短视频等设置上限</em></div><div class="label-item"><span>设置 → 专注模式 → 学习</span><em>学习时减少通知干扰</em></div><div class="label-item"><span>设置 → 屏幕使用时间 → 停用时间</span><em>在固定时段限制娱乐 App</em></div></div></div></section>
@@ -99,7 +194,7 @@ function renderDashboard(){let d=today(),mil=nextMilestone();$('statDue').textCo
 let current=state.events.filter(x=>isOn(x,d)).sort((a,b)=>{let order={ddl:0,registration:1,exam:2,study:3};return order[a.category]-order[b.category]});$('todayTasks').innerHTML=current.length?current.map(e=>`<label class="today-item ${e.done?'done':''}"><input type="checkbox" data-done="${escapeHTML(e.id)}" ${e.done?'checked':''}><span>${escapeHTML(e.title)}<small style="display:block;font-weight:400">${escapeHTML(e.details||'')} · 截止 ${short(e.end)}</small></span><span class="pill ${e.category==='registration'?'blue':e.category==='ddl'?'warn':'green'}">${catLabel(e.category)}</span></label>`).join(''):'<div class="empty">今天还没有安排。可以新建一项小任务。</div>';
 let next=state.events.filter(x=>x.end>=d&&!x.done).sort((a,b)=>a.end.localeCompare(b.end)).slice(0,5);$('upcoming').innerHTML=next.length?next.map(e=>`<div class="event-row"><div class="date-chip"><b>${+e.end.slice(8)}</b><span>${+e.end.slice(5,7)} 月</span></div><div class="event-body"><strong>${escapeHTML(e.title)}</strong><p>${escapeHTML(fmtDayStatus(e))} · ${e.start===e.end?'单日安排':short(e.start)+'—'+short(e.end)}</p></div><span class="pill ${e.category==='ddl'?'warn':e.category==='registration'?'blue':'green'}">${catLabel(e.category)}</span></div>`).join(''):'<div class="empty">暂无近期安排</div>';renderBars('dashboardBars')}
 function renderBars(target){let start=today();let vals=Array.from({length:7},(_,i)=>{let d=plus(start,i-6);return{date:d,study:studyMins(d),ent:state.screen[d]?.entertainment||0}});let max=Math.max(120,...vals.flatMap(x=>[x.study,x.ent]));$(target).innerHTML=`<div class="week-bars">${vals.map(x=>`<div class="bar-group"><div class="bar-pair"><div class="bar" title="学习${x.study}分钟" style="height:${Math.max(2,x.study/max*116)}px"></div><div class="bar ent" title="娱乐${x.ent}分钟" style="height:${Math.max(2,x.ent/max*116)}px"></div></div><small>${+x.date.slice(8)}日</small></div>`).join('')}</div><div class="legend"><span><i></i>学习时长</span><span><i class="ent-key"></i>娱乐屏幕时间</span></div>`}
-function renderCalendar(){let [y,m]=monthCursor.split('-').map(Number);$('monthLabel').textContent=`${y}年 ${m}月`;$('selectedDateTitle').textContent=`${fmt(selectedDate)} · 当日安排`;let dow=['日','一','二','三','四','五','六'].map(x=>`<div class="weekday">周${x}</div>`).join('');let first=new Date(Date.UTC(y,m-1,1)).getUTCDay();let all=new Date(Date.UTC(y,m,0)).getUTCDate();let content=[];for(let n=0;n<Math.ceil((first+all)/7)*7;n++){let num=n-first+1,d=new Date(Date.UTC(y,m-1,num)).toISOString().slice(0,10),off=num<1||num>all,events=state.events.filter(x=>isOn(x,d));content.push(`<button type="button" class="day ${off?'off':''} ${d===today()?'today':''} ${d===selectedDate?'selected':''}" data-date="${d}"><span class="daynum">${+d.slice(8)}${events.length?'<i class="dot"></i>':''}</span><div class="day-tags">${events.slice(0,2).map(e=>`<span class="day-tag ${e.category}">${escapeHTML(e.title)}</span>`).join('')}${events.length>2?`<span class="day-tag">+${events.length-2}</span>`:''}</div></button>`)}$('calendarGrid').innerHTML=dow+content.join('');const selected=state.events.filter(x=>isOn(x,selectedDate)).sort((a,b)=>a.end.localeCompare(b.end));$('selectedEvents').innerHTML=selected.length?selected.map(eventHtml).join(''):'<div class="empty">这一天暂无安排，可以添加新的复习任务。</div>'}
+function renderCalendar(){let [y,m]=monthCursor.split('-').map(Number);$('monthLabel').textContent=`${y}年 ${m}月`;$('selectedDateTitle').textContent=`${fmt(selectedDate)} · 当日安排`;let dow=['日','一','二','三','四','五','六'].map(x=>`<div class="weekday">周${x}</div>`).join('');let first=new Date(Date.UTC(y,m-1,1)).getUTCDay();let all=new Date(Date.UTC(y,m,0)).getUTCDate();let content=[];for(let n=0;n<Math.ceil((first+all)/7)*7;n++){let num=n-first+1,d=new Date(Date.UTC(y,m-1,num)).toISOString().slice(0,10),off=num<1||num>all,events=state.events.filter(x=>isOn(x,d));content.push(`<button type="button" class="day ${off?'off':''} ${d===today()?'today':''} ${d===selectedDate?'selected':''}" data-date="${d}" aria-pressed="${d===selectedDate}" aria-label="${escapeHTML(`${d}，${events.length?`${events.length}项安排：${events.map(e=>e.title).join('、')}`:'无安排'}`)}"><span class="daynum">${+d.slice(8)}${events.length?'<i class="dot"></i>':''}</span><div class="day-tags">${events.slice(0,2).map(e=>`<span class="day-tag ${e.category}">${escapeHTML(e.title)}</span>`).join('')}${events.length>2?`<span class="day-tag">+${events.length-2}</span>`:''}</div></button>`)}$('calendarGrid').innerHTML=dow+content.join('');const selected=state.events.filter(x=>isOn(x,selectedDate)).sort((a,b)=>a.end.localeCompare(b.end));$('selectedEvents').innerHTML=selected.length?selected.map(eventHtml).join(''):'<div class="empty">这一天暂无安排，可以添加新的复习任务。</div>'}
 function eventHtml(e){return `<div class="task-row"><input type="checkbox" data-done="${escapeHTML(e.id)}" ${e.done?'checked':''}><div><div class="task-title ${e.done?'done':''}">${escapeHTML(e.title)}</div><div class="task-detail"><span class="pill ${e.category==='ddl'?'warn':e.category==='registration'?'blue':e.category==='exam'?'warn':'green'}">${catLabel(e.category)}</span><span>${short(e.start)}—${short(e.end)}</span><span>${fmtDayStatus(e)}</span></div>${e.details?`<p class="subtle" style="margin:8px 0 0">${escapeHTML(e.details)}</p>`:''}</div><div class="task-actions"><button class="btn btn-sm" data-edit="${escapeHTML(e.id)}" aria-label="编辑">编辑</button><button class="btn btn-sm btn-danger" data-delete="${escapeHTML(e.id)}" aria-label="删除">×</button></div></div>`}
 function renderTasks(){let d=today(),items=[...state.events].sort((a,b)=>a.end.localeCompare(b.end));items=items.filter(e=>taskFilter==='all'||taskFilter==='unfinished'&&!e.done||taskFilter==='done'&&e.done||taskFilter==='soon'&&!e.done&&diff(e.end,d)>=0&&diff(e.end,d)<=14);$('taskList').innerHTML=items.length?items.map(eventHtml).join(''):'<div class="empty">暂无符合筛选条件的任务。</div>';document.querySelectorAll('[data-filter]').forEach(x=>x.classList.toggle('active',x.dataset.filter===taskFilter))}
 function renderFocus(){let records=[...state.sessions].sort((a,b)=>String(b.at||b.date).localeCompare(String(a.at||a.date))).slice(0,16);$('recentSessions').innerHTML=records.length?records.map(x=>`<div class="session-line"><div><strong>${escapeHTML(x.subject)}</strong><br><small>${escapeHTML(x.date)}</small></div><span>${x.minutes} 分钟 <button class="btn btn-sm" data-remove-session="${escapeHTML(x.id)}" aria-label="删除学习记录">×</button></span></div>`).join(''):'<div class="empty">还没有学习记录。完成一个专注单元就开始积累。</div>'}
