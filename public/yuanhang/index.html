@@ -138,9 +138,13 @@ render();updateTimer();if('serviceWorker' in navigator&&location.protocol.starts
 const rootKey='yuanhang_cloud_sync_v2';
 const baseStorageKey='sisu_2027_study_workbench_v1';
 const byId=id=>document.getElementById(id);
-let cfg={url:'',key:'',email:'',session:null,remoteRevision:null,connected:false};
+const DEFAULT_PROJECT_URL='https://myejuodrhgdxphdkrvsa.supabase.co';
+const DEFAULT_PUBLIC_KEY='sb_publishable_PDlkk1ZY9WUH78qzPoJiFQ_kGiIYFr7';
+let cfg={url:DEFAULT_PROJECT_URL,key:DEFAULT_PUBLIC_KEY,email:'',session:null,remoteRevision:null,connected:false};
 let pendingSave=false, dirty=false, syncing=false, debounce=null, lastCloudCheck=0;
 try{cfg={...cfg,...JSON.parse(localStorage.getItem(rootKey)||'{}')}}catch{}
+if(!cfg.url)cfg.url=DEFAULT_PROJECT_URL;
+if(!cfg.key)cfg.key=DEFAULT_PUBLIC_KEY;
 if(!cfg.session?.access_token)cfg.connected=false;
 function metaSave(){localStorage.setItem(rootKey,JSON.stringify(cfg))}
 function status(msg,kind=''){byId('cloudMessage').textContent=msg;byId('cloudBadge').textContent=kind||((cfg.connected&&cfg.session)?'已连接':'离线');byId('cloudRevision').textContent=cfg.remoteRevision==null?'无云端版本':`修订 ${cfg.remoteRevision}`}
