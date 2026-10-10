@@ -1,0 +1,4 @@
+// Select your Apple Developer team in Xcode; do not put certificates here.
+DEVELOPMENT_TEAM =
+YH_BUNDLE_PREFIX = dev.jas.yuanhang
+YH_APP_GROUP = group.$(YH_BUNDLE_PREFIX).monitor
