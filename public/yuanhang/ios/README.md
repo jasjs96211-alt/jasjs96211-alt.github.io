@@ -16,7 +16,7 @@
 
 ## 安装前必须具备的条件
 
-1. 可使用的 Mac 与支持 iPhone 当前系统的 Xcode（工程最低 iOS 17.4）。
+1. 支持 iPhone 当前系统的 Xcode 构建环境（工程最低 iOS 17.4）。可以使用 GitHub 云端 macOS，不要求用户拥有 Mac；签名及实际安装仍需单独配置。
 2. 有权配置 Family Controls 和 App Groups 的 Apple 开发者团队及签名。不要假定普通免费个人签名具备全部能力。
 3. 用户在 iPhone 上亲自授予屏幕时间与通知权限；必要时启用开发者模式。
 4. 走 TestFlight / App Store 等分发路径时，账户持有人还需为主 App 和 Screen Time 扩展申请 Family Controls 分发授权。源码本身不等于获得授权。
@@ -48,13 +48,15 @@ python3 Tests/test_project.py
 
 只检查工程引用、文件分配、权限边界和配置；**不能证明 Swift 能编译或 iOS 监测正常**。
 
-Mac + Xcode：
+Mac + Xcode（本地或云端）：
 
 ```sh
 python3 Scripts/check_macos.py
 ```
 
 执行真正的 Swift 策略检查（北京时间跨日、阈值、状态、配置序列化），随后编译未签名 iOS 工程。不会安装、签名或上传；没有 Xcode 会明确失败，不伪报通过。
+
+`.github/workflows/yuanhang-ios-check.yml` 在原生源码变更时自动使用 GitHub 的标准 `macos-15` runner 执行以上检查，也可以手动触发。仅授予仓库读取权限，不读取 Apple 凭据、不生成可安装的签名 IPA，不修改网站部署流程。首轮云端编译结果待验证。
 
 修改 target 结构后，可用 `python3 Scripts/generate_project.py` 重建 pbxproj、Info.plist、entitlements、shared scheme。生成器不修改 Swift 文件或 Signing.xcconfig。
 

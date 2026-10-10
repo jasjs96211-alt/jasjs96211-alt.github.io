@@ -7,7 +7,7 @@
 - 目标：服务 2027 上外比较文学与世界文学备考，减少配置负担。
 - 线上地址：https://jasjs96211-alt.github.io/yuanhang/
 - 仓库：jasjs96211-alt/jasjs96211-alt.github.io，main 分支。
-- 修改范围仅限 `public/yuanhang/`。不改仓库其他项目、根目录配置或侨批内容。
+- 产品代码修改范围仅限 `public/yuanhang/`。另允许独立的 `.github/workflows/yuanhang-ios-check.yml` 检查远航原生工程；不改其他项目、根目录产品配置、现有部署工作流或侨批内容。
 - 使用现有 GitHub Pages 工作流：根项目构建后原样复制 public 内容至 dist。
 - 不迁移托管地址，避免改变浏览器本地数据所属域名。
 
@@ -60,7 +60,7 @@
 覆盖旧数据加载、日历跨年选择、逾期任务、完成与撤销、周/月统计、计时刷新/暂停/跨天/去重、原有补录、备份导入及失败保护、ICS 日期与转义。
 这是受控 DOM 的行为测试，不是 Safari 或布局渲染测试。
 
-发布前运行上述回归、`git diff --check`、现有 `npm run build`；确认 Git diff 仅包含远航目录，再提交 main 并检查该提交的 GitHub Actions Pages 部署。
+发布前运行上述回归、`git diff --check`、现有 `npm run build`；确认 Git diff 仅包含远航目录及专用原生检查工作流，再提交 main 并检查该提交的 GitHub Actions Pages 部署。
 本次环境缺少 control-browser，按 Sites 技能要求不启动预览、不安装浏览器；手机/桌面视觉验收明确待完成。
 关闭网页后的提醒仍由系统日历等承担，网页不会持续在后台运行。
 

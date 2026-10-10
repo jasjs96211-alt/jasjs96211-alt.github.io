@@ -1,0 +1,37 @@
+name: Yuanhang iOS checks
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'public/yuanhang/ios/**'
+      - '.github/workflows/yuanhang-ios-check.yml'
+  pull_request:
+    paths:
+      - 'public/yuanhang/ios/**'
+      - '.github/workflows/yuanhang-ios-check.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: yuanhang-ios-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  unsigned-build:
+    name: Swift checks and unsigned iOS build
+    runs-on: macos-15
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Show Xcode version
+        run: xcodebuild -version
+      - name: Check project structure
+        run: python3 public/yuanhang/ios/Tests/test_project.py
+      - name: Compile policy checks and all iOS targets
+        run: python3 public/yuanhang/ios/Scripts/check_macos.py
