@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import vm from 'node:vm';
 import {readFileSync} from 'node:fs';
 const html=readFileSync(new URL('../index.html',import.meta.url),'utf8');
-const code=[...html.matchAll(/<script>([\s\S]*?)<\/script>/g)].map(x=>x[1]).join('\n');
+const code=readFileSync(new URL('../usage.js',import.meta.url),'utf8')+'\n'+[...html.matchAll(/<script>([\s\S]*?)<\/script>/g)].map(x=>x[1]).join('\n');
 const KEY='sisu_2027_study_workbench_v1';
 function boot({data,storage=new Map(),now='2026-10-10T12:00:00Z'}={}){
  if(data)storage.set(KEY,JSON.stringify(data));
@@ -91,4 +91,53 @@ test('a paused timer in another tab cannot be completed by a stale tab',()=>{
 
 test('failed import persistence preserves in-memory and stored data',async()=>{
  const original=data([event()]),a=boot({data:original});a.run("localStorage.setItem=(key,value)=>{if(key===STORAGE)throw Error('quota')}");await a.get('importJson').onchange({target:{files:[{text:async()=>JSON.stringify(data([event({id:'replacement'})]))}],value:'x'}});assert.deepEqual(a.snapshot(),original);assert.equal(a.run('state.events[0].id'),'one');
+});
+
+async function previewUsage(a,text){await a.get('usageFile').onchange({target:{files:[{size:Buffer.byteLength(text),text:async()=>text}],value:'file'}})}
+const usageLine=(start='2026-10-10T12:00:00+08:00',minutes='30',separator='｜')=>`三角洲行动 ${separator} ${start} ${separator} ${minutes}分钟`;
+test('usage import previews without mutation, preserves study/manual records, and survives reload',async()=>{
+ const original={...data([event()],[{id:'s',date:'2026-10-10',minutes:60,subject:'英语'}]),screen:{'2026-10-10':{total:120,entertainment:90,game:60,note:'系统读数'}}};
+ const a=boot({data:original});await previewUsage(a,usageLine());assert.deepEqual(a.snapshot(),original);assert.equal(a.get('confirmUsageImport').disabled,false);
+ a.get('confirmUsageImport').onclick();assert.equal(a.snapshot().usageSessions.length,1);assert.deepEqual(a.snapshot().screen,original.screen);assert.deepEqual(a.snapshot().sessions,original.sessions);assert.deepEqual(a.snapshot().events,original.events);
+ const b=boot({storage:a.storage});assert.equal(b.get('usageToday').textContent,'30 分钟');assert.equal(b.get('statScreen').textContent,'1.5h');assert.match(b.get('usageDashboardHint').textContent,/30 分钟/);
+});
+test('usage import accepts BOM, CRLF, both pipes, spaces, fractions and canonical timezones',async()=>{
+ const a=boot();await previewUsage(a,'\uFEFF'+usageLine(undefined,'0.5','|')+'\r\n'+usageLine('2026-10-10T13:00:00+08:00','2,5')+'\r\n\r\n');a.get('confirmUsageImport').onclick();assert.equal(a.get('usageToday').textContent,'3 分钟');
+ await previewUsage(a,usageLine('2026-10-10T04:00:00Z','0.5'));assert.equal(a.get('confirmUsageImport').disabled,true);assert.match(a.get('usagePreviewText').textContent,/重复 1 条/);
+});
+test('duplicate or manually rerun sessions do not inflate duration and new rows still import',async()=>{
+ const a=boot();await previewUsage(a,[usageLine(),usageLine(),usageLine(undefined,'120')].join('\n'));assert.match(a.get('usagePreviewText').textContent,/重复 1 条/);assert.match(a.get('usagePreviewText').textContent,/时长不同 1 条/);a.get('confirmUsageImport').onclick();assert.equal(a.snapshot().usageSessions.length,1);assert.equal(a.get('usageToday').textContent,'30 分钟');
+ await previewUsage(a,[usageLine(),usageLine('2026-10-10T14:00:00+08:00','15')].join('\n'));a.get('confirmUsageImport').onclick();assert.equal(a.snapshot().usageSessions.length,2);assert.equal(a.get('usageToday').textContent,'45 分钟');
+});
+test('invalid logs and start-only files never silently become valid usage',async()=>{
+ const a=boot({data:data([event()])}),before=a.snapshot();
+ const invalid=[usageLine(undefined,'-1'),usageLine(undefined,'NaN'),usageLine(undefined,'1441'),usageLine('2026-02-30T12:00:00+08:00'),usageLine('2026-10-10T12:00:00'),usageLine('2026-10-11T12:00:00+08:00'),'<img onerror=alert(1)>|2026-10-10T12:00:00+08:00|3分钟','2026-10-10T12:00:00+08:00'];
+ await previewUsage(a,invalid.join('\n'));assert.equal(a.get('confirmUsageImport').disabled,true);assert.match(a.get('usagePreviewText').textContent,/格式异常 8 行/);assert.deepEqual(a.snapshot(),before);assert.doesNotMatch(a.get('usageRows').innerHTML,/onerror/);
+ await previewUsage(a,usageLine()+'\n'+invalid[0]);assert.match(a.get('usagePreviewText').textContent,/可新增 1 条/);assert.match(a.get('usagePreviewText').textContent,/格式异常 1 行/);a.get('cancelUsageImport').onclick();assert.deepEqual(a.snapshot(),before);
+});
+test('usage statistics split midnight, union overlapping intervals and start week on Monday',async()=>{
+ const a=boot();await previewUsage(a,[usageLine('2026-10-09T23:50:00+08:00','30'),usageLine('2026-10-10T00:10:00+08:00','30'),usageLine('2026-10-04T12:00:00+08:00','60'),usageLine('2026-10-05T12:00:00+08:00','60')].join('\n'));a.get('confirmUsageImport').onclick();
+ assert.equal(a.get('usageToday').textContent,'40 分钟');assert.equal(a.get('usageWeek').textContent,'110 分钟');assert.equal(a.get('usageMonth').textContent,'170 分钟');a.get('usageDate').value='2026-10-09';a.get('usageDate').onchange();assert.match(a.get('usageDaySummary').textContent,/10 分钟/);
+});
+test('excluded test sessions stay excluded after reimport and restore without loss',async()=>{
+ const a=boot();await previewUsage(a,usageLine());a.get('confirmUsageImport').onclick();const id=a.snapshot().usageSessions[0].id;
+ a.get('usageRows').onclick({target:{closest:()=>({dataset:{usageToggle:id}})}});assert.equal(a.get('usageToday').textContent,'0 分钟');assert.equal(a.snapshot().usageSessions[0].excluded,true);
+ await previewUsage(a,usageLine()+'\n'+usageLine('2026-10-10T14:00:00+08:00','10'));a.get('confirmUsageImport').onclick();assert.equal(a.get('usageToday').textContent,'10 分钟');
+ a.get('usageRows').onclick({target:{closest:()=>({dataset:{usageToggle:id}})}});assert.equal(a.get('usageToday').textContent,'40 分钟');
+});
+test('usage backup roundtrip preserves exclusions; malformed usage backup rejected',async()=>{
+ const a=boot();await previewUsage(a,usageLine());a.get('confirmUsageImport').onclick();a.run('state.usageSessions[0].excluded=true;save()');const original=a.snapshot();
+ const b=boot();await b.get('importJson').onchange({target:{files:[{text:async()=>JSON.stringify(original)}],value:'x'}});assert.deepEqual(b.snapshot().usageSessions,original.usageSessions);assert.equal(b.get('usageToday').textContent,'0 分钟');
+ const invalid={...original,usageSessions:[{...original.usageSessions[0],minutes:-1}]};await b.get('importJson').onchange({target:{files:[{text:async()=>JSON.stringify(invalid)}],value:'x'}});assert.deepEqual(b.snapshot().usageSessions,original.usageSessions);
+});
+test('usage storage failure preserves prior state and allows retry',async()=>{
+ const original=data([event()]),a=boot({data:original});await previewUsage(a,usageLine());a.run("localStorage.setItem=()=>{throw Error('quota')}");a.get('confirmUsageImport').onclick();assert.deepEqual(a.snapshot(),original);assert.equal(a.run('state.usageSessions'),undefined);assert.match(a.get('usageImportStatus').textContent,/保存失败/);
+});
+test('import merges latest other-tab state at confirmation',async()=>{
+ const a=boot({data:data([event()])});await previewUsage(a,usageLine());const b=boot({storage:a.storage});await previewUsage(b,usageLine());b.get('confirmUsageImport').onclick();b.run("state.events[0].title='其他标签页编辑';save()");a.get('confirmUsageImport').onclick();assert.equal(a.snapshot().events[0].title,'其他标签页编辑');assert.equal(a.snapshot().usageSessions.length,1);
+});
+test('stale async file reads cannot replace a newer preview or cancelled import',async()=>{
+ const a=boot();let release;
+ const loading=a.get('usageFile').onchange({target:{files:[{size:10,text:()=>new Promise(r=>{release=r})}],value:'x'}});
+ a.get('cancelUsageImport').onclick();release(usageLine());await loading;assert.equal(a.run('pendingUsage'),null);assert.equal(a.get('confirmUsageImport').disabled,true);
 });
