@@ -65,5 +65,19 @@ const YuanhangUsage = (() => {
     const lo=Date.parse(day+'T00:00:00+08:00'), hi=lo+86400000, start=Date.parse(x.start);
     return start<hi && (x.minutes===0 ? start>=lo : start+x.minutes*60000>lo);
   }
-  return {MAX_BYTES, parse, merge, validRecords, minutesBetween, touchesDay};
+  function fromFragment(hash, now = Date.now()) {
+    if (typeof hash !== 'string' || !hash.startsWith('#usage=')) return null;
+    if (hash.length > 4096) throw Error('链接过长，请用 TXT 文件导入历史记录。');
+    let text;
+    try {
+      const encoded = decodeURIComponent(hash.slice(7)).replace(/\s/g,'').replace(/-/g,'+').replace(/_/g,'/');
+      if (!encoded || !/^[A-Za-z0-9+/]*={0,2}$/.test(encoded)) throw Error();
+      const bytes = Uint8Array.from(atob(encoded), c=>c.charCodeAt(0));
+      text = new TextDecoder('utf-8',{fatal:true}).decode(bytes);
+    } catch { throw Error('链接内容无法解码，请检查 Base64 编码操作及 URL 中的变量。'); }
+    const parsed = parse(text, now);
+    if (parsed.errors.length || parsed.rows.length !== 1) throw Error('链接需携带一条完整的本次记录；历史记录请用 TXT 文件导入。');
+    return parsed;
+  }
+  return {MAX_BYTES, parse, merge, validRecords, minutesBetween, touchesDay, fromFragment};
 })();

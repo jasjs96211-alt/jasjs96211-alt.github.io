@@ -6,7 +6,7 @@ import {readFileSync} from 'node:fs';
 const html=readFileSync(new URL('../index.html',import.meta.url),'utf8');
 const code=readFileSync(new URL('../usage.js',import.meta.url),'utf8')+'\n'+[...html.matchAll(/<script>([\s\S]*?)<\/script>/g)].map(x=>x[1]).join('\n');
 const KEY='sisu_2027_study_workbench_v1';
-function boot({data,storage=new Map(),now='2026-10-10T12:00:00Z'}={}){
+function boot({data,storage=new Map(),now='2026-10-10T12:00:00Z',hash=''}={}){
  if(data)storage.set(KEY,JSON.stringify(data));
  const clock={now:Date.parse(now)},listeners={},wl={},elements=new Map();
  const element=(id='')=>({id,value:'',dataset:{},innerHTML:'',textContent:'',disabled:false,style:{setProperty(){}},classList:{add(){},remove(){},toggle(){}},addEventListener(n,fn){this[n]=fn},focus(){},click(){},remove(){}});
@@ -17,10 +17,10 @@ function boot({data,storage=new Map(),now='2026-10-10T12:00:00Z'}={}){
  const get=id=>{assert.ok(elements.has(id),`Missing DOM element: ${id}`);return elements.get(id)};
  get('timerSubject').value=get('studySubject').value='中国现当代文学史';
  class ClockDate extends Date{constructor(...a){super(...(a.length?a:[clock.now]))}static now(){return clock.now}}
- const context=vm.createContext({console,Date:ClockDate,Intl,Math,Set,JSON,Number,String,Array,Object,Map,RegExp,Blob,URL,
+ const context=vm.createContext({console,Date:ClockDate,Intl,Math,Set,JSON,Number,String,Array,Object,Map,RegExp,Blob,URL,TextDecoder,Uint8Array,atob,decodeURIComponent,
  localStorage:{getItem:k=>storage.get(k)??null,setItem:(k,v)=>storage.set(k,v)},
  document:{hidden:false,getElementById:get,querySelectorAll:s=>s==='[data-min]'?presets:s==='[data-filter]'?filters:s==='[data-period]'?periods:[],addEventListener(n,fn){(listeners[n]??=[]).push(fn)},createElement:()=>element(),body:{appendChild(){}}},
- window:{addEventListener(n,fn){(wl[n]??=[]).push(fn)},scrollTo(){}},navigator:{},location:{protocol:'file:'},confirm:()=>true,prompt:()=>{},setTimeout:()=>1,clearTimeout(){},setInterval:()=>2,clearInterval(){},fetch(){throw Error('Unexpected network request')}});
+ window:{addEventListener(n,fn){(wl[n]??=[]).push(fn)},scrollTo(){}},navigator:{},location:{protocol:'file:',hash,pathname:'/yuanhang/',search:''},history:{state:null,replaceState(){context.location.hash=''}},confirm:()=>true,prompt:()=>{},setTimeout:()=>1,clearTimeout(){},setInterval:()=>2,clearInterval(){},fetch(){throw Error('Unexpected network request')}});
  vm.runInContext(code,context);
  return {get,clock,storage,run:s=>vm.runInContext(s,context),emit:(name,event)=>listeners[name]?.forEach(f=>f(event)),windowEmit:(name,event)=>wl[name]?.forEach(f=>f(event)),snapshot:()=>JSON.parse(storage.get(KEY)||'null'),presets};
 }
@@ -140,4 +140,36 @@ test('stale async file reads cannot replace a newer preview or cancelled import'
  const a=boot();let release;
  const loading=a.get('usageFile').onchange({target:{files:[{size:10,text:()=>new Promise(r=>{release=r})}],value:'x'}});
  a.get('cancelUsageImport').onclick();release(usageLine());await loading;assert.equal(a.run('pendingUsage'),null);assert.equal(a.get('confirmUsageImport').disabled,true);
+});
+
+const usageHash=text=>'#usage='+Buffer.from(text,'utf8').toString('base64');
+test('usage link opens a reviewable preview, clears fragment and never writes without confirmation',()=>{
+ const original=data([event()]),a=boot({data:original,hash:usageHash(usageLine())});
+ assert.equal(a.run('view'),'screen');assert.equal(a.run('location.hash'),'');assert.deepEqual(a.snapshot(),original);
+ assert.match(a.get('usagePreviewText').textContent,/链接带来的本次记录/);assert.match(a.get('usagePreviewRecords').textContent,/三角洲行动 · 2026-10-10 12:00 开始 · 30 分钟/);
+ a.get('confirmUsageImport').onclick();assert.equal(a.snapshot().usageSessions.length,1);assert.equal(a.get('usageToday').textContent,'30 分钟');
+ const b=boot({storage:a.storage,hash:usageHash(usageLine())});assert.equal(b.get('confirmUsageImport').disabled,true);assert.match(b.get('usageImportStatus').textContent,/没有新记录/);assert.equal(b.snapshot().usageSessions.length,1);
+});
+test('link parser accepts percent-encoded, wrapped and URL-safe UTF-8 Base64',()=>{
+ const base64=Buffer.from(usageLine(),'utf8').toString('base64');
+ for(const payload of [encodeURIComponent(base64),base64.match(/.{1,20}/g).join('%0A'),base64.replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'')]){
+  const a=boot({hash:'#usage='+payload});assert.equal(a.get('confirmUsageImport').disabled,false);a.get('confirmUsageImport').onclick();assert.equal(a.get('usageToday').textContent,'30 分钟');
+ }
+});
+test('invalid, future, oversized and multi-session links leave prior data unchanged',()=>{
+ const invalid=['#usage=','#usage=%ZZ','#usage=***','#usage=/w==','#usage='+'A'.repeat(4100),usageHash(usageLine()+'\n'+usageLine('2026-10-10T13:00:00+08:00')),usageHash('三角洲行动|2026-10-10T12:00:00+08:00|<script>alert(1)</script>分钟'),usageHash(usageLine('2026-10-11T12:00:00+08:00'))];
+ for(const hash of invalid){const original=data([event()]),a=boot({data:original,hash});assert.deepEqual(a.snapshot(),original);assert.equal(a.run('location.hash'),'');assert.equal(a.get('confirmUsageImport').disabled,true);assert.match(a.get('usageImportStatus').textContent,/未导入/);assert.equal(a.run('pendingUsage'),null)}
+});
+test('same-tab incoming link invalidates an old file read and uses latest link',async()=>{
+ const a=boot();let release;
+ const loading=a.get('usageFile').onchange({target:{files:[{size:20,text:()=>new Promise(r=>{release=r})}],value:'x'}});
+ a.run('location.hash='+JSON.stringify(usageHash(usageLine(undefined,'12'))));a.windowEmit('hashchange');
+ release(usageLine(undefined,'30'));await loading;assert.match(a.get('usagePreviewRecords').textContent,/12 分钟/);a.get('confirmUsageImport').onclick();assert.equal(a.get('usageToday').textContent,'12 分钟');
+});
+test('cancelled link and unrelated fragments do not modify state or interfere with navigation',()=>{
+ const original=data([event()]),a=boot({data:original,hash:usageHash(usageLine())});a.get('cancelUsageImport').onclick();assert.equal(a.run('pendingUsage'),null);assert.deepEqual(a.snapshot(),original);
+ const b=boot({data:original,hash:'#other-section'});assert.equal(b.run('location.hash'),'#other-section');assert.equal(b.run('view'),'dashboard');assert.deepEqual(b.snapshot(),original);
+});
+test('link confirmation storage failure preserves data and preview for retry',()=>{
+ const original=data([event()]),a=boot({data:original,hash:usageHash(usageLine())});a.run("localStorage.setItem=()=>{throw Error('quota')}");a.get('confirmUsageImport').onclick();assert.deepEqual(a.snapshot(),original);assert.equal(a.run('state.usageSessions'),undefined);assert.equal(a.run('pendingUsage.rows.length'),1);assert.match(a.get('usageImportStatus').textContent,/保存失败/);
 });
