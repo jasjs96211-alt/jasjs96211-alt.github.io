@@ -173,3 +173,39 @@ test('cancelled link and unrelated fragments do not modify state or interfere wi
 test('link confirmation storage failure preserves data and preview for retry',()=>{
  const original=data([event()]),a=boot({data:original,hash:usageHash(usageLine())});a.run("localStorage.setItem=()=>{throw Error('quota')}");a.get('confirmUsageImport').onclick();assert.deepEqual(a.snapshot(),original);assert.equal(a.run('state.usageSessions'),undefined);assert.equal(a.run('pendingUsage.rows.length'),1);assert.match(a.get('usageImportStatus').textContent,/保存失败/);
 });
+
+const mergeFile=(a,value)=>a.get('mergeBackupFile').onchange({target:{files:[{size:100,text:async()=>JSON.stringify(value)}]}});
+test('entry label distinguishes standalone from browser without changing data',()=>{
+ const a=boot({data:data()});assert.match(a.get('entryEnvironment').textContent,/浏览器版/);
+ assert.match(a.run('navigator.standalone=true;entryEnvironment()'),/主屏幕独立版/);assert.deepEqual(a.snapshot(),data());
+});
+test('cross-entry merge previews, preserves target conflicts/timer, adds missing records and is idempotent',async()=>{
+ const target=data([event()],[{id:'s1',date:'2026-10-09',minutes:20,subject:'英语'}]);target.screen={'2026-10-09':{total:20,entertainment:10,game:5}};
+ const source=data([event({title:'不同版本'}),event({id:'new',title:'新任务'})],[{id:'s1',date:'2026-10-09',minutes:30,subject:'英语'},{id:'s2',date:'2026-10-10',minutes:45,subject:'文论'}]);
+ source.screen={'2026-10-09':{total:30,entertainment:20,game:10},'2026-10-10':{total:30,entertainment:20,game:10}};
+ source.focusTimer={running:true};source.usageSessions=[{id:'三角洲行动@2026-10-09T01:00:00.000Z',app:'三角洲行动',start:'2026-10-09T01:00:00.000Z',minutes:3,excluded:true}];
+ const a=boot({data:target});await mergeFile(a,source);assert.deepEqual(a.snapshot(),target);assert.match(a.get('mergeBackupSummary').textContent,/冲突 3 条/);
+ a.get('confirmBackupMerge').onclick();const saved=a.snapshot();assert.equal(saved.events.length,2);assert.equal(saved.events[0].title,target.events[0].title);assert.equal(saved.sessions.length,2);assert.equal(saved.sessions[0].minutes,20);assert.equal(saved.screen['2026-10-09'].total,20);assert.equal(saved.usageSessions[0].excluded,true);assert.equal(saved.focusTimer,undefined);assert.deepEqual(JSON.parse(a.storage.get(KEY+'_before_merge')),target);
+ await mergeFile(a,source);assert.equal(a.get('confirmBackupMerge').disabled,true);assert.deepEqual(a.snapshot(),saved);
+});
+test('cross-entry merge keeps existing exclusions and running target timer',async()=>{
+ const a=boot({data:data()});a.get('timerToggle').onclick();const timer=a.snapshot().focusTimer;
+ const source=data([event()]);await mergeFile(a,source);a.get('confirmBackupMerge').onclick();assert.deepEqual(a.snapshot().focusTimer,timer);
+ const row={id:'三角洲行动@2026-10-09T01:00:00.000Z',app:'三角洲行动',start:'2026-10-09T01:00:00.000Z',minutes:3,excluded:true};
+ const target={...data(),usageSessions:[row]}, incoming={...data(),usageSessions:[{...row,excluded:false}]};
+ a.run(`globalThis.plan=backupMergePlan(${JSON.stringify(target)},${JSON.stringify(incoming)})`);assert.equal(a.run('plan.next.usageSessions[0].excluded'),true);assert.equal(a.run('plan.conflicts'),1);
+});
+test('cross-entry merge re-previews latest target edits instead of overwriting',async()=>{
+ const a=boot({data:data()});await mergeFile(a,data([event()]));const other=data([],[{id:'new',date:'2026-10-10',minutes:15,subject:'英语'}]);a.storage.set(KEY,JSON.stringify(other));
+ a.get('confirmBackupMerge').onclick();assert.deepEqual(a.snapshot(),other);assert.match(a.get('mergeBackupStatus').textContent,/再次确认/);
+ a.get('confirmBackupMerge').onclick();assert.equal(a.snapshot().sessions.length,1);assert.equal(a.snapshot().events.length,1);
+});
+test('invalid, cancelled and stale backup reads cannot mutate or restore cancelled preview',async()=>{
+ const a=boot({data:data([event()])});const initial=a.snapshot();await mergeFile(a,{events:[]});assert.equal(a.run('pendingBackupMerge'),null);assert.deepEqual(a.snapshot(),initial);
+ let finish;const pending=a.get('mergeBackupFile').onchange({target:{files:[{size:1,text:()=>new Promise(r=>finish=r)}]}});a.get('cancelBackupMerge').onclick();finish(JSON.stringify(data([event({id:'new'})])));await pending;assert.equal(a.run('pendingBackupMerge'),null);assert.deepEqual(a.snapshot(),initial);
+});
+test('merge quota failure preserves memory/storage and retryable preview',async()=>{
+ const a=boot({data:data()});await mergeFile(a,data([event()]));a.run("globalThis.realSet=localStorage.setItem;localStorage.setItem=(k,v)=>{if(k===STORAGE)throw Error('quota');realSet(k,v)}");
+ a.get('confirmBackupMerge').onclick();assert.deepEqual(a.snapshot(),data());assert.equal(a.run('state.events.length'),0);assert.ok(a.run('pendingBackupMerge'));assert.match(a.get('mergeBackupStatus').textContent,/原数据保留/);
+ a.run('localStorage.setItem=realSet');a.get('confirmBackupMerge').onclick();assert.equal(a.snapshot().events.length,1);
+});
