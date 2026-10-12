@@ -6,7 +6,7 @@ import {readFileSync} from 'node:fs';
 const html=readFileSync(new URL('../index.html',import.meta.url),'utf8');
 const code=readFileSync(new URL('../usage.js',import.meta.url),'utf8')+'\n'+[...html.matchAll(/<script>([\s\S]*?)<\/script>/g)].map(x=>x[1]).join('\n');
 const KEY='sisu_2027_study_workbench_v1';
-function boot({data,storage=new Map(),now='2026-10-10T12:00:00Z',hash=''}={}){
+function boot({data,storage=new Map(),now='2026-10-10T12:00:00Z',hash='',cloud=false,fetcher}={}){
  if(data)storage.set(KEY,JSON.stringify(data));
  const clock={now:Date.parse(now)},listeners={},wl={},elements=new Map();
  const element=(id='')=>({id,value:'',dataset:{},innerHTML:'',textContent:'',disabled:false,style:{setProperty(){}},classList:{add(){},remove(){},toggle(){}},addEventListener(n,fn){this[n]=fn},focus(){},click(){},remove(){}});
@@ -17,11 +17,12 @@ function boot({data,storage=new Map(),now='2026-10-10T12:00:00Z',hash=''}={}){
  const get=id=>{assert.ok(elements.has(id),`Missing DOM element: ${id}`);return elements.get(id)};
  get('timerSubject').value=get('studySubject').value='中国现当代文学史';
  class ClockDate extends Date{constructor(...a){super(...(a.length?a:[clock.now]))}static now(){return clock.now}}
- const context=vm.createContext({console,Date:ClockDate,Intl,Math,Set,JSON,Number,String,Array,Object,Map,RegExp,Blob,URL,TextDecoder,Uint8Array,atob,decodeURIComponent,
+ const context=vm.createContext({console,Date:ClockDate,Intl,Math,Set,JSON,Number,String,Array,Object,Map,RegExp,Blob,URL,TextDecoder,Uint8Array,atob,decodeURIComponent,AbortSignal,
  localStorage:{getItem:k=>storage.get(k)??null,setItem:(k,v)=>storage.set(k,v)},
  document:{hidden:false,getElementById:get,querySelectorAll:s=>s==='[data-min]'?presets:s==='[data-filter]'?filters:s==='[data-period]'?periods:[],addEventListener(n,fn){(listeners[n]??=[]).push(fn)},createElement:()=>element(),body:{appendChild(){}}},
- window:{addEventListener(n,fn){(wl[n]??=[]).push(fn)},scrollTo(){}},navigator:{},location:{protocol:'file:',hash,pathname:'/yuanhang/',search:''},history:{state:null,replaceState(){context.location.hash=''}},confirm:()=>true,prompt:()=>{},setTimeout:()=>1,clearTimeout(){},setInterval:()=>2,clearInterval(){},fetch(){throw Error('Unexpected network request')}});
+ window:{addEventListener(n,fn){(wl[n]??=[]).push(fn)},scrollTo(){}},navigator:{},location:{protocol:'file:',hash,pathname:'/yuanhang/',search:''},history:{state:null,replaceState(){context.location.hash=''}},confirm:()=>true,prompt:()=>{},setTimeout:()=>1,clearTimeout(){},setInterval:()=>2,clearInterval(){},fetch:fetcher||(()=>{throw Error('Unexpected network request')})});
  vm.runInContext(code,context);
+ if(cloud)vm.runInContext(readFileSync(new URL('../cloud.js',import.meta.url),'utf8'),context);
  return {get,clock,storage,run:s=>vm.runInContext(s,context),emit:(name,event)=>listeners[name]?.forEach(f=>f(event)),windowEmit:(name,event)=>wl[name]?.forEach(f=>f(event)),snapshot:()=>JSON.parse(storage.get(KEY)||'null'),presets};
 }
 const event=(patch={})=>({id:'one',title:'文学史',start:'2026-10-09',end:'2026-10-10',category:'ddl',details:'目标',done:false,...patch});
@@ -32,7 +33,7 @@ test('startup renders all sections without modifying legacy data or cloud creden
  const original=data([event()],[{id:'s',date:'2026-10-09',minutes:60,subject:'英语'}]);
  const storage=new Map([['yuanhang_cloud_sync_v2','{"connected":true,"session":{"access_token":"test"}}']]);
  const a=boot({data:original,storage});assert.deepEqual(a.snapshot(),original);assert.equal(storage.get('yuanhang_cloud_sync_v2'),'{"connected":true,"session":{"access_token":"test"}}');
- assert.ok(a.get('calendarGrid').innerHTML.includes('2026-10-10'));assert.match(html,/云同步已暂停/);assert.doesNotMatch(code,/supabase|fetch\(/);
+ assert.ok(a.get('calendarGrid').innerHTML.includes('2026-10-10'));assert.match(html,/云同步可选/);assert.doesNotMatch(code,/supabase|fetch\(/);
 });
 test('calendar preserves seven-day rows, year navigation and selected-day creation',()=>{
  const a=boot();a.run("monthCursor='2026-01';renderCalendar()");a.get('prevMonth').onclick();assert.match(a.get('monthLabel').textContent,/2025年 12月/);
@@ -208,4 +209,77 @@ test('merge quota failure preserves memory/storage and retryable preview',async(
  const a=boot({data:data()});await mergeFile(a,data([event()]));a.run("globalThis.realSet=localStorage.setItem;localStorage.setItem=(k,v)=>{if(k===STORAGE)throw Error('quota');realSet(k,v)}");
  a.get('confirmBackupMerge').onclick();assert.deepEqual(a.snapshot(),data());assert.equal(a.run('state.events.length'),0);assert.ok(a.run('pendingBackupMerge'));assert.match(a.get('mergeBackupStatus').textContent,/原数据保留/);
  a.run('localStorage.setItem=realSet');a.get('confirmBackupMerge').onclick();assert.equal(a.snapshot().events.length,1);
+});
+
+const ACCOUNT='yuanhang_account_sync_v1';
+const session={access_token:'test-access',refresh_token:'test-refresh',expires_at:9999999999,user:{id:'test-user',email:'test@example.com'}};
+function server(initial){
+ let row=initial?{revision:1,payload:initial}:null;const calls=[];let beforePatch=null,fail=false;
+ return {calls,get row(){return row},set row(v){row=v},set beforePatch(f){beforePatch=f},set fail(v){fail=v},async fetch(url,options){
+  calls.push({url,options});if(fail)throw Error('offline');const path=new URL(url).pathname;let response,status=200;
+  if(path==='/auth/v1/otp')response={};else if(path==='/auth/v1/verify'||path==='/auth/v1/token')response=session;
+  else if(path==='/rest/v1/workbench_state'){
+   assert.equal(options.headers.Authorization,'Bearer test-access');
+   if(options.method==='GET')response=row?[row]:[];
+   if(options.method==='POST'){const b=JSON.parse(options.body);assert.equal(b.user_id,'test-user');row={revision:b.revision,payload:b.payload};response=[{revision:row.revision}]}
+   if(options.method==='PATCH'){
+    if(beforePatch)await beforePatch();
+    const match=Number(new URL(url).searchParams.get('revision').slice(3));
+    if(row.revision!==match)response=[];else{const b=JSON.parse(options.body);row={revision:b.revision,payload:b.payload};response=[{revision:row.revision}]}
+   }
+  }else throw Error('Unexpected endpoint');return {ok:status===200,status,json:async()=>response};
+ }};
+}
+const accountStorage=(base,enabled=true)=>new Map([[ACCOUNT,JSON.stringify({email:session.user.email,session,enabled,...(base?{base:{...base,usageSessions:base.usageSessions||[]}}:{})})]]);
+test('cloud module remains inert until explicitly enabled and never reuses legacy credentials',()=>{
+ const srv=server();const a=boot({cloud:true,data:data(),fetcher:srv.fetch});assert.equal(srv.calls.length,0);assert.equal(a.get('accountEnable').disabled,true);assert.equal(a.storage.has(ACCOUNT),false);
+});
+test('cloud login accepts original magic link, rejects foreign origins and does not enable sync',async()=>{
+ const srv=server();const a=boot({cloud:true,data:data(),fetcher:srv.fetch});a.get('accountEmail').value='test@example.com';
+ a.get('accountToken').value='https://evil.example/auth/v1/verify?token=abc&type=magiclink';await a.get('accountVerify').onclick();assert.equal(srv.calls.length,0);
+ a.get('accountToken').value='https://myejuodrhgdxphdkrvsa.supabase.co/auth/v1/verify?token=abc&type=magiclink';await a.get('accountVerify').onclick();
+ assert.deepEqual(JSON.parse(srv.calls[0].options.body),{token_hash:'abc',type:'magiclink'});assert.equal(JSON.parse(a.storage.get(ACCOUNT)).enabled,false);assert.equal(a.get('accountToken').value,'');assert.deepEqual(a.snapshot(),data());
+});
+test('first cloud enable creates account payload without timer or credentials',async()=>{
+ const srv=server();const a=boot({cloud:true,data:data([event()]),storage:accountStorage(null,false),fetcher:srv.fetch});a.get('timerToggle').onclick();const timer=a.snapshot().focusTimer;
+ await a.get('accountEnable').onclick();assert.equal(srv.row.payload.events.length,1);assert.equal(srv.row.payload.focusTimer,undefined);assert.equal(srv.row.payload.session,undefined);assert.deepEqual(a.snapshot().focusTimer,timer);assert.equal(JSON.parse(a.storage.get(ACCOUNT)).enabled,true);
+});
+test('two isolated entries exchange confirmed game records and task changes',async()=>{
+ const base={...data([event()]),usageSessions:[]},srv=server(base);
+ const a=boot({cloud:true,data:base,storage:accountStorage(base),fetcher:srv.fetch});const b=boot({cloud:true,data:base,storage:accountStorage(base),fetcher:srv.fetch});
+ const row={id:'三角洲行动@2026-10-09T01:00:00.000Z',app:'三角洲行动',start:'2026-10-09T01:00:00.000Z',minutes:3};
+ a.run(`state.usageSessions=[${JSON.stringify(row)}];save()`);await a.get('accountSyncNow').onclick();await b.get('accountSyncNow').onclick();assert.deepEqual(b.snapshot().usageSessions,[row]);
+ b.emit('change',{target:{dataset:{done:'one'},checked:true}});await b.get('accountSyncNow').onclick();await a.get('accountSyncNow').onclick();assert.equal(a.snapshot().events[0].done,true);assert.equal(a.snapshot().usageSessions.length,1);
+});
+test('three-way cloud merge preserves independent edits and deletion; concurrent same-record change stops',async()=>{
+ const base={...data([event(),event({id:'two'})]),usageSessions:[]},srv=server(base);
+ const a=boot({cloud:true,data:base,storage:accountStorage(base),fetcher:srv.fetch});a.run("state.events=state.events.filter(x=>x.id!=='two');save()");srv.row={revision:2,payload:{...base,sessions:[{id:'new',date:'2026-10-09',minutes:30,subject:'英语'}]}};
+ await a.get('accountSyncNow').onclick();assert.equal(a.snapshot().events.length,1);assert.equal(a.snapshot().sessions.length,1);assert.equal(srv.row.payload.events.length,1);
+ a.run("state.events[0].title='本地修改';save()");srv.row={revision:4,payload:{...srv.row.payload,events:[event({title:'云端修改'})]}};
+ await a.get('accountSyncNow').onclick();assert.equal(a.snapshot().events[0].title,'本地修改');assert.equal(srv.row.payload.events[0].title,'云端修改');assert.match(a.get('accountStatus').textContent,/两边都修改/);
+});
+test('cloud rebase preserves edits during upload and CAS rejects stale overwrite',async()=>{
+ const base={...data([event()]),usageSessions:[]},srv=server(base),a=boot({cloud:true,data:base,storage:accountStorage(base),fetcher:srv.fetch});
+ a.run("state.events[0].title='上传中';save()");srv.beforePatch=()=>a.run("state.sessions.push({id:'late',date:'2026-10-10',minutes:5,subject:'英语'});save()");
+ await a.get('accountSyncNow').onclick();assert.equal(a.snapshot().sessions.length,1);assert.equal(srv.row.payload.sessions.length,0);
+ srv.beforePatch=null;await a.get('accountSyncNow').onclick();assert.equal(srv.row.payload.sessions.length,1);
+ a.run("state.events[0].title='新编辑';save()");srv.beforePatch=()=>{srv.row={...srv.row,revision:srv.row.revision+1}};await a.get('accountSyncNow').onclick();assert.match(a.get('accountStatus').textContent,/刚更新/);assert.equal(srv.row.payload.events[0].title,'上传中');
+});
+test('offline and failed local cloud apply preserve local data and recovery backup',async()=>{
+ const base={...data([event()]),usageSessions:[]},srv=server(base),a=boot({cloud:true,data:base,storage:accountStorage(base),fetcher:srv.fetch});
+ srv.fail=true;await a.get('accountSyncNow').onclick();assert.deepEqual(a.snapshot(),base);
+ srv.fail=false;srv.row={revision:2,payload:{...base,sessions:[{id:'r',date:'2026-10-10',minutes:5,subject:'英语'}]}};
+ a.run("localStorage.setItem=(k,v)=>{if(k===STORAGE)throw Error('quota')}");await a.get('accountSyncNow').onclick();assert.deepEqual(a.snapshot(),base);assert.equal(a.run('state.sessions.length'),0);
+});
+test('stop sync clears new credentials and preserves data, without another remote request',async()=>{
+ const base=data([event()]),srv=server(base),a=boot({cloud:true,data:base,storage:accountStorage(base),fetcher:srv.fetch});a.get('accountLogout').onclick();await a.get('accountSyncNow').onclick();assert.equal(srv.calls.length,0);assert.deepEqual(a.snapshot(),base);assert.equal(JSON.parse(a.storage.get(ACCOUNT)).session,undefined);
+});
+test('first connection preserves cloud conflicts by default and requires explicit local preference',async()=>{
+ const remote={...data([event({title:'已保存的云端任务',done:true})]),usageSessions:[]};
+ for(const localWins of [false,true]){
+  const srv=server(remote),a=boot({cloud:true,data:data([event()]),storage:accountStorage(null,false),fetcher:srv.fetch});
+  a.get('accountFirstConflict').value=localWins?'local':'remote';await a.get('accountEnable').onclick();
+  assert.equal(a.snapshot().events[0].title,localWins?event().title:'已保存的云端任务');
+  assert.equal(srv.row.payload.events[0].title,a.snapshot().events[0].title);
+ }
 });

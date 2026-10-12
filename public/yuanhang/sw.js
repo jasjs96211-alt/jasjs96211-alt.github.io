@@ -1,6 +1,6 @@
 /* Only cache this app's public static assets. Never cache API responses or private data. */
-const CACHE = 'yuanhang-static-v3-4-20261012';
-const ASSETS = ['./', './index.html', './manifest.webmanifest', './icon.svg', './usage.js'];
+const CACHE = 'yuanhang-static-v3-5-20261012';
+const ASSETS = ['./', './index.html', './manifest.webmanifest', './icon.svg', './usage.js', './cloud.js'];
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)).then(() => self.skipWaiting()));
 });
@@ -14,7 +14,7 @@ self.addEventListener('fetch', event => {
   const req=event.request, url=new URL(req.url);
   if (req.method !== 'GET' || url.origin !== self.location.origin ||
       !url.pathname.startsWith(new URL(self.registration.scope).pathname) ||
-      !/\/(?:usage\.js|index\.html|manifest\.webmanifest|icon\.svg)?$/.test(url.pathname)) return;
+      !/\/(?:cloud\.js|usage\.js|index\.html|manifest\.webmanifest|icon\.svg)?$/.test(url.pathname)) return;
   event.respondWith(fetch(req).then(response => {
     if (response.ok) {
       const copy=response.clone();
