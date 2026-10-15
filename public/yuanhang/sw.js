@@ -1,6 +1,6 @@
 /* Only cache this app's public static assets. Never cache API responses or private data. */
-const CACHE = 'yuanhang-static-v9-wendao-1.3.2-art-20261016';
-const ASSETS = ['./', './index.html', './manifest.webmanifest', './icon.svg', './usage.js', './cloud.js','./wendao/engine.js','./wendao/story.js','./wendao/app.js','./wendao/style.css','./wendao/assets/study-room.webp','./wendao/assets/sister-calm.webp','./wendao/assets/lamp-study.webp','./wendao/assets/sister-tired.webp','./wendao/assets/sister-concerned.webp','./wendao/assets/sister-ill.webp','./wendao/assets/sister-injured.webp','./wendao/assets/sister-relieved.webp'];
+const CACHE = 'yuanhang-static-v10-wendao-private-ai-20261016';
+const ASSETS = ['./', './index.html', './manifest.webmanifest', './icon.svg', './usage.js', './cloud.js','./wendao/engine.js','./wendao/story.js','./wendao/app.js','./wendao/transport.js','./wendao/style.css','./wendao/assets/study-room.webp','./wendao/assets/sister-calm.webp','./wendao/assets/lamp-study.webp','./wendao/assets/sister-tired.webp','./wendao/assets/sister-concerned.webp','./wendao/assets/sister-ill.webp','./wendao/assets/sister-injured.webp','./wendao/assets/sister-relieved.webp'];
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)).then(() => self.skipWaiting()));
 });
@@ -14,7 +14,7 @@ self.addEventListener('fetch', event => {
   const req=event.request, url=new URL(req.url);
   if (req.method !== 'GET' || url.origin !== self.location.origin ||
       !url.pathname.startsWith(new URL(self.registration.scope).pathname) ||
-      !/(?:\/wendao\/(?:engine\.js|story\.js|app\.js|style\.css|assets\/[a-z-]+\.webp)$|\/(?:cloud\.js|usage\.js|index\.html|manifest\.webmanifest|icon\.svg)?$)/.test(url.pathname)) return;
+      !/(?:\/wendao\/(?:engine\.js|story\.js|app\.js|transport\.js|style\.css|assets\/[a-z-]+\.webp)$|\/(?:cloud\.js|usage\.js|index\.html|manifest\.webmanifest|icon\.svg)?$)/.test(url.pathname)) return;
   event.respondWith(fetch(req).then(response => {
     if (response.ok) {
       const copy=response.clone();
