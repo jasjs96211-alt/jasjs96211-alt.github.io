@@ -47,3 +47,8 @@ test('six built-in portraits can be inspected without changing live character or
 test('deadline confirmation with no eligible settlement explains unchanged daily portrait',async()=>{
  const a=boot(),s=a.snapshot();s.supervision.deadlines.offlinePending=true;a.storage.set(WD,JSON.stringify(s));const b=boot(a.storage);await b.action('verify-deadlines');assert.match(b.get('toast').textContent,/没有新增符合条件/);assert.match(b.get('wendao').innerHTML,/温柔·日常/);
 });
+
+test('past untracked DDL appears for explicit individual settlement and changes portrait without changing study data',async()=>{
+ const a=boot(),work=JSON.parse(a.storage.get(KEY)),at=Date.now()-60000,d=new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Shanghai',year:'numeric',month:'2-digit',day:'2-digit'}).format(at);
+ work.events.push({id:'missed-ui',title:'遗漏的DDL',category:'ddl',start:d,end:d,dueAt:new Date(at).toISOString(),done:false});a.storage.set(KEY,JSON.stringify(work));const b=boot(a.storage);assert.match(b.get('wendao').innerHTML,/已逾期 · 尚未登记结算/);assert.equal(b.snapshot().supervision.deadlines.punishments.length,0);await b.action('settle-missed',{task:'missed-ui'});assert.equal(b.snapshot().supervision.deadlines.punishments[0].taskId,'missed-ui');assert.match(b.get('wendao').innerHTML,/受罚·负伤/);assert.deepEqual(JSON.parse(b.storage.get(KEY)),work);const c=boot(b.storage);assert.equal(c.snapshot().supervision.deadlines.punishments.length,1);
+});

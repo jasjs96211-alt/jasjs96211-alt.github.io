@@ -80,13 +80,31 @@ function watchDeadlines(s,study,now=Date.now()){
  }
  return ds;
 }
-function checkDeadlines(s,study,now=Date.now(),{verified=false}={}){
+// Discover missed registrations without automatically punishing imported history.
+function untrackedOverdue(s,study,now=Date.now()){
+ const ds={watched:{},punishments:[],excused:[],...s.supervision.deadlines};
+ return (study.events||[]).filter(e=>e.category==='ddl'&&e.id&&e.end&&Number.isFinite(dueTime(e))&&dueTime(e)<now&&!ds.watched[e.id]&&!ds.excused.includes(e.id)&&!ds.punishments.some(p=>(p.ids||[p.taskId]).includes(e.id))&&(!e.done||!e.completedAt||!Number.isFinite(Date.parse(e.completedAt))||Date.parse(e.completedAt)>dueTime(e))).sort((a,b)=>dueTime(b)-dueTime(a));
+}
+function confirmMissedDeadline(s,study,id,now=Date.now()){
+ let ds=s.supervision.deadlines||{};if(s.settings.deadlineMajor===false)throw Error('请先开启DDL监管');
+ if(s.supervision.pending)throw Error('请先核对离线学习和休息时段');
+ if(ds.lastCheck&&now<ds.lastCheck)throw Error('设备时间倒退，请先核对时间');
+ const row=untrackedOverdue(s,study,now).find(x=>x.id===id);if(!row)throw Error('任务已变更或已经结算，请刷新核对');
+ if(row.done&&(!row.completedAt||!Number.isFinite(Date.parse(row.completedAt))||Date.parse(row.completedAt)>now))throw Error('请先核对并保存实际完成时间');
+ ds=deadlineState(s);
+ ds.watched[id]={id,title:String(row.title||'未命名DDL').slice(0,100),end:row.end,due:row.end,dueAt:dueISO(row),taskRevision:taskVersion(row),importance:row.ddlImportance||'important',watchedAt:now,verifiedLateAt:now};
+ log(s,'late-verification:'+settlementID(row),'补核验遗漏DDL','人工确认「'+ds.watched[id].title+'」真实逾期；补登记本条，保留原截止时间，不追罚其他历史任务。',now,'verification');
+ checkDeadlines(s,study,now,{verified:true,onlyTask:id});
+ return ds.punishments.find(p=>p.taskId===id);
+}
+function checkDeadlines(s,study,now=Date.now(),{verified=false,onlyTask=null}={}){
  migrateInPlace(s);const ds=deadlineState(s);
  if(s.settings.deadlineMajor===false)return derive(s,study,now);
  if(ds.lastCheck&&now<ds.lastCheck){ds.clockPending=true;return derive(s,study,now)}
  ds.lastCheck=now;ds.clockPending=false;
  watchDeadlines(s,study,now);const rows=new Map((study.events||[]).map(e=>[e.id,e]));
  for(const w of Object.values(ds.watched)){
+  if(onlyTask&&w.id!==onlyTask)continue;
   w.end??=w.due;w.dueAt??=dueISO(w);w.taskRevision??=1;
   const due=dueTime(w),row=rows.get(w.id);
   if(now<=due||ds.excused.includes(w.id)||ds.punishments.some(p=>p.ids.includes(w.id)))continue;
@@ -224,5 +242,5 @@ function merge(a,b){
  n.cultivation.realm=Math.max(a.cultivation.realm,b.cultivation.realm);return n;
 }
 
-root.WendaoEngine={RULES,EVENTS,dueTime,settlementID,migrateLegacySave,recoverDeadline,injuryFor,unionRows,recalculate,proactive,day,dateAt,fresh,baseline,derive,advance,settle,independent,eligible,choose,finish,validate,merge,log,subtract,watchDeadlines,checkDeadlines,resolveDeadline,portrait};
+root.WendaoEngine={RULES,EVENTS,dueTime,settlementID,migrateLegacySave,recoverDeadline,injuryFor,unionRows,recalculate,proactive,day,dateAt,fresh,baseline,derive,advance,settle,independent,eligible,choose,finish,validate,merge,log,subtract,watchDeadlines,checkDeadlines,untrackedOverdue,confirmMissedDeadline,resolveDeadline,portrait};
 })(typeof window!=='undefined'?window:globalThis);

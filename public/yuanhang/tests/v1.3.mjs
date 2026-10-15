@@ -58,3 +58,19 @@ test('remote malicious system role is rejected and cannot modify game state',asy
 test('local proxy forwards reviewed longterm memory and injury context only, model response is text-only',async()=>{let sent;await withServer({key:'test-only',base:'https://model.invalid',model:'m',fetcher:async(u,o)=>{sent=JSON.parse(o.body);return{ok:true,json:async()=>({choices:[{message:{content:'姐姐会照顾自己。'}}],characterState:{health:0}})}}},async url=>{const r=await request(url);assert.equal(r.status,200);const v=await r.json();assert.equal(v.characterState,undefined);assert.match(sent.messages[1].content,/severity/);assert.match(sent.messages[1].content,/longTermMemories/)})});
 test('offline pre-deadline revision evidence uses extended due even if reopening after both deadlines',()=>{const d=data(task()),s=E.fresh(t);E.checkDeadlines(s,d,t);const extended=due+60000;Object.assign(d.events[0],{dueAt:new Date(extended).toISOString(),taskRevision:2,updatedAt:new Date(t+1).toISOString()});E.checkDeadlines(s,d,extended+1);const p=s.supervision.deadlines.punishments[0];assert.ok(p.id.includes(':2:overdue'));assert.equal(p.dueAt,new Date(extended).toISOString())});
 test('explicit verification can settle original monitored deadline after late extension without erasing audit',()=>{const d=data(task()),s=E.fresh(t);E.checkDeadlines(s,d,t);Object.assign(d.events[0],{dueAt:new Date(due+60000).toISOString(),taskRevision:2,updatedAt:new Date(due+1).toISOString()});E.checkDeadlines(s,d,due+2);assert.equal(s.character.injuries.length,0);E.checkDeadlines(s,d,due+3,{verified:true});assert.equal(s.character.injuries.length,1);assert.equal(s.supervision.deadlines.punishments[0].dueAt,new Date(due).toISOString())});
+
+test('Oct15 deadline missed before first launch can be individually settled on Oct16 with original time and injury',()=>{
+ const at=Date.parse('2026-10-16T05:15:00+08:00'),a=task('oct15',{dueAt:null}),b=task('other',{dueAt:null});const d=data(a,b),s=E.fresh(at);
+ E.checkDeadlines(s,d,at);assert.equal(s.supervision.deadlines.punishments.length,0);assert.equal(E.untrackedOverdue(s,d,at).length,2);
+ const p=E.confirmMissedDeadline(s,d,'oct15',at);assert.equal(p.at,Date.parse('2026-10-16T00:00:00+08:00'));assert.equal(p.detectedAt,at);assert.equal(E.portrait(s,at).state,'injured');assert.equal(s.supervision.deadlines.punishments.length,1);assert.equal(E.untrackedOverdue(s,d,at)[0].id,'other');
+ assert.throws(()=>E.confirmMissedDeadline(s,d,'oct15',at+1));E.checkDeadlines(s,d,at+1);assert.equal(s.supervision.deadlines.punishments.length,1);
+ const reloaded=E.migrateLegacySave(clone(s));assert.equal(E.portrait(reloaded,at+2).state,'injured');
+});
+test('manual missed-task settlement cannot authorize other monitored deadlines awaiting verification',()=>{
+ const at=due+5000,d=data(task('tracked'),task('missed')),s=E.fresh(t);E.checkDeadlines(s,data(task('tracked')),t);s.supervision.deadlines.offlinePending=true;E.checkDeadlines(s,d,at);assert.equal(s.supervision.deadlines.punishments.length,0);
+ E.confirmMissedDeadline(s,d,'missed',at);assert.equal(s.supervision.deadlines.punishments.length,1);assert.equal(s.supervision.deadlines.punishments[0].taskId,'missed');assert.ok(s.supervision.deadlines.pending.tracked);assert.equal(s.supervision.deadlines.offlinePending,true);
+});
+test('missed-task discovery excludes timely completion and exemption; unknown completion must be corrected first',()=>{
+ const at=due+5000,d=data(task('ontime',{done:true,completedAt:new Date(due).toISOString()}),task('unknown',{done:true}),task('excused'),task('ordinary',{category:'study'})),s=E.fresh(at);s.supervision.deadlines.excused.push('excused');
+ const before=JSON.stringify(s);assert.deepEqual(Array.from(E.untrackedOverdue(s,d,at),x=>x.id),['unknown']);assert.equal(JSON.stringify(s),before);assert.throws(()=>E.confirmMissedDeadline(s,d,'unknown',at),/实际完成时间/);assert.equal(JSON.stringify(s),before);
+});

@@ -1,5 +1,5 @@
 /* Only cache this app's public static assets. Never cache API responses or private data. */
-const CACHE = 'yuanhang-static-v11-wendao-art-login-fix-20261016';
+const CACHE = 'yuanhang-static-v12-wendao-missed-ddl-20261016';
 const ASSETS = ['./', './index.html', './manifest.webmanifest', './icon.svg', './usage.js', './cloud.js','./wendao/engine.js','./wendao/story.js','./wendao/app.js','./wendao/transport.js','./wendao/style.css','./wendao/assets/study-room.webp','./wendao/assets/sister-calm.webp','./wendao/assets/lamp-study.webp','./wendao/assets/sister-tired.webp','./wendao/assets/sister-concerned.webp','./wendao/assets/sister-ill.webp?v=20261016-ill','./wendao/assets/sister-injured.webp?v=20261016-unbound','./wendao/assets/sister-relieved.webp'];
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)).then(() => self.skipWaiting()));
