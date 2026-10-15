@@ -1,0 +1,6 @@
+import http from 'node:http';import {readFile} from 'node:fs/promises';import {fileURLToPath} from 'node:url';import {resolve,sep,extname} from 'node:path';import {createProxy} from './chat-proxy.mjs';
+const root=fileURLToPath(new URL('../../',import.meta.url));
+const types={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.webp':'image/webp','.svg':'image/svg+xml','.webmanifest':'application/manifest+json'};
+const server=http.createServer(async(req,res)=>{try{const u=new URL(req.url,'http://127.0.0.1:8765');const path=resolve(root,'.'+decodeURIComponent(u.pathname==='/'?'/index.html':u.pathname));if(!path.startsWith(root.endsWith(sep)?root:root+sep)){res.writeHead(403).end();return}const data=await readFile(path);res.writeHead(200,{'Content-Type':types[extname(path)]||'application/octet-stream','Cache-Control':'no-cache'}).end(data)}catch{res.writeHead(404).end('Not found')}});
+server.listen(8765,'127.0.0.1',()=>console.log('打开 http://127.0.0.1:8765 。本地入口与线上入口数据独立，请使用JSON迁移。'));
+createProxy({origins:(process.env.ALLOWED_ORIGINS||'https://jasjs96211-alt.github.io,http://127.0.0.1:8765,http://localhost:8765').split(',')}).listen(8787,'127.0.0.1');

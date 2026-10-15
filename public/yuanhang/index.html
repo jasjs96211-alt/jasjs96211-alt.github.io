@@ -127,6 +127,7 @@ button:focus-visible,summary:focus-visible{outline:3px solid #c5774d;outline-off
 #usageFile{width:100%;min-height:44px}#usageDetails{max-height:420px;overflow:auto}#usageDetails summary{cursor:pointer;min-height:44px;padding:12px 0}
 @media(max-width:370px){.usage-metric strong{font-size:18px}.usage-metric{padding:12px 8px}}
 </style>
+<link rel="stylesheet" href="./wendao/style.css">
 </head>
 <body>
 <div class="app">
@@ -216,7 +217,7 @@ const $=x=>document.getElementById(x);const ndate=d=>new Date(d+'T12:00:00+08:00
 const diff=(a,b)=>daynum(a)-daynum(b);const plus=(d,num)=>new Date((daynum(d)+num)*864e5).toISOString().slice(0,10);const short=d=>`${+d.slice(5,7)}/${+d.slice(8,10)}`;const fmt=d=>`${+d.slice(5,7)}月${+d.slice(8,10)}日`;
 function defaultState(){return {events:JSON.parse(JSON.stringify(seedEvents)),sessions:[],screen:{}}}
 try {const val=JSON.parse(localStorage.getItem(STORAGE)||'null'); state=(val&&Array.isArray(val.events)&&Array.isArray(val.sessions)&&val.screen&&typeof val.screen==='object')?val:defaultState()}catch{state=defaultState()}
-function save(){try{localStorage.setItem(STORAGE,JSON.stringify(state));if(window.yuanhangMarkDirty)window.yuanhangMarkDirty()}catch{toast('当前浏览器无法持久保存，请尽快导出 JSON 备份。')}}
+function save(){try{localStorage.setItem(STORAGE,JSON.stringify(state));window.Wendao?.sync();if(window.yuanhangMarkDirty)window.yuanhangMarkDirty()}catch{toast('当前浏览器无法持久保存，请尽快导出 JSON 备份。')}}
 function toast(msg){const el=$('toast');el.textContent=msg;el.classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>el.classList.remove('show'),4400)}
 function isOn(e,d){return e.start<=d&&e.end>=d}function catLabel(c){return ({study:'学习',ddl:'DDL',registration:'报名',exam:'考试'})[c]||'安排'}
 function daysLeft(end){return diff(end,today())}function fmtDayStatus(e){let n=daysLeft(e.end);return e.done?'已完成':n<0?`已过期 ${-n} 天`:n===0?'今天截止':`剩 ${n} 天`}
@@ -252,7 +253,7 @@ $('studyDate').value=today();$('screenDate').value=today();
 $('manualStudy').addEventListener('submit',e=>{e.preventDefault();let minutes=Number($('studyMinutes').value);if(!(minutes>0&&minutes<=1440))return toast('请填入有效学习分钟数');state.sessions.push({id:rid(),date:$('studyDate').value,minutes,subject:$('studySubject').value,at:new Date().toISOString()});$('studyMinutes').value='';save();render();toast(`已记录 ${minutes} 分钟学习`)});
 $('screenDate').onchange=renderScreen;$('screenForm').addEventListener('submit',e=>{e.preventDefault();let d=$('screenDate').value,total=Number($('screenTotal').value),entertainment=Number($('screenEntertainment').value),game=Number($('screenGame').value);if([total,entertainment,game].some(n=>!Number.isFinite(n)||n<0||n>1440)||game>entertainment||entertainment>total){toast('应满足：游戏时间 ≤ 娱乐时间 ≤ 屏幕总时间');return}state.screen[d]={total,entertainment,game,note:$('screenNote').value.trim()};save();render();toast('屏幕时间已记录（手动）')});
 let timer, timerHandle=null;
-function freshTimer(total=1500){return {total,remaining:total,running:false,endAt:0,id:null,subject:'',startedAt:null}}
+function freshTimer(total=1500){return {total,remaining:total,running:false,endAt:0,id:null,subject:'',startedAt:null,activeFrom:null,segments:[]}}
 function validTimer(t){return t&&[1500,2700,3600].includes(t.total)&&Number.isFinite(t.remaining)&&t.remaining>=0&&t.remaining<=t.total&&typeof t.running==='boolean'&&(!t.id||typeof t.id==='string')&&(!t.running||(t.id&&typeof t.subject==='string'&&Number.isFinite(t.endAt)&&t.endAt>0))}
 function restoreTimer(){stopTick();timer=validTimer(state.focusTimer)?{...state.focusTimer}:freshTimer();if(timer.id)$('timerSubject').value=timer.subject;if(timer.running){timerTick();if(timer.running)timerHandle=setInterval(timerTick,250)}updateTimer()}
 function persistTimer(){state.focusTimer={...timer};save()}
@@ -262,10 +263,10 @@ function timerTick(){if(!timer.running)return;timer.remaining=Math.max(0,Math.ce
  stopTick();
  // Reload the latest snapshot before completion so another tab's edits survive.
  try{const latest=JSON.parse(localStorage.getItem(STORAGE)||'null');if(latest&&Array.isArray(latest.sessions)&&Array.isArray(latest.events)&&latest.screen){if(latest.focusTimer?.id!==timer.id||!latest.focusTimer.running||latest.focusTimer.endAt!==timer.endAt){state=latest;restoreTimer();render();return}state=latest}}catch{}
- const finishedAt=new Date(timer.endAt).toISOString();if(!state.sessions.some(x=>x.id===timer.id))state.sessions.push({id:timer.id,date:shanghaiDate(finishedAt),minutes:timer.total/60,subject:timer.subject,at:finishedAt});
+ const finishedAt=new Date(timer.endAt).toISOString();if(!state.sessions.some(x=>x.id===timer.id))state.sessions.push({id:timer.id,date:shanghaiDate(finishedAt),minutes:timer.total/60,subject:timer.subject,at:finishedAt,source:'timer',studyIntervals:[...(timer.segments||[]),...(Number.isFinite(timer.activeFrom)?[[timer.activeFrom,timer.endAt]]:[])]});
  timer=freshTimer(timer.total);persistTimer();render();toast('专注完成！已记入学习时间。');try{navigator.vibrate?.([120,80,120])}catch{}
 }updateTimer()}
-$('timerToggle').onclick=()=>{if(timer.running){timerTick();if(!timer.running)return;timer.running=false;stopTick()}else{if(!timer.id){timer.id=rid();timer.subject=$('timerSubject').value;timer.startedAt=new Date().toISOString()}timer.running=true;timer.endAt=Date.now()+timer.remaining*1000;timerHandle=setInterval(timerTick,250)}persistTimer();updateTimer()};
+$('timerToggle').onclick=()=>{if(timer.running){timerTick();if(!timer.running)return;if(Number.isFinite(timer.activeFrom)){timer.segments??=[];timer.segments.push([timer.activeFrom,Date.now()])}timer.activeFrom=null;timer.running=false;stopTick()}else{if(!timer.id){timer.id=rid();timer.subject=$('timerSubject').value;timer.startedAt=new Date().toISOString()}timer.running=true;timer.activeFrom=Date.now();timer.endAt=Date.now()+timer.remaining*1000;timerHandle=setInterval(timerTick,250)}persistTimer();updateTimer()};
 function resetTimer(total=timer.total){if(timer.id&&!confirm('结束本次专注并重置？未完成的时长不会自动计入，可手动补录。'))return;stopTick();timer=freshTimer(total);persistTimer();updateTimer()}
 $('timerReset').onclick=()=>resetTimer();document.querySelectorAll('[data-min]').forEach(btn=>btn.onclick=()=>resetTimer(Number(btn.dataset.min)*60));
 document.addEventListener('visibilitychange',()=>{if(!document.hidden){timerTick();renderHeader();renderDashboard();renderCalendar();renderTasks();renderProgress()}});
@@ -429,4 +430,14 @@ render();restoreTimer();readUsageLink();if('serviceWorker' in navigator&&locatio
 </script>
 
 <script src="./cloud.js"></script>
+<script>
+window.WendaoBridge={
+ get:()=>JSON.parse(JSON.stringify(state)),studyKey:STORAGE,valid:validBackup,merge:backupMergePlan,go,toast,download:downloadText,
+ annotate:(id,a,b)=>{const row=state.sessions.find(x=>x.id===id);if(!row||Math.abs((b-a)/60000-row.minutes)>1||shanghaiDate(a)!==row.date||shanghaiDate(b)!==row.date)throw Error('时段须与原记录日期、分钟数一致；跨日请拆分记录');delete row.studyIntervals;row.startedAt=new Date(a).toISOString();row.endedAt=new Date(b).toISOString();row.source='manual-confirmed';save()},
+ replace:(val,reset=true)=>{if(!validBackup(val))throw Error('工作台备份无效');const next={...val,focusTimer:reset?freshTimer():(val.focusTimer||state.focusTimer)};delete next.wendao;delete next.wendaoResources;localStorage.setItem(STORAGE,JSON.stringify(next));state=next;stopTick();restoreTimer();clearUsagePreview();resetBackupMerge();render();window.yuanhangMarkDirty?.()}
+};
+</script>
+<script src="./wendao/engine.js"></script>
+<script src="./wendao/story.js"></script>
+<script src="./wendao/app.js"></script>
 </body></html>
