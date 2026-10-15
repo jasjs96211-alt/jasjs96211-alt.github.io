@@ -18,3 +18,7 @@
 /* Missing artwork is text, never a recoloured replacement. */
 .wd-art-pending{min-height:300px;display:grid;align-content:center;text-align:center;gap:12px;padding:25px;color:#536c64;line-height:1.8}.wd-portrait-frame.wd-injured{border:2px solid #986c6e}.wd-portrait-frame.wd-ill .wd-portrait{opacity:1}.wd input,.wd textarea{font-size:16px}.wd-message,.wd-row{overflow-wrap:anywhere}.wd-chat textarea{width:100%;min-width:0;flex:1}.wd-chat .btn{flex-shrink:0}
 @media(max-width:720px){.wd-art-pending{min-height:230px}.wd-chat{height:min(75dvh,660px);min-height:420px}.wd-chat:focus-within{height:max(360px,calc(var(--wd-viewport,100dvh) - 100px));scroll-margin-bottom:90px}.wd-controls .btn{min-height:42px}.wd-form input{max-width:100%;min-width:0}}
+
+/* Full-figure previews keep all six distinct authored portraits inspectable. */
+.wd-portraits{grid-template-columns:repeat(2,minmax(0,1fr))}.wd-portraits button{width:100%}.wd-portraits img{height:300px;object-fit:contain;background:#f2f2e9}.wd-portraits p{font-size:12px}.wd-portrait-frame.wd-injured .wd-portrait{opacity:1}
+@media(max-width:720px){.wd-portraits img{height:230px}}

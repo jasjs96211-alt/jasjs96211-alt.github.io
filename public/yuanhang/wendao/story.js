@@ -6,8 +6,8 @@ window.WendaoContent={
  {id:'sister-tired',kind:'portrait',title:'温知遥 · 疲惫',src:'./wendao/assets/sister-tired.webp',status:'ready'},
  {id:'sister-concerned',kind:'portrait',title:'温知遥 · 忧心担忧',src:'./wendao/assets/sister-concerned.webp',status:'ready'},
  {id:'sister-relieved',kind:'portrait',title:'温知遥 · 欣慰浅笑',src:'./wendao/assets/sister-relieved.webp',status:'ready'},
- {id:'sister-ill',kind:'portrait',title:'温知遥 · 病中虚弱',src:'./wendao/assets/sister-ill.webp',status:'ready'},
- {id:'sister-weakened',kind:'portrait',title:'温知遥 · 受罚负伤',src:'./wendao/assets/sister-injured.webp',status:'ready'},
+ {id:'sister-ill',kind:'portrait',title:'温知遥 · 病中虚弱',src:'./wendao/assets/sister-ill.webp?v=20261016-ill',status:'ready'},
+ {id:'sister-weakened',kind:'portrait',title:'温知遥 · 受罚负伤',src:'./wendao/assets/sister-injured.webp?v=20261016-unbound',status:'ready'},
  {id:'lamp-study',kind:'cg',title:'灯下理书',src:'./wendao/assets/lamp-study.webp',status:'ready',chapter:'opening'},
  {id:'future-cg',kind:'cg',title:'未解锁',src:null,status:'pending',chapter:'canon-pending'}],
  chapters:[{id:'opening',title:'灯下问道',subtitle:'序章 · 准备期试读',description:'一盏灯，两份功课。交接包授权的起始场景；根据已确认准备期改编；不是原小说新增正文。',requires:{},start:'a',nodes:{

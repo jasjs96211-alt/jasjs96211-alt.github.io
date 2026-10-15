@@ -38,3 +38,12 @@ test('online retry persists identical request envelope and successful reply evid
 });
 test('memory deletion is visible and survives reload with tombstone',async()=>{const a=boot(),s=a.snapshot();s.chatMemory=[{id:'memory:1',text:'可删除记忆',at:Date.now()}];a.storage.set(WD,JSON.stringify(s));const b=boot(a.storage);b.tab('settings');assert.match(b.get('wendao').innerHTML,/可删除记忆/);await b.action('delete-memory',{memory:'memory:1'});assert.equal(b.snapshot().chatMemory.length,0);assert.equal(b.snapshot().memoryTombstones[0].id,'memory:1');const c=boot(b.storage);assert.equal(c.snapshot().chatMemory.length,0)});
 test('cloud export strips device clock/backend/art while preserving injury ledger and memories',()=>{const a=boot();const cloud=a.run('window.Wendao.cloudRead()');assert.equal(cloud.supervision.cursor,0);assert.equal(cloud.supervision.mode,'exempt');assert.equal(cloud.supervision.deadlines.lastCheck,undefined);assert.equal(cloud.settings.chatEndpoint,'');assert.equal(Object.keys(cloud.assets).length,0);assert.ok(Array.isArray(cloud.chatMemory));assert.ok(Array.isArray(cloud.supervision.deadlines.punishments))});
+
+test('six built-in portraits can be inspected without changing live character or settlement state',async()=>{
+ const a=boot(),before=a.snapshot();await a.action('portrait-gallery');
+ const html=a.get('wendao').innerHTML;assert.match(html,/状态立绘/);assert.match(html,/sister-injured.webp\?v=20261016-unbound/);assert.match(html,/sister-ill.webp\?v=20261016-ill/);assert.equal((html.match(/data-wd="portrait-preview"/g)||[]).length,6);
+ await a.action('portrait-preview',{asset:'sister-weakened'});assert.deepEqual(a.snapshot(),before);assert.equal(a.document.body.children.at(-1).children[0].src,'./wendao/assets/sister-injured.webp?v=20261016-unbound');
+});
+test('deadline confirmation with no eligible settlement explains unchanged daily portrait',async()=>{
+ const a=boot(),s=a.snapshot();s.supervision.deadlines.offlinePending=true;a.storage.set(WD,JSON.stringify(s));const b=boot(a.storage);await b.action('verify-deadlines');assert.match(b.get('toast').textContent,/没有新增符合条件/);assert.match(b.get('wendao').innerHTML,/温柔·日常/);
+});
