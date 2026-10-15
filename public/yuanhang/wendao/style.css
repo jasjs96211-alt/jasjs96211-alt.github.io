@@ -4,3 +4,17 @@
 @media(prefers-reduced-motion:reduce){.wd-scene,.wd-standing{transition:none}}
 /* Author display:grid rules must not override HTML hidden on overlays. */
 .wd-player [hidden],.wd [hidden]{display:none!important}
+
+/* Status art slots: two supplied PNG/WebP portraits are real; new states have
+   labelled placeholders until the user imports approved matching artwork. */
+.wd-portrait-frame{position:relative;overflow:hidden;border:1px solid #b2cabe;background:radial-gradient(ellipse,#dcebe3,#f8f5ec)}
+.wd-portrait-frame.wd-tired{background:radial-gradient(ellipse,#e2e4d7,#f8f5ec)}
+.wd-portrait-frame.wd-ill{background:radial-gradient(ellipse,#bfcfd0,#f2f5f3);border-color:#a6b6b6}
+.wd-portrait-frame.wd-major{background:radial-gradient(ellipse,#b2b6c3,#e1e1e9);border:2px solid #85666b}
+.wd-portrait-frame.wd-ill .wd-portrait{opacity:.88}.wd-portrait-frame.wd-major .wd-portrait{opacity:.76}
+.wd-state-tag{position:absolute;right:9px;bottom:9px;background:#183430df;color:white;padding:5px 10px;font-size:12px}
+.wd-major-banner{margin:12px 0 22px;padding:14px;border:1px solid #986c6e;background:#f8eded}.wd-major-banner b{color:#863c42}.wd-major-banner p{margin:8px 0}
+
+/* Missing artwork is text, never a recoloured replacement. */
+.wd-art-pending{min-height:300px;display:grid;align-content:center;text-align:center;gap:12px;padding:25px;color:#536c64;line-height:1.8}.wd-portrait-frame.wd-injured{border:2px solid #986c6e}.wd-portrait-frame.wd-ill .wd-portrait{opacity:1}.wd input,.wd textarea{font-size:16px}.wd-message,.wd-row{overflow-wrap:anywhere}.wd-chat textarea{width:100%;min-width:0;flex:1}.wd-chat .btn{flex-shrink:0}
+@media(max-width:720px){.wd-art-pending{min-height:230px}.wd-chat{height:min(75dvh,660px);min-height:420px}.wd-chat:focus-within{height:max(360px,calc(var(--wd-viewport,100dvh) - 100px));scroll-margin-bottom:90px}.wd-controls .btn{min-height:42px}.wd-form input{max-width:100%;min-width:0}}

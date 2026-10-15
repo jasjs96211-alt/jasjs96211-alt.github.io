@@ -1,6 +1,6 @@
 /* Only cache this app's public static assets. Never cache API responses or private data. */
-const CACHE = 'yuanhang-static-v4-wendao-20261015';
-const ASSETS = ['./', './index.html', './manifest.webmanifest', './icon.svg', './usage.js', './cloud.js','./wendao/engine.js','./wendao/story.js','./wendao/app.js','./wendao/style.css','./wendao/assets/study-room.webp','./wendao/assets/sister-calm.webp','./wendao/assets/lamp-study.webp','./wendao/assets/sister-tired.webp'];
+const CACHE = 'yuanhang-static-v9-wendao-1.3.2-art-20261016';
+const ASSETS = ['./', './index.html', './manifest.webmanifest', './icon.svg', './usage.js', './cloud.js','./wendao/engine.js','./wendao/story.js','./wendao/app.js','./wendao/style.css','./wendao/assets/study-room.webp','./wendao/assets/sister-calm.webp','./wendao/assets/lamp-study.webp','./wendao/assets/sister-tired.webp','./wendao/assets/sister-concerned.webp','./wendao/assets/sister-ill.webp','./wendao/assets/sister-injured.webp','./wendao/assets/sister-relieved.webp'];
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)).then(() => self.skipWaiting()));
 });

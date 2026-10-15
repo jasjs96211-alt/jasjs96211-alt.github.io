@@ -1,0 +1,95 @@
+{
+  "conversion": "PNG to lossless WebP, RGBA pixel equality verified for all four new final sprites; injured v2 selected",
+  "portraits": [
+    {
+      "file": "sister-calm.webp",
+      "dimensions": [
+        1024,
+        1536
+      ],
+      "mode": "RGBA",
+      "alphaRange": [
+        0,
+        254
+      ],
+      "fullyTransparentPixels": 663453,
+      "transparentFraction": 0.4218,
+      "sha256": "828c805f5b87f7c8a333220dd9f8b486c9c808ae50d3af788ad2e4e16fd489b8"
+    },
+    {
+      "file": "sister-concerned.webp",
+      "dimensions": [
+        1024,
+        1536
+      ],
+      "mode": "RGBA",
+      "alphaRange": [
+        0,
+        254
+      ],
+      "fullyTransparentPixels": 653490,
+      "transparentFraction": 0.4155,
+      "sha256": "0b5347b7ca21efadd07479bf5ade54e169d678677dc25d967b76c61854ab263f"
+    },
+    {
+      "file": "sister-ill.webp",
+      "dimensions": [
+        1024,
+        1536
+      ],
+      "mode": "RGBA",
+      "alphaRange": [
+        0,
+        254
+      ],
+      "fullyTransparentPixels": 661232,
+      "transparentFraction": 0.4204,
+      "sha256": "963cf9d52990cf05479ad7428f57bab2e04e5911d7eafc9e5e02d375a6488a6e"
+    },
+    {
+      "file": "sister-injured.webp",
+      "dimensions": [
+        1024,
+        1536
+      ],
+      "mode": "RGBA",
+      "alphaRange": [
+        0,
+        254
+      ],
+      "fullyTransparentPixels": 563967,
+      "transparentFraction": 0.3586,
+      "sha256": "19c934d1514575e6e74e0eb5ecd7c8142741e46103682063146c34d93d784c27"
+    },
+    {
+      "file": "sister-relieved.webp",
+      "dimensions": [
+        1024,
+        1536
+      ],
+      "mode": "RGBA",
+      "alphaRange": [
+        0,
+        254
+      ],
+      "fullyTransparentPixels": 655064,
+      "transparentFraction": 0.4165,
+      "sha256": "9fab0cc9e20f89c903ce10adb563529907e43cf812040b11f39e606a4f272f04"
+    },
+    {
+      "file": "sister-tired.webp",
+      "dimensions": [
+        1024,
+        1536
+      ],
+      "mode": "RGBA",
+      "alphaRange": [
+        0,
+        254
+      ],
+      "fullyTransparentPixels": 668719,
+      "transparentFraction": 0.4252,
+      "sha256": "7b88ffc6a9289a2985ada622065925ddbeb7dacde544aebabb0c59290735626d"
+    }
+  ]
+}

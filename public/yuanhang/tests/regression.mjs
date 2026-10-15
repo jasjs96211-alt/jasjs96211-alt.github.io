@@ -283,3 +283,16 @@ test('first connection preserves cloud conflicts by default and requires explici
   assert.equal(srv.row.payload.events[0].title,a.snapshot().events[0].title);
  }
 });
+
+test('DDL editor persists precision, importance and monotone audited revision without losing legacy completion',()=>{
+ const a=boot({data:data([event({done:true,completedAt:'2026-10-10T10:00:00Z'})])});a.run("openModal(today(),'one')");a.get('eventDueAt').value='2026-10-10T21:30';a.get('eventImportance').value='critical';a.get('eventForm').submit(submit);
+ const e=a.snapshot().events[0];assert.equal(e.category,'ddl');assert.equal(e.end,'2026-10-10');assert.equal(e.dueAt,'2026-10-10T13:30:00.000Z');assert.equal(e.ddlImportance,'critical');assert.equal(e.taskRevision,2);assert.equal(e.revisionHistory.length,1);assert.equal(e.completedAt,'2026-10-10T10:00:00.000Z');
+ a.run("openModal(today(),'one')");a.get('eventDueAt').value='';a.get('eventForm').submit(submit);assert.equal(a.snapshot().events[0].dueAt,undefined);assert.equal(a.snapshot().events[0].taskRevision,3);
+});
+test('DDL backup rejects unknown importance, timezone-free dueAt and invalid revision without touching data',()=>{
+ const a=boot({data:data([event()])});for(const patch of [{ddlImportance:'low'},{dueAt:'2026-10-10T20:00:00'},{dueAt:'2026-10-11T20:00:00+08:00'},{taskRevision:0},{taskRevision:1.5}]){a.run('candidate='+JSON.stringify(data([event(patch)])));assert.equal(a.run('validBackup(candidate)'),false)}
+ a.run('candidate='+JSON.stringify(data([event({dueAt:'2026-10-10T20:00:00+08:00',ddlImportance:'important',taskRevision:1})])));assert.equal(a.run('validBackup(candidate)'),true);assert.equal(a.snapshot().events[0].dueAt,undefined)
+});
+test('DDL editor rejects precise time on other end date, and supports manual completion evidence correction',()=>{
+ const a=boot({data:data([event({done:true})])});a.run("openModal(today(),'one')");a.get('eventDueAt').value='2026-10-11T20:00';a.get('eventForm').submit(submit);assert.equal(a.snapshot().events[0].taskRevision,undefined);a.get('eventDueAt').value='';a.get('eventCompletedAt').value='2026-10-10T17:00';a.get('eventForm').submit(submit);assert.equal(a.snapshot().events[0].completedAt,'2026-10-10T09:00:00.000Z');
+});

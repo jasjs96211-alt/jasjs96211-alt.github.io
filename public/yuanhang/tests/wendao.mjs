@@ -22,3 +22,37 @@ test('proxy without credentials reports503 instead of claiming an online respons
 
 test('retroactive nap correction recalculates risk and is stable on replay',()=>{const s=tick(active(),180);assert.equal(s.supervision.judgements.length,1);s.supervision.intervals.push({start,end:start+2*3600000,kind:'exempt'});E.recalculate(s,study,start+3*3600000);assert.equal(s.supervision.judgements.length,0);assert.equal(s.supervision.idle,60);E.recalculate(s,study,start+3*3600000);assert.equal(s.supervision.idle,60)});
 test('custom sleeping hours and verified study intervals are excluded',()=>{const s=active();s.settings.sleepStart='02:00';s.settings.sleepEnd='11:00';E.advance(s,start+3*3600000,study,{confirmed:true});assert.equal(s.supervision.idle,0);const data={events:[],sessions:[{id:'timed',date:'2026-10-15',subject:'822',minutes:60,startedAt:'2026-10-15T11:00:00+08:00',endedAt:'2026-10-15T12:00:00+08:00'}]};E.advance(s,start+4*3600000,data,{confirmed:true});assert.equal(s.supervision.idle,0)});
+
+test('tracked DDL has 48h acute scene followed by persistent illness',()=>{
+ const day1=Date.parse('2026-10-15T09:00:00+08:00'),day2=Date.parse('2026-10-16T00:02:00+08:00');
+ const items={sessions:[],events:[{id:'exam',category:'ddl',title:'现代文学默写',start:'2026-10-14',end:'2026-10-15',done:false}]};
+ const s=E.baseline(E.fresh(day1),items);
+ E.checkDeadlines(s,items,day1);assert.equal(Object.keys(s.supervision.deadlines.watched).length,1);
+ E.checkDeadlines(s,items,day2);const p=s.supervision.deadlines.punishments[0];assert.equal(p.result,'summons');assert.equal(p.endsAt-p.at,48*3600000);assert.equal(s.chronicle.filter(x=>x.kind==='major').length,1);assert.equal(E.portrait(s,day2).severity,'major');
+ E.checkDeadlines(s,items,day2+3600000);assert.equal(s.supervision.deadlines.punishments.length,1);
+ E.checkDeadlines(s,items,day2+49*3600000);assert.equal(E.portrait(s,day2+49*3600000).state,'ill');assert.ok(s.character.injuries[0].active);
+ assert.equal(s.character.bond,'彼此守护');
+});
+test('old overdue imported ddl or on-time completion never receives retroactive punishment',()=>{
+ const before=Date.parse('2026-10-14T09:00:00+08:00'),after=Date.parse('2026-10-17T09:00:00+08:00');
+ const overdue={sessions:[],events:[{id:'old',category:'ddl',end:'2026-10-13',title:'历史逾期',done:false}]};
+ const s=E.baseline(E.fresh(after),overdue);E.checkDeadlines(s,overdue,after);assert.equal(s.supervision.deadlines.punishments.length,0);
+ const due={sessions:[],events:[{id:'timely',category:'ddl',end:'2026-10-14',title:'按时交',done:false}]};
+ const t=E.baseline(E.fresh(before),due);E.checkDeadlines(t,due,before);due.events[0].done=true;due.events[0].completedAt='2026-10-14T22:59:00+08:00';E.checkDeadlines(t,due,after);assert.equal(t.supervision.deadlines.punishments.length,0);
+});
+test('major penalty can be disabled or corrected and imported state merges major ledger idempotently',()=>{
+ const d1=Date.parse('2026-10-15T09:00:00+08:00'),d2=Date.parse('2026-10-16T09:00:00+08:00');const item={events:[{id:'miss',category:'ddl',end:'2026-10-15',title:'漏交',done:false}],sessions:[]};
+ const s=E.fresh(d1);s.settings.deadlineMajor=false;E.checkDeadlines(s,item,d1);E.checkDeadlines(s,item,d2);assert.equal(s.supervision.deadlines.punishments.length,0);
+ s.settings.deadlineMajor=true;E.checkDeadlines(s,item,d1);E.checkDeadlines(s,item,d2);assert.equal(s.supervision.deadlines.punishments.length,1);
+ const h=s.character.health;assert.ok(h<=56);assert.equal(E.resolveDeadline(s,s.supervision.deadlines.punishments[0].id,'corrected',d2),true);E.derive(s,item,d2);assert.ok(s.character.health>h);E.checkDeadlines(s,item,d2);assert.equal(s.supervision.deadlines.punishments.length,1);
+ const merged=E.merge(E.merge(E.fresh(d1),s),s);assert.equal(merged.supervision.deadlines.punishments.length,1);
+});
+
+test('cloud payload preserves WEN and three-way merge safely detects simultaneous story edits',()=>{
+ const c=vm.createContext({Intl,Date,Math,JSON,Set,Map,URL,AbortSignal});vm.runInContext(readFileSync(new URL('../cloud.js',import.meta.url),'utf8'),c);
+ const C=vm.runInContext('YuanhangCloud',c),base={events:[],sessions:[],screen:{},usageSessions:[],wendao:E.fresh(start)};
+ const local=JSON.parse(JSON.stringify(base)),remote=JSON.parse(JSON.stringify(base));
+ local.wendao.chat.push({id:'x',role:'user',text:'今日日程'});let out=C.reconcile(base,local,remote);assert.equal(out.conflicts.length,0);assert.equal(out.data.wendao.chat.length,1);
+ remote.wendao.chat.push({id:'y',role:'user',text:'另一设备'});out=C.reconcile(base,local,remote);assert.equal(out.conflicts[0].field,'wendao');assert.equal(out.data.wendao.chat[0].id,'x');
+ remote.wendao={...base.wendao,revision:99};out=C.reconcile(base,base,remote);assert.equal(out.conflicts.length,0);
+});

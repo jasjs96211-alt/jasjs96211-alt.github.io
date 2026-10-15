@@ -1,0 +1,83 @@
+{
+  "conversion": "Lossless WebP; exact RGBA pixel equality with final PNG verified for both edits",
+  "portraits": [
+    {
+      "file": "sister-calm.webp",
+      "dimensions": [
+        1024,
+        1536
+      ],
+      "alphaRange": [
+        0,
+        254
+      ],
+      "fullyTransparentPixels": 663453,
+      "sha256": "828c805f5b87f7c8a333220dd9f8b486c9c808ae50d3af788ad2e4e16fd489b8"
+    },
+    {
+      "file": "sister-concerned.webp",
+      "dimensions": [
+        1024,
+        1536
+      ],
+      "alphaRange": [
+        0,
+        254
+      ],
+      "fullyTransparentPixels": 653490,
+      "sha256": "0b5347b7ca21efadd07479bf5ade54e169d678677dc25d967b76c61854ab263f"
+    },
+    {
+      "file": "sister-ill.webp",
+      "dimensions": [
+        1024,
+        1536
+      ],
+      "alphaRange": [
+        0,
+        254
+      ],
+      "fullyTransparentPixels": 617664,
+      "sha256": "b4c01a1cbb152ae1c173282c6c608f4851f882c3aa14adcb9c207695d101439a"
+    },
+    {
+      "file": "sister-injured.webp",
+      "dimensions": [
+        1024,
+        1536
+      ],
+      "alphaRange": [
+        0,
+        254
+      ],
+      "fullyTransparentPixels": 543662,
+      "sha256": "27986b4d6d138d76db20db6722ad1192a17fb5d0b009ce4291b3790138ad8b62"
+    },
+    {
+      "file": "sister-relieved.webp",
+      "dimensions": [
+        1024,
+        1536
+      ],
+      "alphaRange": [
+        0,
+        254
+      ],
+      "fullyTransparentPixels": 655064,
+      "sha256": "9fab0cc9e20f89c903ce10adb563529907e43cf812040b11f39e606a4f272f04"
+    },
+    {
+      "file": "sister-tired.webp",
+      "dimensions": [
+        1024,
+        1536
+      ],
+      "alphaRange": [
+        0,
+        254
+      ],
+      "fullyTransparentPixels": 668719,
+      "sha256": "7b88ffc6a9289a2985ada622065925ddbeb7dacde544aebabb0c59290735626d"
+    }
+  ]
+}
