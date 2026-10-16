@@ -6,7 +6,16 @@ const YuanhangCloud = (()=>{
  const normalize=x=>Array.isArray(x)?x.map(normalize):x&&typeof x==='object'?Object.fromEntries(Object.keys(x).sort().map(k=>[k,normalize(x[k])])):x;
  const equal=(a,b)=>JSON.stringify(normalize(a))===JSON.stringify(normalize(b));
  const payload=s=>({events:s.events,sessions:s.sessions,screen:s.screen,usageSessions:s.usageSessions||[],...(s.wendao?{wendao:s.wendao}:{})});
- const cleanWendao=w=>w?{...w,revision:0}:null;
+ const cleanWendao=w=>{
+  if(!w)return null;
+  const next={...w,revision:0},deadlines=w.supervision?.deadlines;
+  if(deadlines){
+   const clean={...deadlines};
+   for(const k of ['offlinePending','cloudPending','lastCheck','pending','clockPending'])delete clean[k];
+   next.supervision={...w.supervision,deadlines:clean};
+  }
+  return next;
+ };
  function pendingChanges(base,local){
   if(!base)return null;
   let count=0;
@@ -59,6 +68,7 @@ const YuanhangCloud = (()=>{
   else if(lw&&rw){out.wendao=mergeWendao(bw,lw,rw,conflicts)}
   else{conflicts.push({field:'wendao',id:'story-state'});out.wendao=lw||undefined}
   if(out.wendao&&typeof window!=='undefined'&&window.WendaoEngine)window.WendaoEngine.derive(out.wendao,out,Math.max(local.wendao?.supervision?.deadlines?.lastCheck||0,remote.wendao?.supervision?.deadlines?.lastCheck||0,Date.now()));
+  if(out.wendao)out.wendao=cleanWendao(out.wendao); // Engine derives device-only deadline review state; never cloud-store it.
   return {data:out,conflicts};
  }
  function verification(input,email){
