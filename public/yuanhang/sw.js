@@ -42,7 +42,7 @@ self.addEventListener('fetch',event=>{
  const req=event.request,url=new URL(req.url);
  if(req.method!=='GET'||url.origin!==self.location.origin||
     !url.pathname.startsWith(new URL(self.registration.scope).pathname)||
-    !/(?:\/wendao\/(?:novel\.js|engine\.js|story\.js|app\.js|transport\.js|style\.css|assets\/[a-z-]+\.webp)$|\/(?:cloud\.js|usage\.js|index\.html|manifest\.webmanifest|icon\.svg)?$)/.test(url.pathname))return;
+    !/(?:\/wendao\/(?:novel\.js|engine\.js|story\.js|app\.js|companion\.js|transport\.js|style\.css|companion\.css|assets\/[a-z-]+\.webp)$|\/(?:cloud\.js|usage\.js|index\.html|manifest\.webmanifest|icon\.svg)?$)/.test(url.pathname))return;
  event.respondWith(fetch(req).then(response=>{
   if(response.ok){
    const copy=response.clone();
