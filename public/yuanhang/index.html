@@ -180,6 +180,8 @@ button:focus-visible,summary:focus-visible{outline:3px solid #c5774d;outline-off
 <div class="form-group"><label for="accountFirstConflict">首次连接时，同一条记录内容不一致</label><select id="accountFirstConflict"><option value="remote">保留云端版本（新入口推荐）</option><option value="local">保留本入口版本（本入口记录较新时）</option></select></div><div class="usage-actions" style="margin-top:12px"><button class="btn" id="accountVerify">验证登录</button><button class="btn btn-primary" id="accountEnable" disabled>开启自动同步</button><button class="btn" id="accountSyncNow" disabled>立即同步</button><button class="btn btn-sm" id="accountLogout" disabled>停止同步并退出此入口</button></div>
 <p id="accountIdentity" class="helper">尚未登录</p><p id="accountStatus" class="helper" role="status" aria-live="polite">云同步可选，未开启时仍只在本地保存。登录链接过期或已使用时，请申请新邮件。</p>
 <p id="accountDiagnostics" class="helper" role="status" aria-live="polite"></p>
+<div id="accountConflictActions" class="usage-actions" hidden style="margin:10px 0"><button type="button" class="btn btn-soft" id="accountReviewConflicts">逐项核对云同步冲突</button><span class="helper">不会自动覆盖任一端；重大DDL与聊天纪事继续按规则安全合并。</span></div>
+<div id="accountConflictPanel" class="usage-preview" hidden role="region" aria-label="云同步冲突逐项核对"></div>
 <p class="helper">时间均为北京时间。待同步变更按学习记录及问道字段组计数；登录成功不代表数据已同步。自定义图片、聊天服务地址和运行中的计时仅留在各自设备。</p>
 <p class="helper">首次连接按所选优先端保留人物数值，并尝试合并剧情纪事和聊天；后续同步会保存学习任务、温知遥状态、对话、长时记忆与重大DDL记录。两端同时编辑同一问道状态时为避免丢失，会暂停并提示。云端不含自定义图片文件；图片请用完整JSON迁移。必须在每个入口用同一邮箱登录开启。</p>
 <div class="usage-actions"><button class="btn btn-soft" id="openDataSettings">打开备份与设置</button><button class="btn btn-sm" id="exportBeforeCloud">导出云同步前的恢复备份</button></div></div>
@@ -444,7 +446,7 @@ setTimeout(()=>{let d=today(),soon=state.events.filter(e=>!e.done&&e.end>=d&&e.e
 render();restoreTimer();readUsageLink();if('serviceWorker' in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('./sw.js').catch(()=>{});
 </script>
 
-<script src="./cloud.js?v=20261016-sync-r2"></script>
+<script src="./cloud.js?v=20261016-sync-r3"></script>
 <script>
 window.WendaoBridge={
  editTask:id=>{go('calendar');openModal(today(),id)},get:()=>JSON.parse(JSON.stringify(state)),studyKey:STORAGE,valid:validBackup,merge:backupMergePlan,go,toast,download:downloadText,
