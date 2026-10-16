@@ -69,8 +69,19 @@ function bindPortraitImage(img){
   img.style.visibility=type==='ready'?'visible':'hidden';
  };
  img.onload=()=>status('ready');
- img.onerror=()=>status('error');
- status(img.complete?(img.naturalWidth>0?'ready':'error'):'loading');
+ img.onerror=()=>{
+  if(img.dataset.portraitAutoRetry!=='1'&&(typeof navigator==='undefined'||navigator.onLine!==false)){
+   img.dataset.portraitAutoRetry='1';
+   status('loading');
+   setTimeout(()=>{
+    if(!img.isConnected)return;
+    const src=img.dataset.portraitSource||img.getAttribute('src');
+    img.src=src+(src.includes('?')?'&':'?')+'retry_portrait='+Date.now().toString(36);
+   },1200);
+  }else status('error');
+ };
+ if(img.complete){if(img.naturalWidth>0)status('ready');else img.onerror()}
+ else status('loading');
 }
 
 function openDB(){return new Promise((resolve,reject)=>{if(!window.indexedDB)return reject(Error('当前浏览器不支持图片缓存'));const r=indexedDB.open('yuanhang_wendao_media',1);r.onupgradeneeded=()=>r.result.createObjectStore('assets');r.onsuccess=()=>{db=r.result;resolve(db)};r.onerror=()=>reject(r.error)})}
