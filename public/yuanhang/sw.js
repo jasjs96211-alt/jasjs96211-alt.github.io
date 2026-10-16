@@ -1,12 +1,14 @@
 /* Offline app shell first. Large portraits must not prevent the updated code
    from installing over mobile data. No API responses or user data are cached. */
-const CACHE='yuanhang-static-v18-visual-novel-20261016';
+const CACHE='yuanhang-static-v19-companion-20261016';
 const SHELL=[
  './','./index.html','./manifest.webmanifest','./icon.svg',
  './usage.js','./cloud.js?v=20261016-sync-r3',
  './wendao/novel.js?v=20261016-vn2','./wendao/engine.js?v=20261016-vn2','./wendao/story.js?v=20261016-vn2','./wendao/transport.js',
- './wendao/app.js?v=20261016-vn2',
- './wendao/style.css?v=20261016-vn2'
+ './wendao/companion.js?v=20261016-companion1',
+ './wendao/app.js?v=20261016-companion1',
+ './wendao/style.css?v=20261016-vn2',
+ './wendao/companion.css?v=20261016-companion1'
 ];
 const ARTWORK=[
  './wendao/assets/study-room.webp','./wendao/assets/lamp-study.webp',
