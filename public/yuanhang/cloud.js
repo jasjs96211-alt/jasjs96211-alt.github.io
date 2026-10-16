@@ -71,6 +71,66 @@ const YuanhangCloud = (()=>{
   if(out.wendao)out.wendao=cleanWendao(out.wendao); // Engine derives device-only deadline review state; never cloud-store it.
   return {data:out,conflicts};
  }
+
+ // Conflict choices affect only disputed fields. The injury ledger, memories and
+ // distinct study records are still merged by reconcile/WendaoEngine.merge.
+ const copy=x=>x===undefined?undefined:JSON.parse(JSON.stringify(x));
+ const forbidden=new Set(['__proto__','prototype','constructor']);
+ function pathForConflict(c){
+  const parts=String(c.id).split('.');
+  if(parts.some(x=>!x||forbidden.has(x)))throw Error('发现不安全的冲突路径');
+  const [root,second]=parts;
+  const allowed=(root==='settings'&&parts.length>=2)||
+   (root==='story'&&['choices','flags','cursors'].includes(second)&&parts.length>=3)||
+   (['outline','approvedChapters','baseline'].includes(root)&&parts.length===1)||
+   (root==='targets'&&parts.length>=2);
+  if(!allowed)throw Error('此问道冲突不能自动处理，请保留备份交由维护者核对：'+String(c.id).slice(0,100));
+  return root==='targets'?['supervision',...parts]:parts;
+ }
+ function conflictValue(data,c){
+  if(!data)return undefined;
+  if(c.field==='wendao'){
+   let target=data.wendao;
+   for(const key of pathForConflict(c))target=target?.[key];
+   return target;
+  }
+  if(c.field==='screen')return data.screen?.[c.id];
+  if(!['events','sessions','usageSessions'].includes(c.field))throw Error('未知的云端冲突类型');
+  return (data[c.field]||[]).find(x=>x.id===c.id);
+ }
+ function resolveConflicts(result,local,remote,choices){
+  if(!Array.isArray(choices)||choices.length!==result.conflicts.length)throw Error('请逐项核对所有冲突');
+  const next=copy(result.data);
+  for(let i=0;i<result.conflicts.length;i++){
+   const c=result.conflicts[i],selected=choices[i];
+   if(!['local','remote'].includes(selected))throw Error('请逐项选择本入口或云端版本');
+   const value=copy(conflictValue(selected==='local'?local:remote,c));
+   if(c.field==='wendao'){
+    let target=next.wendao,parts=pathForConflict(c);
+    for(let j=0;j<parts.length-1;j++){
+     const key=parts[j];if(!target[key]||typeof target[key]!=='object')target[key]={};
+     target=target[key];
+    }
+    const key=parts.at(-1);if(value===undefined)delete target[key];else target[key]=value;
+   }else if(c.field==='screen'){
+    if(forbidden.has(String(c.id)))throw Error('不安全的屏幕日期');
+    if(value===undefined)delete next.screen[c.id];else next.screen[c.id]=value;
+   }else{
+    const rows=next[c.field]||[],idx=rows.findIndex(x=>x.id===c.id);
+    if(idx>=0)rows.splice(idx,1);
+    if(value!==undefined)rows.push(value);
+    next[c.field]=rows;
+   }
+  }
+  if(next.wendao){
+   const E=typeof window!=='undefined'?window.WendaoEngine:null;
+   if(!E||!E.validate(next.wendao))throw Error('问道合并结果无效，未覆盖原始存档');
+   E.derive(next.wendao,next,Date.now());
+   next.wendao=cleanWendao(next.wendao);
+   if(!E.validate(next.wendao))throw Error('问道合并校验失败，未覆盖原始存档');
+  }
+  return next;
+ }
  function verification(input,email){
   const value=input.trim();
   if(/^\d{6,8}$/.test(value))return {email,token:value,type:'email'};
@@ -87,7 +147,7 @@ const YuanhangCloud = (()=>{
    return data;
   };
  }
- return {payload,equal,reconcile,verification,api,pendingChanges};
+ return {payload,equal,reconcile,verification,api,pendingChanges,conflictValue,resolveConflicts};
 })();
 function startYuanhangCloud(){
  const META='yuanhang_account_sync_v1',request=YuanhangCloud.api();
