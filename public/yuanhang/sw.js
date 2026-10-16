@@ -1,25 +1,56 @@
-/* Only cache this app's public static assets. Never cache API responses or private data. */
-const CACHE = 'yuanhang-static-v15-sync-conflict-review-r3-20261016';
-const ASSETS = ['./', './index.html', './manifest.webmanifest', './icon.svg', './usage.js', './cloud.js?v=20261016-sync-r3','./wendao/engine.js','./wendao/story.js','./wendao/app.js','./wendao/transport.js','./wendao/style.css','./wendao/assets/study-room.webp','./wendao/assets/sister-calm.webp','./wendao/assets/lamp-study.webp','./wendao/assets/sister-tired.webp','./wendao/assets/sister-concerned.webp','./wendao/assets/sister-ill.webp?v=20261016-ill','./wendao/assets/sister-injured.webp?v=20261016-unbound','./wendao/assets/sister-relieved.webp'];
-self.addEventListener('install', event => {
-  event.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)).then(() => self.skipWaiting()));
+/* Offline app shell first. Large portraits must not prevent the updated code
+   from installing over mobile data. No API responses or user data are cached. */
+const CACHE='yuanhang-static-v16-portrait-resilience-20261016';
+const SHELL=[
+ './','./index.html','./manifest.webmanifest','./icon.svg',
+ './usage.js','./cloud.js?v=20261016-sync-r3',
+ './wendao/engine.js','./wendao/story.js','./wendao/transport.js',
+ './wendao/app.js?v=20261016-portrait-r1',
+ './wendao/style.css?v=20261016-portrait-r1'
+];
+const ARTWORK=[
+ './wendao/assets/study-room.webp','./wendao/assets/lamp-study.webp',
+ './wendao/assets/sister-calm.webp','./wendao/assets/sister-tired.webp',
+ './wendao/assets/sister-concerned.webp','./wendao/assets/sister-relieved.webp',
+ './wendao/assets/sister-ill.webp?v=20261016-ill',
+ './wendao/assets/sister-injured.webp?v=20261016-unbound'
+];
+self.addEventListener('install',event=>{
+ event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(SHELL)).then(()=>self.skipWaiting()));
 });
-self.addEventListener('activate', event => {
-  event.waitUntil(Promise.all([caches.keys().then(keys =>
-    Promise.all(keys.filter(k => k.startsWith('yuanhang-static-') && k !== CACHE).map(k => caches.delete(k)))),
-    self.clients.claim()
-  ]));
+self.addEventListener('activate',event=>{
+ event.waitUntil((async()=>{
+  const keys=await caches.keys();
+  const old=keys.filter(key=>key.startsWith('yuanhang-static-')&&key!==CACHE);
+  const target=await caches.open(CACHE);
+  // Reuse already-downloaded pictures: some are 1.4-1.7 MB.
+  for(const name of old){
+   const source=await caches.open(name);
+   for(const asset of ARTWORK){
+    if(await target.match(asset))continue;
+    const saved=await source.match(asset);
+    if(saved?.ok)await target.put(asset,saved);
+   }
+  }
+  await Promise.all(old.map(name=>caches.delete(name)));
+  await self.clients.claim();
+ })());
 });
-self.addEventListener('fetch', event => {
-  const req=event.request, url=new URL(req.url);
-  if (req.method !== 'GET' || url.origin !== self.location.origin ||
-      !url.pathname.startsWith(new URL(self.registration.scope).pathname) ||
-      !/(?:\/wendao\/(?:engine\.js|story\.js|app\.js|transport\.js|style\.css|assets\/[a-z-]+\.webp)$|\/(?:cloud\.js|usage\.js|index\.html|manifest\.webmanifest|icon\.svg)?$)/.test(url.pathname)) return;
-  event.respondWith(fetch(req).then(response => {
-    if (response.ok) {
-      const copy=response.clone();
-      event.waitUntil(caches.open(CACHE).then(c => c.put(req,copy)));
-    }
-    return response;
-  }).catch(() => caches.match(req)));
+self.addEventListener('fetch',event=>{
+ const req=event.request,url=new URL(req.url);
+ if(req.method!=='GET'||url.origin!==self.location.origin||
+    !url.pathname.startsWith(new URL(self.registration.scope).pathname)||
+    !/(?:\/wendao\/(?:engine\.js|story\.js|app\.js|transport\.js|style\.css|assets\/[a-z-]+\.webp)$|\/(?:cloud\.js|usage\.js|index\.html|manifest\.webmanifest|icon\.svg)?$)/.test(url.pathname))return;
+ event.respondWith(fetch(req).then(response=>{
+  if(response.ok){
+   const copy=response.clone();
+   event.waitUntil(caches.open(CACHE).then(cache=>cache.put(req,copy)));
+  }
+  return response;
+ }).catch(async()=>{
+  const exact=await caches.match(req);
+  if(exact)return exact;
+  if(url.pathname.endsWith('.webp'))return caches.match(req,{ignoreSearch:true});
+  throw Error('离线状态下，此静态资源尚未缓存');
+ }));
 });
