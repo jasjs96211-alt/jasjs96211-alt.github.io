@@ -65,7 +65,8 @@ const YuanhangCloud = (()=>{
    out[field]=field==='screen'?Object.fromEntries(result):result.map(x=>x[1]);
   }
   const bw=cleanWendao(base.wendao),lw=cleanWendao(local.wendao),rw=cleanWendao(remote.wendao);
-  if(equal(lw,rw))out.wendao=lw||undefined;
+  if(lw&&rw&&typeof window!=='undefined'&&window.WendaoEngine)out.wendao=mergeWendao(bw,lw,rw,conflicts);
+  else if(equal(lw,rw))out.wendao=lw||undefined;
   else if(equal(lw,bw))out.wendao=rw||undefined;
   else if(equal(rw,bw))out.wendao=lw||undefined;
   else if(lw&&rw){out.wendao=mergeWendao(bw,lw,rw,conflicts)}
