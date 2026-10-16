@@ -90,16 +90,17 @@ function startYuanhangCloud(){
  const read=()=>{const s=latestUsageState();if(!validBackup(s))throw Error('本地数据无效，请先导出备份。');const w=window.Wendao?.cloudRead?.();return YuanhangCloud.payload({...s,...(w?{wendao:w}:{})})};
  function diagnostics(){
   let pendingChanges=null;try{pendingChanges=YuanhangCloud.pendingChanges(cfg.base,read())}catch{}
-  return {origin:location.origin||'本地文件',enabled:!!cfg.enabled,signedIn:!!cfg.session,pendingChanges,conflictCount:cfg.conflictCount||0,lastReadAt:cfg.lastReadAt||null,lastWriteAt:cfg.lastWriteAt||null,lastSyncAt:cfg.lastSyncAt||null,revision:cfg.revision||null,lastError:cfg.lastError||null};
+  return {origin:location.origin||'本地文件',enabled:!!cfg.enabled,signedIn:!!cfg.session,pendingChanges,conflictCount:cfg.conflictCount||0,lastReadAt:cfg.lastReadAt||null,lastWriteAt:cfg.lastWriteAt||null,lastSyncAt:cfg.lastSyncAt||null,revision:cfg.revision||null,lastError:cfg.lastError||null,clientVersion:'2026-10-16-r2'};
  }
  function controls(){
   $('accountIdentity').textContent=cfg.session?.user?.email?`已登录：${cfg.session.user.email}`:'尚未登录';
-  $('accountEnable').disabled=!cfg.session||cfg.enabled;
-  $('accountSyncNow').disabled=!cfg.enabled;
-  $('accountLogout').disabled=!cfg.session;
+  $('accountEnable').disabled=busy||!cfg.session||cfg.enabled;
+  $('accountSyncNow').disabled=busy||!cfg.enabled;
+  $('accountSyncNow').textContent=busy?'同步中…':'立即同步';
+  $('accountLogout').disabled=busy||!cfg.session;
   $('accountBadge').textContent=cfg.enabled?'自动同步已开启':cfg.session?'已登录 · 待开启':'未开启云同步';
   const d=diagnostics(),time=x=>x?new Date(x).toLocaleString('zh-CN',{timeZone:'Asia/Shanghai'}):'暂无成功记录';
-  $('accountDiagnostics').textContent=`上次读取：${time(d.lastReadAt)}；上次上传：${time(d.lastWriteAt)}；上次完整同步：${time(d.lastSyncAt)}。待同步变更：${d.pendingChanges===null?'尚未建立基准':d.pendingChanges}；待处理冲突：${d.conflictCount}。`;
+  $('accountDiagnostics').textContent=`同步程序：2026-10-16 R2。上次读取：${time(d.lastReadAt)}；上次上传：${time(d.lastWriteAt)}；上次完整同步：${time(d.lastSyncAt)}。待同步变更：${d.pendingChanges===null?'尚未建立基准':d.pendingChanges}；待处理冲突：${d.conflictCount}。${d.lastError?' 最近失败：'+d.lastError:''}`;
  }
  async function authorized(path,options={}){
   if(!cfg.session)throw Error('请先登录。');
@@ -147,10 +148,10 @@ function startYuanhangCloud(){
  }
  async function work(first=false){
   if(busy||!cfg.session||(!first&&!cfg.enabled)||document.hidden)return;
-  busy=true;controls();
+  busy=true;controls();say('正在读取云端并核对本地存档，可能需要20秒，请等待结果。');
   try{
    // Capture local state *after* the network read. Time-tracking and story autosaves may change it while awaiting Supabase.
-   const row=await remote(),local=read();let next;
+   const row=await remote(),local=read();let next;say('云端读取成功，正在核对问道存档、DDL账本及同步冲突…');
    if(first){
     const plan=row?($('accountFirstConflict').value==='local'?backupMergePlan(local,row.data):backupMergePlan(row.data,local)):{next:local,conflicts:0,total:0};
     if(!confirm(`开启此邮箱的自动同步？将把任务、学习、屏幕记录及问道剧情/聊天上传到你的 Supabase 账户（不含自定义图片）。首次补入云端缺少的记录，${plan.conflicts} 项冲突保留${$('accountFirstConflict').value==='local'?'本入口':'云端'}版本。正在进行的计时仅留在本入口。`))return;
