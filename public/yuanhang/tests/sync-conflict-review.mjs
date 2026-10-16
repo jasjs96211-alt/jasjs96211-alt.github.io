@@ -37,11 +37,15 @@ test('four real task conflicts are reported without changing local/cloud inputs'
  assert.equal(JSON.stringify(local),beforeLocal);assert.equal(JSON.stringify(remote),beforeRemote);
 });
 test('independent DDL injury and chat history survive per-row choices and no duplicate penalty',()=>{
- const {C,base,local,remote}=fixture(),result=C.reconcile(base,local,remote);
+ const {C,base,local,remote}=fixture();
+ local.wendao.chat.push({id:'local-chat',role:'user',text:'Study reminder',at:1});
+ remote.wendao.chat.push({id:'cloud-chat',role:'assistant',text:'Sister message',at:2});
+ const result=C.reconcile(base,local,remote);
  const merged=C.resolveConflicts(result,local,remote,['remote','local','remote','local']);
  assert.equal(merged.events.find(e=>e.id==='one').title,'Desktop one');
  assert.equal(merged.events.find(e=>e.id==='two').title,'Safari two');
  assert.equal(merged.wendao.supervision.deadlines.punishments.length,1);
+ assert.deepEqual(merged.wendao.chat.map(x=>x.id).sort(),['cloud-chat','local-chat']);
  assert.ok(merged.wendao.character.health<78);
  assert.equal(C.reconcile(merged,merged,merged).data.wendao.supervision.deadlines.punishments.length,1);
  assert.equal(C.pendingChanges(merged,merged),0);
