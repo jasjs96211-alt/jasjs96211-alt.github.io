@@ -7,6 +7,19 @@ const YuanhangCloud = (()=>{
  const equal=(a,b)=>JSON.stringify(normalize(a))===JSON.stringify(normalize(b));
  const payload=s=>({events:s.events,sessions:s.sessions,screen:s.screen,usageSessions:s.usageSessions||[],...(s.wendao?{wendao:s.wendao}:{})});
  const cleanWendao=w=>w?{...w,revision:0}:null;
+ function pendingChanges(base,local){
+  if(!base)return null;
+  let count=0;
+  for(const field of ['events','sessions','usageSessions','screen']){
+   const map=s=>new Map(field==='screen'?Object.entries(s[field]||{}):(s[field]||[]).map(x=>[x.id,x]));
+   const b=map(base),l=map(local);
+   for(const id of new Set([...b.keys(),...l.keys()]))if(!equal(b.get(id),l.get(id)))count++;
+  }
+  // Story fields are groups, not individual chat messages; never expose their contents.
+  const b=cleanWendao(base.wendao)||{},l=cleanWendao(local.wendao)||{};
+  for(const k of new Set([...Object.keys(b),...Object.keys(l)]))if(!equal(b[k],l[k]))count++;
+  return count;
+ }
  function mergeWendao(base,local,remote,conflicts){
   const E=typeof window!=='undefined'?window.WendaoEngine:null;if(!E){conflicts.push({field:'wendao',id:'engine-unavailable'});return local}
   const n=E.merge(local,remote),b=base||{};
@@ -64,23 +77,29 @@ const YuanhangCloud = (()=>{
    return data;
   };
  }
- return {payload,equal,reconcile,verification,api};
+ return {payload,equal,reconcile,verification,api,pendingChanges};
 })();
 function startYuanhangCloud(){
  const META='yuanhang_account_sync_v1',request=YuanhangCloud.api();
  let cfg={},busy=false,epoch=0,debounce;
  let deadlineReady=!cfg.enabled;
- window.YuanhangAccount={deadlineReady:()=>!cfg.enabled||deadlineReady,token:async()=>{await authorized('/auth/v1/user');return cfg.session.access_token},diagnostics:()=>({origin:location.origin||'本地文件',enabled:!!cfg.enabled,userId:cfg.session?.user?.id||null,lastReadAt:cfg.lastReadAt||null,lastWriteAt:cfg.lastWriteAt||null,lastError:cfg.lastError||null})};
+ window.YuanhangAccount={deadlineReady:()=>!cfg.enabled||deadlineReady,token:async()=>{await authorized('/auth/v1/user');return cfg.session.access_token},diagnostics};
  try{cfg=JSON.parse(localStorage.getItem(META)||'{}')}catch{}
  const say=message=>{$('accountStatus').textContent=message};
  const persist=()=>localStorage.setItem(META,JSON.stringify(cfg));
  const read=()=>{const s=latestUsageState();if(!validBackup(s))throw Error('本地数据无效，请先导出备份。');const w=window.Wendao?.cloudRead?.();return YuanhangCloud.payload({...s,...(w?{wendao:w}:{})})};
+ function diagnostics(){
+  let pendingChanges=null;try{pendingChanges=YuanhangCloud.pendingChanges(cfg.base,read())}catch{}
+  return {origin:location.origin||'本地文件',enabled:!!cfg.enabled,signedIn:!!cfg.session,pendingChanges,conflictCount:cfg.conflictCount||0,lastReadAt:cfg.lastReadAt||null,lastWriteAt:cfg.lastWriteAt||null,lastSyncAt:cfg.lastSyncAt||null,revision:cfg.revision||null,lastError:cfg.lastError||null};
+ }
  function controls(){
   $('accountIdentity').textContent=cfg.session?.user?.email?`已登录：${cfg.session.user.email}`:'尚未登录';
   $('accountEnable').disabled=!cfg.session||cfg.enabled;
   $('accountSyncNow').disabled=!cfg.enabled;
   $('accountLogout').disabled=!cfg.session;
   $('accountBadge').textContent=cfg.enabled?'自动同步已开启':cfg.session?'已登录 · 待开启':'未开启云同步';
+  const d=diagnostics(),time=x=>x?new Date(x).toLocaleString('zh-CN',{timeZone:'Asia/Shanghai'}):'暂无成功记录';
+  $('accountDiagnostics').textContent=`上次读取：${time(d.lastReadAt)}；上次上传：${time(d.lastWriteAt)}；上次完整同步：${time(d.lastSyncAt)}。待同步变更：${d.pendingChanges===null?'尚未建立基准':d.pendingChanges}；待处理冲突：${d.conflictCount}。`;
  }
  async function authorized(path,options={}){
   if(!cfg.session)throw Error('请先登录。');
@@ -97,7 +116,8 @@ function startYuanhangCloud(){
  async function remote(){
   const rows=await authorized('/rest/v1/workbench_state?select=revision,payload&user_id=eq.'+encodeURIComponent(cfg.session.user.id)+'&limit=1');
   if(!Array.isArray(rows))throw Error('云端数据返回异常。');
-  cfg.lastReadAt=new Date().toISOString();const row=rows[0];if(row&&(!validBackup(row.payload)||row.payload.wendao&&!window.WendaoEngine?.validate(row.payload.wendao)||!Number.isSafeInteger(row.revision)||row.revision<1))throw Error('云端备份格式异常，未修改本地。');
+  const row=rows[0];if(row&&(!validBackup(row.payload)||row.payload.wendao&&!window.WendaoEngine?.validate(row.payload.wendao)||!Number.isSafeInteger(row.revision)||row.revision<1))throw Error('云端备份格式异常，未修改本地。');
+  cfg.lastReadAt=new Date().toISOString();cfg.revision=row?.revision||null;
   return row?{revision:row.revision,data:YuanhangCloud.payload(row.payload)}:null;
  }
  async function upload(data,row){
@@ -106,13 +126,14 @@ function startYuanhangCloud(){
   const result=await authorized('/rest/v1/workbench_state?select=revision'+filter,{method:row?'PATCH':'POST',prefer:'return=representation',body:row?{payload:data,revision,updated_at:new Date().toISOString()}:{user_id:cfg.session.user.id,payload:data,revision}});
   if(!Array.isArray(result)||result.length!==1||result[0].revision!==revision)throw Error('另一入口刚更新了云端，请点击立即同步重试。');
   cfg.lastWriteAt=new Date().toISOString();
+  cfg.revision=revision;
  }
  function apply(data){
   if(!validBackup(data))throw Error('合并后数据超过限制或格式无效。');
   const latest=latestUsageState();
   if(YuanhangCloud.equal(read(),data))return;
-  localStorage.setItem(STORAGE+'_before_cloud',JSON.stringify(latest));
   const wdKey='yuanhang_wendao_v1',priorWD=localStorage.getItem(wdKey),priorStudy=localStorage.getItem(STORAGE);
+  localStorage.setItem(STORAGE+'_before_cloud',JSON.stringify({...latest,...(priorWD?{wendao:JSON.parse(priorWD)}:{})}));
   try{
    const next={...latest,...data};delete next.wendao;
    localStorage.setItem(STORAGE,JSON.stringify(next));state=next;
@@ -142,7 +163,7 @@ function startYuanhangCloud(){
     if(!cfg.base||!validBackup(cfg.base))throw Error('缺少同步基准，请停止同步后重新登录开启。');
     if(!row)throw Error('云端记录已不存在，已暂停本次同步，请检查账户。');
     const result=YuanhangCloud.reconcile(cfg.base,local,row.data);
-    if(result.conflicts.length){localStorage.setItem(STORAGE+'_cloud_conflict_snapshot',JSON.stringify({at:new Date().toISOString(),base:cfg.base,local,remote:row.data,conflicts:result.conflicts}));throw Error(`有 ${result.conflicts.length} 项两边都修改过的记录，未覆盖任何一边。请分别导出备份，再通过「合并另一入口」核对。`);}
+    if(result.conflicts.length){cfg.conflictCount=result.conflicts.length;localStorage.setItem(STORAGE+'_cloud_conflict_snapshot',JSON.stringify({at:new Date().toISOString(),base:cfg.base,local,remote:row.data,conflicts:result.conflicts}));throw Error(`有 ${result.conflicts.length} 项两边都修改过的记录，未覆盖任何一边。请分别导出备份，再通过「合并另一入口」核对。`);}
     next=result.data;
    }
    if(!validBackup(next))throw Error('合并后数据超过限制，未同步。');
@@ -150,9 +171,9 @@ function startYuanhangCloud(){
    if(!row||!YuanhangCloud.equal(next,row.data))await upload(next,row);
    // Rebase edits made during the upload instead of replacing them with the captured snapshot.
    const changed=YuanhangCloud.reconcile(local,read(),next);
-   if(changed.conflicts.length)throw Error('上传期间本地也有修改，已保留本地。请再次同步核对。');
+   if(changed.conflicts.length){cfg.conflictCount=changed.conflicts.length;localStorage.setItem(STORAGE+'_cloud_conflict_snapshot',JSON.stringify({at:new Date().toISOString(),base:local,local:read(),remote:next,conflicts:changed.conflicts}));throw Error('上传期间本地也有修改，已保留本地及冲突快照。请再次同步核对。');}
    deadlineReady=true;apply(changed.data);
-   cfg.lastError=null;const previous=cfg;cfg={...cfg,base:next,enabled:true};try{persist()}catch(err){cfg=previous;throw err}
+   cfg.lastError=null;const previous=cfg;cfg={...cfg,base:next,enabled:true,conflictCount:0,...(YuanhangCloud.equal(read(),next)?{lastSyncAt:new Date().toISOString()}:{})};try{persist()}catch(err){cfg=previous;throw err}
    if(!YuanhangCloud.equal(changed.data,next)){say('本地新修改待上传，正在安排下一次同步。');schedule()}else say(`已同步 · ${new Date().toLocaleTimeString('zh-CN')}。桌面版重新打开时会拉取更新。`);
   }catch(err){deadlineReady=!cfg.enabled;cfg.lastError=err.message;try{persist()}catch{};say(`尚未同步：${err.message} 本地记录仍保留。`)}
   finally{busy=false;controls()}
@@ -161,7 +182,7 @@ function startYuanhangCloud(){
   if(navigator.locks)return navigator.locks.request('yuanhang-account-sync',async()=>{try{cfg=JSON.parse(localStorage.getItem(META)||'{}')}catch{};return work(first)});
   return work(first);
  }
- function schedule(){clearTimeout(debounce);if(cfg.enabled)debounce=setTimeout(()=>lockedWork(),1500)}
+ function schedule(){clearTimeout(debounce);controls();if(cfg.enabled)debounce=setTimeout(()=>lockedWork(),1500)}
  $('accountSend').onclick=async()=>{
   if(busy)return;const email=$('accountEmail').value.trim();if(!/^\S+@\S+\.\S+$/.test(email))return say('请填写邮箱。');
   busy=true;$('accountSend').disabled=true;

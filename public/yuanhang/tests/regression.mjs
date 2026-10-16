@@ -274,6 +274,36 @@ test('offline and failed local cloud apply preserve local data and recovery back
 test('stop sync clears new credentials and preserves data, without another remote request',async()=>{
  const base=data([event()]),srv=server(base),a=boot({cloud:true,data:base,storage:accountStorage(base),fetcher:srv.fetch});a.get('accountLogout').onclick();await a.get('accountSyncNow').onclick();assert.equal(srv.calls.length,0);assert.deepEqual(a.snapshot(),base);assert.equal(JSON.parse(a.storage.get(ACCOUNT)).session,undefined);
 });
+test('sync diagnostics distinguish login, pending edits, reads and successful uploads without identity secrets',async()=>{
+ const base=data([event()]),srv=server(base),a=boot({cloud:true,data:base,storage:accountStorage(base),fetcher:srv.fetch});
+ const diagnostic=()=>JSON.parse(a.run('JSON.stringify(window.YuanhangAccount.diagnostics())'));
+ assert.equal(diagnostic().signedIn,true);assert.equal(diagnostic().lastWriteAt,null);assert.equal(diagnostic().lastSyncAt,null);
+ a.run("state.events[0].title='修改';save()");assert.equal(diagnostic().pendingChanges,1);
+ srv.fail=true;await a.get('accountSyncNow').onclick();assert.equal(diagnostic().pendingChanges,1);assert.equal(diagnostic().lastReadAt,null);
+ srv.fail=false;await a.get('accountSyncNow').onclick();const d=diagnostic();assert.equal(d.pendingChanges,0);assert.ok(d.lastReadAt);assert.ok(d.lastWriteAt);assert.ok(d.lastSyncAt);assert.equal(d.revision,2);
+ assert.doesNotMatch(JSON.stringify(d),/test-user|test@example|test-access|test-refresh|修改/);
+ assert.match(a.get('accountDiagnostics').textContent,/待同步变更：0/);
+});
+test('sync conflict diagnostics expose counts while retaining private recovery snapshots locally',async()=>{
+ const base=data([event()]),srv=server(base),a=boot({cloud:true,data:base,storage:accountStorage(base),fetcher:srv.fetch});
+ a.run("state.events[0].title='私有本地标题';save()");srv.row={revision:2,payload:data([event({title:'私有云端标题'})])};
+ await a.get('accountSyncNow').onclick();const d=JSON.parse(a.run('JSON.stringify(window.YuanhangAccount.diagnostics())'));
+ assert.equal(d.conflictCount,1);assert.equal(d.lastSyncAt,null);assert.doesNotMatch(JSON.stringify(d),/私有/);
+ const snapshot=JSON.parse(a.storage.get(KEY+'_cloud_conflict_snapshot'));assert.equal(snapshot.local.events[0].title,'私有本地标题');assert.equal(snapshot.remote.events[0].title,'私有云端标题');
+ a.run("state.events[0].title='私有云端标题';save()");await a.get('accountSyncNow').onclick();assert.equal(a.run('window.YuanhangAccount.diagnostics().conflictCount'),0);
+});
+test('cloud recovery backup retains the pre-merge story alongside study and excludes account credentials',async()=>{
+ const base=data([event()]),srv=server(base),storage=accountStorage(base),story={chat:[{id:'private',text:'原对话'}],character:{health:21}};
+ storage.set('yuanhang_wendao_v1',JSON.stringify(story));const a=boot({cloud:true,data:base,storage,fetcher:srv.fetch});
+ srv.row={revision:2,payload:data([event()],[{id:'remote',date:'2026-10-10',minutes:30,subject:'英语'}])};await a.get('accountSyncNow').onclick();
+ const backup=JSON.parse(storage.get(KEY+'_before_cloud'));assert.deepEqual(backup.wendao,story);assert.deepEqual(backup.events,base.events);assert.equal(backup.sessions.length,0);assert.equal(a.snapshot().sessions.length,1);assert.doesNotMatch(JSON.stringify(backup),/test-access|test-refresh|test-user/);
+});
+test('pending counts include deletion and story groups but ignore local revision increments',()=>{
+ const a=boot({cloud:true,data:data()});
+ assert.equal(a.run('YuanhangCloud.pendingChanges(null,{})'),null);
+ assert.equal(a.run('YuanhangCloud.pendingChanges({events:[{id:"x"}],wendao:{revision:1,chat:[]}},{events:[],wendao:{revision:2,chat:[{id:"c"}]}})'),2);
+ assert.equal(a.run('YuanhangCloud.pendingChanges({wendao:{revision:1}},{wendao:{revision:9}})'),0);
+});
 test('first connection preserves cloud conflicts by default and requires explicit local preference',async()=>{
  const remote={...data([event({title:'已保存的云端任务',done:true})]),usageSessions:[]};
  for(const localWins of [false,true]){
