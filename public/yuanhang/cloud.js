@@ -169,9 +169,74 @@ function startYuanhangCloud(){
   $('accountSyncNow').textContent=busy?'同步中…':'立即同步';
   $('accountLogout').disabled=busy||!cfg.session;
   $('accountBadge').textContent=cfg.enabled?'自动同步已开启':cfg.session?'已登录 · 待开启':'未开启云同步';
+  $('accountConflictActions').hidden=!(cfg.conflictCount>0);
+  $('accountReviewConflicts').textContent='逐项核对 '+(cfg.conflictCount||0)+' 项冲突（不直接覆盖）';
   const d=diagnostics(),time=x=>x?new Date(x).toLocaleString('zh-CN',{timeZone:'Asia/Shanghai'}):'暂无成功记录';
   $('accountDiagnostics').textContent=`同步程序：2026-10-16 R2。上次读取：${time(d.lastReadAt)}；上次上传：${time(d.lastWriteAt)}；上次完整同步：${time(d.lastSyncAt)}。待同步变更：${d.pendingChanges===null?'尚未建立基准':d.pendingChanges}；待处理冲突：${d.conflictCount}。${d.lastError?' 最近失败：'+d.lastError:''}`;
  }
+
+ // The snapshot is private to this browser. Only human-approved disputed fields
+ // are selected; all independent records and the monotone DDL ledger are merged.
+ function showConflictReview(){
+  const panel=$('accountConflictPanel');let snap;
+  try{
+   snap=JSON.parse(localStorage.getItem(STORAGE+'_cloud_conflict_snapshot')||'null');
+   if(!snap||!Array.isArray(snap.conflicts)||!snap.conflicts.length||!snap.local||!snap.remote||!snap.base)throw Error('没有可供核对的冲突快照，请点击立即同步后再试');
+  }catch(err){say('无法打开核对面板：'+err.message);return}
+  const element=(tag,value)=>{const node=document.createElement(tag);if(value!==undefined)node.textContent=value;return node};
+  const kinds={events:'任务／DDL',sessions:'学习记录',usageSessions:'游戏记录',screen:'屏幕时间',wendao:'问道剧情决定'};
+  panel.replaceChildren();panel.hidden=false;
+  panel.append(element('h3','逐项核对 '+snap.conflicts.length+' 项云同步冲突'));
+  panel.append(element('p','左侧“本入口”指当前 Safari（或正在使用的入口）；“云端”是其他入口已上传的版本。所有无冲突记录自动合并，温知遥的DDL伤病、聊天与纪事账本继续取双方并集；这四项必须由你决定，不会默默覆盖。'));
+  const selects=[];
+  for(let i=0;i<snap.conflicts.length;i++){
+   const c=snap.conflicts[i];let local,remote;
+   try{
+    local=YuanhangCloud.conflictValue(snap.local,c);
+    remote=YuanhangCloud.conflictValue(snap.remote,c);
+   }catch(err){
+    panel.append(element('p','第 '+(i+1)+' 项需要人工维护：'+err.message));
+    return;
+   }
+   const preview=(value)=>{
+    if(value===undefined)return '(此入口没有这条记录，可能已删除)';
+    const output=JSON.stringify(value,null,2)||String(value);
+    return output.length>16000?output.slice(0,16000)+'\n…内容过长，请核对导出的完整备份':output;
+   };
+   const summary=(v)=>v?.title||v?.subject||v?.app||String(c.id);
+   const row=element('div');row.className='card';row.style.margin='12px 0';row.style.padding='14px';
+   row.append(element('h4',(i+1)+' / '+snap.conflicts.length+' · '+(kinds[c.field]||c.field)+' · '+String(summary(local||remote)).slice(0,120)));
+   row.append(element('p','冲突位置：'+String(c.id).slice(0,180)));
+   const select=element('select');select.style.width='100%';select.style.minHeight='44px';
+   for(const [value,title] of [['','请明确选择保留哪一端的这项记录'],['local','保留本入口（当前手机）'],['remote','保留云端（另一入口已上传）']]){
+    const opt=element('option',title);opt.value=value;select.append(opt);
+   }
+   row.append(select);selects.push(select);
+   const details=element('details');details.style.marginTop='10px';
+   details.append(element('summary','展开比较这项记录的具体内容'));
+   for(const [title,value] of [['本入口原记录',local],['云端原记录',remote]]){
+    details.append(element('strong',title));
+    const pre=element('pre',preview(value));pre.style.whiteSpace='pre-wrap';pre.style.overflowWrap='anywhere';pre.style.maxHeight='240px';pre.style.overflow='auto';pre.style.fontSize='12px';
+    details.append(pre);
+   }
+   row.append(details);panel.append(row);
+  }
+  panel.append(element('p','确认后系统会再次核对云端与本地是否发生新变化；如版本已改变，将拒绝覆盖并要求重新核对。原始备份和冲突快照不会被清除。'));
+  const actions=element('div');actions.className='usage-actions';
+  const submit=element('button','确认选择并安全合并');submit.className='btn btn-primary';
+  const cancel=element('button','暂不处理');cancel.className='btn';
+  submit.onclick=async()=>{
+   const selected=selects.map(x=>x.value);
+   if(selected.some(x=>!x))return say('请为每一项冲突选择本入口或云端版本，未选择时不会修改数据');
+   if(!confirm('确认按这 '+selected.length+' 项选择合并？所有独立记录与既有DDL伤病账本都会保留；若上传期间数据变化则停止，不会强制覆盖。'))return;
+   submit.disabled=true;
+   try{if(await lockedWork(false,selected,snap)){panel.hidden=true;panel.replaceChildren();}}
+   finally{submit.disabled=false}
+  };
+  cancel.onclick=()=>{panel.hidden=true;panel.replaceChildren();say('核对已取消，云端和本地存档均未覆盖。')};
+  actions.append(submit,cancel);panel.append(actions);panel.scrollIntoView?.({block:'nearest'});
+ }
+
  async function authorized(path,options={}){
   if(!cfg.session)throw Error('请先登录。');
   const generation=epoch;
