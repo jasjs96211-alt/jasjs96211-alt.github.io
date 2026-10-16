@@ -310,7 +310,7 @@ function startYuanhangCloud(){
       const beforeLocal=YuanhangCloud.conflictValue(reviewSnapshot.local,c),beforeRemote=YuanhangCloud.conflictValue(reviewSnapshot.remote,c);
       if(!YuanhangCloud.equal(beforeLocal,YuanhangCloud.conflictValue(local,c))||!YuanhangCloud.equal(beforeRemote,YuanhangCloud.conflictValue(row.data,c)))throw Error('核对期间某条冲突记录发生变化，请重新点击立即同步核对');
      }
-     next=YuanhangCloud.resolveConflicts(result,local,row.data,resolutions);
+     next=YuanhangCloud.resolveConflicts(result,local,row.data,result.conflicts.map(c=>resolutions[reviewSnapshot.conflicts.findIndex(x=>x.field===c.field&&x.id===c.id)]));
     }else if(result.conflicts.length){
      cfg.conflictCount=result.conflicts.length;
      localStorage.setItem(STORAGE+'_cloud_conflict_snapshot',JSON.stringify({at:new Date().toISOString(),revision:row.revision,base:cfg.base,local,remote:row.data,conflicts:result.conflicts}));
