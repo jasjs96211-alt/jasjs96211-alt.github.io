@@ -17,6 +17,7 @@ const YuanhangCloud = (()=>{
    for(const k of ['offlinePending','cloudPending','lastCheck','pending','clockPending'])delete clean[k];
    next.supervision={...next.supervision,deadlines:clean};
   }
+  if(next.life)delete next.life.clockPending;if(next.rhythmState)delete next.rhythmState.napUntil;
   return next;
  };
  function pendingChanges(base,local){
@@ -47,6 +48,7 @@ const YuanhangCloud = (()=>{
   for(const k of ['choices','flags','cursors'])n.story[k]=pick(b.story?.[k],local.story[k],remote.story[k],'story.'+k);
   for(const k of ['outline','approvedChapters','baseline'])n[k]=pick(b[k],local[k],remote[k],k);
   n.supervision.targets=pick(b.supervision?.targets,local.supervision.targets,remote.supervision.targets,'targets');
+  if(n.rhythmState)n.rhythmState.temporarySleep=pick(b.rhythmState?.temporarySleep??null,local.rhythmState?.temporarySleep??null,remote.rhythmState?.temporarySleep??null,'rhythmState.temporarySleep');
   // Rest/observed logs have stable interval keys and are kept for audit/recalculation.
   for(const k of ['intervals','observed']){const rows=[...(local.supervision[k]||[]),...(remote.supervision[k]||[])];n.supervision[k]=[...new Map(rows.map(x=>[JSON.stringify(x),x])).values()].sort((a,b)=>a.start-b.start)}
   n.revision=0;return n;
@@ -88,7 +90,7 @@ const YuanhangCloud = (()=>{
    (root==='story'&&['choices','flags','cursors'].includes(second)&&parts.length>=3)||
    (['outline','approvedChapters'].includes(root)&&parts.length===1)||
    (root==='baseline'&&parts.length>=1)||
-   (root==='targets'&&parts.length>=2);
+   (root==='targets'&&parts.length>=2)||(root==='rhythmState'&&second==='temporarySleep'&&parts.length>=2);
   if(!allowed)throw Error('此问道冲突不能自动处理，请保留备份交由维护者核对：'+String(c.id).slice(0,100));
   if(root==='story'&&['choices','cursors'].includes(second)&&parts.length>3)return ['story',second,parts.slice(2).join('.')];
   return root==='targets'?['supervision',...parts]:parts;

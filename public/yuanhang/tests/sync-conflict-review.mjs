@@ -90,6 +90,6 @@ test('incomplete or unsupported choices fail closed, and R3 scripts match the SW
  assert.throws(()=>C.resolveConflicts(result,local,remote,['remote']),/逐项/);
  assert.throws(()=>C.resolveConflicts({data:result.data,conflicts:[{field:'wendao',id:'story-state'}]},local,remote,['remote']),/不能自动处理/);
  const html=readFileSync(new URL('../index.html',import.meta.url),'utf8'),sw=readFileSync(new URL('../sw.js',import.meta.url),'utf8');
- assert.match(html,/cloud\.js\?v=20261016-sync-r3/);
- assert.match(sw,/cloud\.js\?v=20261016-sync-r3/);
+ assert.match(html,/cloud\.js\?v=20261016-sync-r4/);
+ assert.match(sw,/cloud\.js\?v=20261016-sync-r4/);
 });
