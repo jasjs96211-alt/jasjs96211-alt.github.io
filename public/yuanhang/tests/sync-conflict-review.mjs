@@ -70,6 +70,21 @@ test('deletion against modification requires explicit choice and deletion can be
  const selected=result.conflicts.map((_,i)=>i===index?'remote':'local');
  assert.equal(C.resolveConflicts(result,local,remote,selected).events.some(e=>e.id==='one'),false);
 });
+test('baseline arrays and dotted story cursor keys can be chosen safely',()=>{
+ const {C,base,local,remote}=fixture();
+ local.wendao.baseline.sessions=['safari-session'];
+ remote.wendao.baseline.sessions=['desktop-session'];
+ local.wendao.story.cursors['chapter.one']=2;
+ remote.wendao.story.cursors['chapter.one']=5;
+ const result=C.reconcile(base,local,remote);
+ assert.ok(result.conflicts.some(c=>c.id==='baseline.sessions'));
+ assert.ok(result.conflicts.some(c=>c.id==='story.cursors.chapter.one'));
+ const choices=result.conflicts.map(c=>['baseline.sessions','story.cursors.chapter.one'].includes(c.id)?'remote':'local');
+ const merged=C.resolveConflicts(result,local,remote,choices);
+ assert.deepEqual(merged.wendao.baseline.sessions,['desktop-session']);
+ assert.equal(merged.wendao.story.cursors['chapter.one'],5);
+ assert.equal(merged.wendao.supervision.deadlines.punishments.length,1);
+});
 test('incomplete or unsupported choices fail closed, and R3 scripts match the SW cache',()=>{
  const {C,base,local,remote}=fixture(),result=C.reconcile(base,local,remote);
  assert.throws(()=>C.resolveConflicts(result,local,remote,['remote']),/逐项/);
