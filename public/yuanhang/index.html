@@ -444,7 +444,7 @@ setTimeout(()=>{let d=today(),soon=state.events.filter(e=>!e.done&&e.end>=d&&e.e
 render();restoreTimer();readUsageLink();if('serviceWorker' in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('./sw.js').catch(()=>{});
 </script>
 
-<script src="./cloud.js"></script>
+<script src="./cloud.js?v=20261016-sync-r2"></script>
 <script>
 window.WendaoBridge={
  editTask:id=>{go('calendar');openModal(today(),id)},get:()=>JSON.parse(JSON.stringify(state)),studyKey:STORAGE,valid:validBackup,merge:backupMergePlan,go,toast,download:downloadText,
