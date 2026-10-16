@@ -29,7 +29,7 @@ self.addEventListener('activate',event=>{
    for(const asset of ARTWORK){
     if(await target.match(asset))continue;
     const saved=await source.match(asset);
-    if(saved?.ok)await target.put(asset,saved);
+    if(saved?.ok){try{await target.put(asset,saved)}catch{/* Optional art must not block activation on a full Safari cache. */}}
    }
   }
   await Promise.all(old.map(name=>caches.delete(name)));
