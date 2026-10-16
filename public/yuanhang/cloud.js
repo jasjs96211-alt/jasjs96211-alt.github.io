@@ -8,11 +8,14 @@ const YuanhangCloud = (()=>{
  const payload=s=>({events:s.events,sessions:s.sessions,screen:s.screen,usageSessions:s.usageSessions||[],...(s.wendao?{wendao:s.wendao}:{})});
  const cleanWendao=w=>{
   if(!w)return null;
-  const next={...w,revision:0},deadlines=w.supervision?.deadlines;
+  // Derivation below mutates nested story state. Work on an owned snapshot so
+  // a failed merge never changes the original local/base/remote backup.
+  const next=JSON.parse(JSON.stringify(w));next.revision=0;
+  const deadlines=next.supervision?.deadlines;
   if(deadlines){
    const clean={...deadlines};
    for(const k of ['offlinePending','cloudPending','lastCheck','pending','clockPending'])delete clean[k];
-   next.supervision={...w.supervision,deadlines:clean};
+   next.supervision={...next.supervision,deadlines:clean};
   }
   return next;
  };
@@ -278,8 +281,9 @@ function startYuanhangCloud(){
    if(data.wendao)window.Wendao?.cloudApply?.(data.wendao);
    clearUsagePreview();resetBackupMerge();restoreTimer();render();window.Wendao?.sync?.();
   }catch(err){
-   if(priorStudy!==null)localStorage.setItem(STORAGE,priorStudy);state=latest;
-   if(priorWD!==null){localStorage.setItem(wdKey,priorWD);window.Wendao?.reloadLocal?.()}
+   if(priorStudy!==null)localStorage.setItem(STORAGE,priorStudy);else localStorage.removeItem(STORAGE);state=latest;
+   if(priorWD!==null)localStorage.setItem(wdKey,priorWD);else localStorage.removeItem(wdKey);
+   window.Wendao?.reloadLocal?.();
    throw err;
   }
  }
@@ -321,8 +325,14 @@ function startYuanhangCloud(){
    // Do not reject a harmless local autosave during the request. The three-way rebase below preserves post-snapshot edits and reports genuine conflicts.
    if(!row||!YuanhangCloud.equal(next,row.data))await upload(next,row);
    // Rebase edits made during the upload instead of replacing them with the captured snapshot.
-   const changed=YuanhangCloud.reconcile(local,read(),next);
-   if(changed.conflicts.length){cfg.conflictCount=changed.conflicts.length;localStorage.setItem(STORAGE+'_cloud_conflict_snapshot',JSON.stringify({at:new Date().toISOString(),base:local,local:read(),remote:next,conflicts:changed.conflicts}));throw Error('上传期间本地也有修改，已保留本地及冲突快照。请再次同步核对。');}
+   const current=read(),changed=YuanhangCloud.reconcile(local,current,next);
+   if(changed.conflicts.length){
+    // The successful upload has moved the server ahead. Its review must use
+    // the upload snapshot as the common ancestor, not the old sync baseline.
+    localStorage.setItem(STORAGE+'_cloud_conflict_snapshot',JSON.stringify({at:new Date().toISOString(),revision:cfg.revision,base:local,local:current,remote:next,conflicts:changed.conflicts}));
+    cfg.base=local;cfg.conflictCount=changed.conflicts.length;
+    throw Error('上传期间本地也有修改，已保留本地及冲突快照。请再次同步核对。');
+   }
    deadlineReady=true;apply(changed.data);
    cfg.lastError=null;const previous=cfg;cfg={...cfg,base:next,enabled:true,conflictCount:0,...(YuanhangCloud.equal(read(),next)?{lastSyncAt:new Date().toISOString()}:{})};try{persist()}catch(err){cfg=previous;throw err}
    if(!YuanhangCloud.equal(changed.data,next)){say('本地新修改待上传，正在安排下一次同步。');schedule()}else say(`已同步 · ${new Date().toLocaleTimeString('zh-CN')}。桌面版重新打开时会拉取更新。`);

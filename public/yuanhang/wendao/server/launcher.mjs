@@ -6,7 +6,7 @@ import {createProxy} from './chat-proxy.mjs';
 const root=fileURLToPath(new URL('../../',import.meta.url));
 const port=Number(process.env.WORKBENCH_PORT||8765),chatPort=Number(process.env.CHAT_PORT||8787);
 const types={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.webp':'image/webp','.svg':'image/svg+xml','.webmanifest':'application/manifest+json'};
-const allowed=/^\/(?:index\.html|usage\.js|cloud\.js|sw\.js|icon\.svg|manifest\.webmanifest|wendao\/(?:engine\.js|story\.js|app\.js|style\.css|assets\/[a-z-]+\.(?:webp|png|jpg)))$/;
+const allowed=/^\/(?:index\.html|usage\.js|cloud\.js|sw\.js|icon\.svg|manifest\.webmanifest|wendao\/(?:engine\.js|story\.js|app\.js|transport\.js|style\.css|assets\/[a-z-]+\.(?:webp|png|jpg)))$/;
 const server=http.createServer(async(req,res)=>{try{
  if(req.method!=='GET'&&req.method!=='HEAD'){res.writeHead(405).end();return}
  if(!/^(?:127\.0\.0\.1|localhost):\d+$/.test(req.headers.host||'')){res.writeHead(403).end();return}
