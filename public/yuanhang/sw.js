@@ -1,12 +1,14 @@
 /* Offline app shell first. Large portraits must not prevent the updated code
    from installing over mobile data. No API responses or user data are cached. */
-const CACHE='yuanhang-static-v18-visual-novel-20261016';
+const CACHE='yuanhang-static-v19-companion-20261016';
 const SHELL=[
  './','./index.html','./manifest.webmanifest','./icon.svg',
  './usage.js','./cloud.js?v=20261016-sync-r3',
  './wendao/novel.js?v=20261016-vn2','./wendao/engine.js?v=20261016-vn2','./wendao/story.js?v=20261016-vn2','./wendao/transport.js',
- './wendao/app.js?v=20261016-vn2',
- './wendao/style.css?v=20261016-vn2'
+ './wendao/companion.js?v=20261016-companion1',
+ './wendao/app.js?v=20261016-companion1',
+ './wendao/style.css?v=20261016-vn2',
+ './wendao/companion.css?v=20261016-companion1'
 ];
 const ARTWORK=[
  './wendao/assets/study-room.webp','./wendao/assets/lamp-study.webp',
@@ -40,7 +42,7 @@ self.addEventListener('fetch',event=>{
  const req=event.request,url=new URL(req.url);
  if(req.method!=='GET'||url.origin!==self.location.origin||
     !url.pathname.startsWith(new URL(self.registration.scope).pathname)||
-    !/(?:\/wendao\/(?:novel\.js|engine\.js|story\.js|app\.js|transport\.js|style\.css|assets\/[a-z-]+\.webp)$|\/(?:cloud\.js|usage\.js|index\.html|manifest\.webmanifest|icon\.svg)?$)/.test(url.pathname))return;
+    !/(?:\/wendao\/(?:novel\.js|engine\.js|story\.js|app\.js|companion\.js|transport\.js|style\.css|companion\.css|assets\/[a-z-]+\.webp)$|\/(?:cloud\.js|usage\.js|index\.html|manifest\.webmanifest|icon\.svg)?$)/.test(url.pathname))return;
  event.respondWith(fetch(req).then(response=>{
   if(response.ok){
    const copy=response.clone();
