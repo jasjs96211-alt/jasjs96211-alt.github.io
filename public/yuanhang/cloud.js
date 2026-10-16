@@ -160,7 +160,7 @@ function startYuanhangCloud(){
  const read=()=>{const s=latestUsageState();if(!validBackup(s))throw Error('本地数据无效，请先导出备份。');const w=window.Wendao?.cloudRead?.();return YuanhangCloud.payload({...s,...(w?{wendao:w}:{})})};
  function diagnostics(){
   let pendingChanges=null;try{pendingChanges=YuanhangCloud.pendingChanges(cfg.base,read())}catch{}
-  return {origin:location.origin||'本地文件',enabled:!!cfg.enabled,signedIn:!!cfg.session,pendingChanges,conflictCount:cfg.conflictCount||0,lastReadAt:cfg.lastReadAt||null,lastWriteAt:cfg.lastWriteAt||null,lastSyncAt:cfg.lastSyncAt||null,revision:cfg.revision||null,lastError:cfg.lastError||null,clientVersion:'2026-10-16-r2'};
+  return {origin:location.origin||'本地文件',enabled:!!cfg.enabled,signedIn:!!cfg.session,pendingChanges,conflictCount:cfg.conflictCount||0,lastReadAt:cfg.lastReadAt||null,lastWriteAt:cfg.lastWriteAt||null,lastSyncAt:cfg.lastSyncAt||null,revision:cfg.revision||null,lastError:cfg.lastError||null,clientVersion:'2026-10-16-r3'};
  }
  function controls(){
   $('accountIdentity').textContent=cfg.session?.user?.email?`已登录：${cfg.session.user.email}`:'尚未登录';
@@ -172,7 +172,7 @@ function startYuanhangCloud(){
   $('accountConflictActions').hidden=!(cfg.conflictCount>0);
   $('accountReviewConflicts').textContent='逐项核对 '+(cfg.conflictCount||0)+' 项冲突（不直接覆盖）';
   const d=diagnostics(),time=x=>x?new Date(x).toLocaleString('zh-CN',{timeZone:'Asia/Shanghai'}):'暂无成功记录';
-  $('accountDiagnostics').textContent=`同步程序：2026-10-16 R2。上次读取：${time(d.lastReadAt)}；上次上传：${time(d.lastWriteAt)}；上次完整同步：${time(d.lastSyncAt)}。待同步变更：${d.pendingChanges===null?'尚未建立基准':d.pendingChanges}；待处理冲突：${d.conflictCount}。${d.lastError?' 最近失败：'+d.lastError:''}`;
+  $('accountDiagnostics').textContent=`同步程序：2026-10-16 R3。上次读取：${time(d.lastReadAt)}；上次上传：${time(d.lastWriteAt)}；上次完整同步：${time(d.lastSyncAt)}。待同步变更：${d.pendingChanges===null?'尚未建立基准':d.pendingChanges}；待处理冲突：${d.conflictCount}。${d.lastError?' 最近失败：'+d.lastError:''}`;
  }
 
  // The snapshot is private to this browser. Only human-approved disputed fields
