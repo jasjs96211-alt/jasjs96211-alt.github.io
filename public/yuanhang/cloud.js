@@ -281,8 +281,8 @@ function startYuanhangCloud(){
    throw err;
   }
  }
- async function work(first=false){
-  if(busy||!cfg.session||(!first&&!cfg.enabled)||document.hidden)return;
+ async function work(first=false,resolutions=null,reviewSnapshot=null){
+  if(busy||!cfg.session||(!first&&!cfg.enabled)||document.hidden)return false;
   busy=true;controls();say('正在读取云端并核对本地存档，可能需要20秒，请等待结果。');
   try{
    // Capture local state *after* the network read. Time-tracking and story autosaves may change it while awaiting Supabase.
@@ -300,8 +300,20 @@ function startYuanhangCloud(){
     if(!cfg.base||!validBackup(cfg.base))throw Error('缺少同步基准，请停止同步后重新登录开启。');
     if(!row)throw Error('云端记录已不存在，已暂停本次同步，请检查账户。');
     const result=YuanhangCloud.reconcile(cfg.base,local,row.data);
-    if(result.conflicts.length){cfg.conflictCount=result.conflicts.length;localStorage.setItem(STORAGE+'_cloud_conflict_snapshot',JSON.stringify({at:new Date().toISOString(),base:cfg.base,local,remote:row.data,conflicts:result.conflicts}));throw Error(`有 ${result.conflicts.length} 项两边都修改过的记录，未覆盖任何一边。请分别导出备份，再通过「合并另一入口」核对。`);}
-    next=result.data;
+    if(resolutions){
+     if(!reviewSnapshot||!Array.isArray(reviewSnapshot.conflicts)||!YuanhangCloud.equal(cfg.base,reviewSnapshot.base))throw Error('同步基准已变化，请先重新核对冲突');
+     const keys=xs=>xs.map(x=>x.field+'|'+x.id).sort();
+     if(!YuanhangCloud.equal(keys(result.conflicts),keys(reviewSnapshot.conflicts))||reviewSnapshot.revision&&reviewSnapshot.revision!==row.revision)throw Error('云端冲突清单或版本已改变，请重新点击立即同步、再核对');
+     for(const c of result.conflicts){
+      const beforeLocal=YuanhangCloud.conflictValue(reviewSnapshot.local,c),beforeRemote=YuanhangCloud.conflictValue(reviewSnapshot.remote,c);
+      if(!YuanhangCloud.equal(beforeLocal,YuanhangCloud.conflictValue(local,c))||!YuanhangCloud.equal(beforeRemote,YuanhangCloud.conflictValue(row.data,c)))throw Error('核对期间某条冲突记录发生变化，请重新点击立即同步核对');
+     }
+     next=YuanhangCloud.resolveConflicts(result,local,row.data,resolutions);
+    }else if(result.conflicts.length){
+     cfg.conflictCount=result.conflicts.length;
+     localStorage.setItem(STORAGE+'_cloud_conflict_snapshot',JSON.stringify({at:new Date().toISOString(),revision:row.revision,base:cfg.base,local,remote:row.data,conflicts:result.conflicts}));
+     throw Error('有 '+result.conflicts.length+' 项两边都修改过的记录，未覆盖任何一边。请在下方点击「逐项核对冲突」选择保留哪一端。');
+    }else next=result.data;
    }
    if(!validBackup(next))throw Error('合并后数据超过限制，未同步。');
    // Do not reject a harmless local autosave during the request. The three-way rebase below preserves post-snapshot edits and reports genuine conflicts.
@@ -312,12 +324,13 @@ function startYuanhangCloud(){
    deadlineReady=true;apply(changed.data);
    cfg.lastError=null;const previous=cfg;cfg={...cfg,base:next,enabled:true,conflictCount:0,...(YuanhangCloud.equal(read(),next)?{lastSyncAt:new Date().toISOString()}:{})};try{persist()}catch(err){cfg=previous;throw err}
    if(!YuanhangCloud.equal(changed.data,next)){say('本地新修改待上传，正在安排下一次同步。');schedule()}else say(`已同步 · ${new Date().toLocaleTimeString('zh-CN')}。桌面版重新打开时会拉取更新。`);
-  }catch(err){deadlineReady=!cfg.enabled;cfg.lastError=err.message;try{persist()}catch{};say(`尚未同步：${err.message} 本地记录仍保留。`)}
+   return true;
+  }catch(err){deadlineReady=!cfg.enabled;cfg.lastError=err.message;try{persist()}catch{};say(`尚未同步：${err.message} 本地记录仍保留。`);return false}
   finally{busy=false;controls()}
  }
- function lockedWork(first=false){
-  if(navigator.locks)return navigator.locks.request('yuanhang-account-sync',async()=>{try{cfg=JSON.parse(localStorage.getItem(META)||'{}')}catch{};return work(first)});
-  return work(first);
+ function lockedWork(first=false,resolutions=null,snapshot=null){
+  if(navigator.locks)return navigator.locks.request('yuanhang-account-sync',async()=>{try{cfg=JSON.parse(localStorage.getItem(META)||'{}')}catch{};return work(first,resolutions,snapshot)});
+  return work(first,resolutions,snapshot);
  }
  function schedule(){clearTimeout(debounce);controls();if(cfg.enabled)debounce=setTimeout(()=>lockedWork(),1500)}
  $('accountSend').onclick=async()=>{
@@ -338,6 +351,7 @@ function startYuanhangCloud(){
  };
  $('accountEnable').onclick=()=>lockedWork(true);
  $('accountSyncNow').onclick=()=>lockedWork();
+ $('accountReviewConflicts').onclick=showConflictReview;
  $('accountLogout').onclick=()=>{
   if(busy)return say('正在处理，请完成后再停止同步。');
   cfg={email:cfg.email};persist();epoch++;clearTimeout(debounce);$('accountToken').value='';controls();say('此入口已停止同步并清除登录凭据，本地数据和云端记录保留。');
