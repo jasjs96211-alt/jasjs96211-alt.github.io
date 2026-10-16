@@ -46,7 +46,7 @@ function update(){
  pause.textContent=timer.running?'Ⅱ 暂停':'▶ 继续';
  $('wcFinish').textContent=finished?'本轮已结束，若计时正常完成，学习分钟数由远航原计时器入账。':'仅使用远航原计时器；离开场景也不影响正在进行的专注。';
  const options=$('wcMinutes').querySelectorAll('option');
- if(!active&&options.length&&[1500,2700,3600].includes(timer.total))$('wcMinutes').value=String(timer.total/60);
+ if(!active&&!$('wcMinutes').dataset.touched&&options.length&&[1500,2700,3600].includes(timer.total))$('wcMinutes').value=String(timer.total/60);
  if(!active){
   const chosen=$('wcSubject');
   if(!chosen.dataset.touched){
@@ -73,6 +73,7 @@ function mount({stage,focusBridge,getCharacterState,onFocusPage:focusPage}={}){
  const official=$('timerSubject');const subject=$('wcSubject');
  if(official){for(const option of official.options){const elem=document.createElement('option');elem.value=option.value;elem.textContent=option.textContent;subject.append(elem)}subject.value=official.value}
  subject.addEventListener('change',()=>{subject.dataset.touched='1'});
+ $('wcMinutes').addEventListener('change',()=>{$('wcMinutes').dataset.touched='1'});
  $('wcClose').onclick=close;
  $('wcStart').onclick=()=>{try{bridge.focusAction('start',{minutes:Number($('wcMinutes').value),subject:subject.value});finished=false;update()}catch(e){bridge.toast?.('未开始专注：'+e.message)}};
  $('wcPause').onclick=()=>{try{const state=focusState();bridge.focusAction(state.running?'pause':'resume');update()}catch(e){bridge.toast?.('未能操作计时器：'+e.message)}};
