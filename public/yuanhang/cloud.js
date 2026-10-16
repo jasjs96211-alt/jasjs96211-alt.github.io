@@ -149,7 +149,8 @@ function startYuanhangCloud(){
   if(busy||!cfg.session||(!first&&!cfg.enabled)||document.hidden)return;
   busy=true;controls();
   try{
-   const local=read(),row=await remote();let next;
+   // Capture local state *after* the network read. Time-tracking and story autosaves may change it while awaiting Supabase.
+   const row=await remote(),local=read();let next;
    if(first){
     const plan=row?($('accountFirstConflict').value==='local'?backupMergePlan(local,row.data):backupMergePlan(row.data,local)):{next:local,conflicts:0,total:0};
     if(!confirm(`开启此邮箱的自动同步？将把任务、学习、屏幕记录及问道剧情/聊天上传到你的 Supabase 账户（不含自定义图片）。首次补入云端缺少的记录，${plan.conflicts} 项冲突保留${$('accountFirstConflict').value==='local'?'本入口':'云端'}版本。正在进行的计时仅留在本入口。`))return;
@@ -167,7 +168,7 @@ function startYuanhangCloud(){
     next=result.data;
    }
    if(!validBackup(next))throw Error('合并后数据超过限制，未同步。');
-   if(!YuanhangCloud.equal(local,read()))throw Error('同步期间本地有更新，请稍后重试。');
+   // Do not reject a harmless local autosave during the request. The three-way rebase below preserves post-snapshot edits and reports genuine conflicts.
    if(!row||!YuanhangCloud.equal(next,row.data))await upload(next,row);
    // Rebase edits made during the upload instead of replacing them with the captured snapshot.
    const changed=YuanhangCloud.reconcile(local,read(),next);
