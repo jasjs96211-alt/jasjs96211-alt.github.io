@@ -127,7 +127,7 @@ button:focus-visible,summary:focus-visible{outline:3px solid #c5774d;outline-off
 #usageFile{width:100%;min-height:44px}#usageDetails{max-height:420px;overflow:auto}#usageDetails summary{cursor:pointer;min-height:44px;padding:12px 0}
 @media(max-width:370px){.usage-metric strong{font-size:18px}.usage-metric{padding:12px 8px}}
 </style>
-<link rel="stylesheet" href="./wendao/style.css?v=20261016-vn2">
+<link rel="stylesheet" href="./wendao/style.css?v=20261016-vn3">
 </head>
 <body>
 <div class="app">
@@ -454,9 +454,9 @@ window.WendaoBridge={
  replace:(val,reset=true)=>{if(!validBackup(val))throw Error('工作台备份无效');const next={...val,focusTimer:reset?freshTimer():(val.focusTimer||state.focusTimer)};delete next.wendao;delete next.wendaoResources;localStorage.setItem(STORAGE,JSON.stringify(next));state=next;stopTick();restoreTimer();clearUsagePreview();resetBackupMerge();render();window.yuanhangMarkDirty?.()}
 };
 </script>
-<script src="./wendao/novel.js?v=20261016-vn2"></script>
-<script src="./wendao/engine.js?v=20261016-vn2"></script>
-<script src="./wendao/story.js?v=20261016-vn2"></script>
+<script src="./wendao/novel.js?v=20261016-vn3"></script>
+<script src="./wendao/engine.js?v=20261016-vn3"></script>
+<script src="./wendao/story.js?v=20261016-vn3"></script>
 <script src="./wendao/transport.js"></script>
-<script src="./wendao/app.js?v=20261016-vn2"></script>
+<script src="./wendao/app.js?v=20261016-vn3"></script>
 </body></html>

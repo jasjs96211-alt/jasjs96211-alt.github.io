@@ -50,7 +50,7 @@ function advance(s,c,view,{choice,E,study={},at=Date.now()}={}){
  if(node.options){const chosen=node.options.find(o=>o.id===choice);if(!chosen||!condition(s,chosen.requires,E,study,at))throw Error('这个选项的条件尚未满足');
   const recorded=s.story.choices[c.id+':'+view.node];if(recorded&&recorded!==choice)throw Error('此处已有剧情选择；重读保留原有分支');
   E.choose(s,c.id,view.node,chosen,at);target=chosen.next;
- }else if(node.end){if(!c.eventId)E.finish(s,c.id,at);return {ended:true,view};}
+ }else if(node.end){if(!c.eventId&&!c.runtimeAction)E.finish(s,c.id,at);return {ended:true,view};}
  else{target=(node.branches||[]).find(b=>condition(s,b.requires,E,study,at))?.next||node.next;}
  if(!c.nodes[target])throw Error('剧情跳转目标无效');applyEffects(s,c,view.node,E,at);
  view.node=target;view.trail=[...view.trail,target].slice(-500);view.updatedAt=at;
