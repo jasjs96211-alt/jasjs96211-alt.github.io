@@ -59,8 +59,8 @@ test('sync renders reuse the same in-flight loaded image instead of resetting it
  assert.match(app,/data-portrait-source/);
  assert.match(app,/wd-portrait-error/);
  assert.match(css,/\.wd-portrait-error\[hidden\]/);
- assert.match(html,/wendao\/app\.js\?v=20261016-portrait-r1/);
- assert.match(html,/wendao\/style\.css\?v=20261016-portrait-r1/);
+ assert.match(html,/wendao\/app\.js\?v=20261016-vn1/);
+ assert.match(html,/wendao\/style\.css\?v=20261016-vn1/);
 });
 test('worker installs without downloading large portraits and reuses prior picture cache',async()=>{
  const registered={},stores=new Map(),old='yuanhang-static-v15-sync-conflict-review-r3-20261016';
@@ -80,8 +80,8 @@ test('worker installs without downloading large portraits and reuses prior pictu
  const {CACHE,SHELL,ARTWORK}=registry(self,caches,()=>{},URL);
  assert.equal(SHELL.some(path=>path.endsWith('.webp')),false);
  assert.ok(ARTWORK.some(path=>path.includes('sister-injured.webp')));
- assert.ok(SHELL.includes('./wendao/app.js?v=20261016-portrait-r1'));
- assert.ok(SHELL.includes('./wendao/style.css?v=20261016-portrait-r1'));
+ assert.ok(SHELL.includes('./wendao/app.js?v=20261016-vn1'));
+ assert.ok(SHELL.includes('./wendao/style.css?v=20261016-vn1'));
  const cachedPath=ARTWORK.find(path=>path.includes('sister-injured.webp'));
  (await caches.open(old)).put(cachedPath,{ok:true,tag:'previously-cached'});
  let installed;registered.install({waitUntil:promise=>installed=promise});

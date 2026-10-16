@@ -34,3 +34,39 @@
 /* Full-figure previews keep all six distinct authored portraits inspectable. */
 .wd-portraits{grid-template-columns:repeat(2,minmax(0,1fr))}.wd-portraits button{width:100%}.wd-portraits img{height:300px;object-fit:contain;background:#f2f2e9}.wd-portraits p{font-size:12px}.wd-portrait-frame.wd-injured .wd-portrait{opacity:1}
 @media(max-width:720px){.wd-portraits img{height:230px}}
+
+/* The existing reader is the main in-world room. The modern workbench is
+   always one explicit action away; its familiar panels open over this room. */
+body.wd-immersed:not(.wd-drawer-open) #wendao{display:none!important}
+body.wd-immersed.wd-drawer-open #wendao{display:block!important;position:fixed;z-index:650;inset:0 0 0 auto;width:min(780px,100vw);height:100dvh;overflow:auto;overscroll-behavior:contain;background:#f8f5ec;padding:25px 28px max(28px,env(safe-area-inset-bottom));box-shadow:-18px 0 70px #071714a8}
+body.wd-immersed.wd-drawer-open #wendao .wd-header{position:sticky;top:-25px;z-index:5;background:#f8f5ec;padding:15px 0;border-bottom:1px solid #d9dfd2}
+.wd-player .wd-presence{position:absolute;left:50%;bottom:0;transform:translateX(-50%);height:88%;width:min(63vw,740px);border:0;background:transparent;z-index:-2;pointer-events:none}
+.wd-player .wd-presence .wd-portrait{height:100%;width:100%;object-fit:contain;object-position:center bottom;background:none;filter:drop-shadow(0 12px 24px #03110fa0)}
+.wd-player .wd-presence .wd-state-tag{bottom:auto;top:70px;right:0;background:#112d29e0}
+.wd-player .wd-presence .wd-portrait-loading,.wd-player .wd-presence .wd-portrait-error{top:25%;bottom:25%;inset-inline:18%;background:#102d2be9;color:#f3e7cb;pointer-events:auto;border-radius:8px}
+.wd-player .wd-presence .wd-portrait-error button{pointer-events:auto}
+.wd-player .wd-player-top{z-index:4;align-items:flex-start}
+.wd-player .wd-player-actions{justify-content:flex-end}
+.wd-player .wd-dialog{z-index:3;width:min(100% - 48px,1120px);margin:auto auto max(24px,env(safe-area-inset-bottom));min-height:0;max-height:48dvh;padding:20px 26px;overflow:auto}
+.wd-player .wd-stage-chat{display:flex;gap:10px;align-items:end;flex-wrap:wrap;border-top:1px solid #b8ae8959;padding-top:11px}
+.wd-player .wd-stage-chat label{flex:0 0 100%;font-size:12px;color:#d8cca9}
+.wd-player .wd-stage-chat textarea{flex:1;min-width:160px;min-height:46px;max-height:115px;background:#eaf0e9;color:#1b3530;border-radius:5px}
+.wd-player #wdUnread:not(:empty){display:inline-grid;place-items:center;min-width:20px;height:20px;border-radius:50%;background:#af654a;color:#fff;font:12px sans-serif}
+.wd-stage-inbox{position:absolute;z-index:6;right:18px;top:75px;width:min(390px,calc(100vw - 36px));max-height:65dvh;overflow:auto;padding:18px;background:#f8f5ec;color:#29483e;box-shadow:0 18px 55px #061714cc;border:1px solid #c8ba95}
+.wd-stage-inbox[hidden]{display:none}.wd-stage-inbox h3{margin:0}.wd-stage-inbox p{line-height:1.65}.wd-stage-inbox article{border-top:1px solid #d9dfd2;padding:9px 0}.wd-stage-inbox small{color:#668078}
+.wd-player .wd-cg:not([hidden])~.wd-player-top{background:#071613c9}
+@media(max-width:720px){body.wd-immersed.wd-drawer-open #wendao{padding:15px 12px 85px}body.wd-immersed.wd-drawer-open #wendao .wd-header{top:-15px}.wd-player .wd-presence{width:100vw;height:72%;bottom:19%}.wd-player .wd-presence .wd-state-tag{top:35px;right:12px}.wd-player .wd-dialog{width:calc(100% - 20px);margin:auto 10px max(10px,env(safe-area-inset-bottom));max-height:55dvh;padding:14px}.wd-player .wd-player-top{padding:8px;display:block}.wd-player .wd-player-actions{justify-content:flex-start;max-width:none;gap:3px}.wd-player button{padding:7px 9px;font-size:11px}.wd-player .wd-stage-chat textarea{min-height:45px}.wd-stage-inbox{top:115px}}
+/* The scene, actor layer and dialogue are independent surfaces. */
+.wd-player .wd-presence{left:var(--actor-x,50%);transition:transform .35s,left .35s;overflow:visible}
+.wd-player .wd-player-top{gap:12px;align-items:start;padding-top:max(14px,env(safe-area-inset-top));padding-right:max(18px,env(safe-area-inset-right));padding-left:max(18px,env(safe-area-inset-left))}
+.wd-player .wd-player-actions{max-width:78%;flex-wrap:wrap}.wd-player button{min-height:44px}.wd-player button:disabled{opacity:.46;cursor:not-allowed}
+.wd-player .wd-dialog{max-height:min(52dvh,calc(var(--wd-viewport,100dvh) - 140px));overscroll-behavior:contain;overflow-wrap:anywhere}
+.wd-player .wd-dialog-text{max-height:24dvh;overflow:auto;overscroll-behavior:contain}
+.wd-slot{border-bottom:1px solid #d5c49466;padding:12px 0}.wd-slot p{font-size:13px;color:#dfd4b7}.wd-slot button{margin-right:8px}.wd-backlog{white-space:pre-wrap;overscroll-behavior:contain}.wd-backlog h3{margin-top:0}
+.wd-player .wd-stage-chat textarea{font-size:16px;padding:12px;resize:vertical;max-width:100%}
+.wd-player .wd-stage-chat:focus-within{scroll-margin-bottom:env(safe-area-inset-bottom)}
+.wd-player:has(.wd-stage-chat:not([hidden])){height:var(--wd-viewport,100dvh)}
+body.wd-immersed .toast{z-index:900}
+@media(max-width:720px){.wd-player .wd-player-top{display:flex;flex-direction:column;padding: max(8px,env(safe-area-inset-top)) 10px 8px}.wd-player .wd-player-actions{display:flex;flex-wrap:nowrap;overflow-x:auto;width:100%;max-width:100%;padding-bottom:6px;overscroll-behavior:contain}.wd-player .wd-player-actions button{flex:0 0 auto;font-size:12px;padding:8px 12px}.wd-player .wd-player-actions #wdClose{position:fixed;top:max(8px,env(safe-area-inset-top));right:10px;min-height:36px;background:#173a35f5}.wd-player #wdChapterTitle{max-width:calc(100vw - 155px);min-height:28px}.wd-player .wd-presence{height:68%;bottom:20%;width:100vw}.wd-player .wd-dialog{max-height:min(55dvh,calc(var(--wd-viewport,100dvh) - 112px))}.wd-player .wd-dialog-text{max-height:25dvh}.wd-backlog{inset:110px 10px max(18px,env(safe-area-inset-bottom))}.wd-player .wd-presence .wd-state-tag{top:10px;right:12px}.wd-player:has(.wd-stage-chat:focus-within) .wd-presence{height:60%;bottom:15%}}
+@media(max-height:500px) and (orientation:landscape){.wd-player .wd-presence{height:90%;width:45vw;left:26%;bottom:0}.wd-player .wd-dialog{width:53vw;margin:auto 12px 12px auto;max-height:70dvh}.wd-player .wd-dialog-text{max-height:28dvh}.wd-player .wd-stage-chat label{display:none}}
+@media(prefers-reduced-motion:reduce){.wd-player .wd-presence{transition:none}}

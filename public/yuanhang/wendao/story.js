@@ -13,13 +13,13 @@ window.WendaoContent={
  chapters:[{id:'opening',title:'灯下问道',subtitle:'序章 · 准备期试读',description:'一盏灯，两份功课。交接包授权的起始场景；根据已确认准备期改编；不是原小说新增正文。',requires:{},start:'a',nodes:{
  a:{speaker:'旁白',text:'竹影映在窗纸上。案头的书尚未理齐，灯火却已为你留着。',background:'study-room',next:'b'},
  b:{speaker:'温知遥',text:'先把今日要读的放在手边。路还长，我们一卷一卷来。',portrait:'sister-calm',emotion:'calm',next:'c'},
- c:{speaker:'旁白',text:'她将散开的书页归拢，指尖在封面上停了一停。学宫入门试，是眼下可以争取的出口。',cg:'lamp-study',next:'d'},
+ c:{speaker:'旁白',text:'她将散开的书页归拢，指尖在封面上停了一停。学宫入门试，是眼下可以争取的出口。',cg:'lamp-study',effects:[{type:'flag',key:'lamp-remembered',value:true}],next:'d'},
  d:{speaker:'温知遥',text:'你有你的功课，我也有我的研习。不必一个人把所有事扛下。',portrait:'sister-calm',cg:null,next:'choice'},
  choice:{speaker:'妹妹',text:'灯芯轻轻一跳。你抬起头，对姐姐说——',options:[{id:'study',label:'“我先读这一卷。读完，我们一起商量。”',next:'study'},{id:'together',label:'“姐姐，你也说说自己的打算吧。”',next:'together'}]},
  study:{speaker:'温知遥',text:'好。我就在这里。等你读完，我们各自说说今日所得。',next:'end'},
  together:{speaker:'温知遥',text:'我想先查查有关灵根与净化的记载。你安心准备考试，我也会为自己找路。',next:'end'},
  end:{speaker:'旁白',text:'她翻开自己的书。两人的影子落在案上，隔着灯火，仍并肩向前。\n本章选择已保存；阅读不会冒充真实学习时长。',end:true}
  }},
- {id:'practice',title:'并肩研习',subtitle:'准备期 · 短章',description:'完成序章、累计30修为，且姐姐已有一次独立研习。演示支线，不改写后续主线。',requires:{previous:['opening'],xp:30,autonomy:1},start:'a',nodes:{a:{speaker:'旁白',text:'书页又翻过了一页。你们各自记下了今日所得。',background:'study-room',portrait:'sister-calm',next:'b'},b:{speaker:'温知遥',text:'我今日也读了一些。你的功课如何？我们交换着说一说。',next:'c'},c:{speaker:'旁白',text:'你们约定，下次仍各自带着新的收获来。',end:true}}},
+ {id:'practice',title:'并肩研习',subtitle:'准备期 · 短章',description:'完成序章、累计30修为，且姐姐已有一次独立研习。演示支线，不改写后续主线。',requires:{previous:['opening'],xp:30,autonomy:1},start:'a',nodes:{a:{speaker:'旁白',text:'书页又翻过了一页。你们各自记下了今日所得。',background:'study-room',portrait:'sister-calm',branches:[{requires:{choice:{key:'opening:choice',value:'together'}},next:'plans'}],next:'b'},plans:{speaker:'温知遥',text:'上次说起我的打算，我还想查查有关灵根与净化的记载。你的功课，我们也一起理一理。',next:'b'},b:{speaker:'温知遥',text:'我今日也读了一些。你的功课如何？我们交换着说一说。',options:[{id:'exchange',label:'各自说说今日所得',next:'c'},{id:'consolidate',label:'结合已记录的修炼，再巩固一遍（需60修为）',requires:{xp:60},next:'review'}]},review:{speaker:'旁白',text:'你翻看自己记下的功课。读过、记过的内容，仍需一遍遍温习。这里的阅读不会另计真实学习时长。',next:'c'},c:{speaker:'旁白',text:'你们约定，下次仍各自带着新的收获来。',end:true}}},
  {id:'canon-pending',title:'后续主线',subtitle:'第二阶段编排',description:'原AU交接包已接入。后续主线尚未转成可运行章节，保持锁定。',pending:true,requires:{previous:['outline-approved']}}]
 };
