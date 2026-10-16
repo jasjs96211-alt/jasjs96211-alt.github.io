@@ -6,17 +6,17 @@ const day=t=>new Intl.DateTimeFormat('en-CA',{timeZone:TZ,year:'numeric',month:'
 const dateAt=d=>Date.parse(d+'T00:00:00+08:00');
 const clamp=(v,a=0,b=100)=>Math.max(a,Math.min(b,v));
 const copy=x=>JSON.parse(JSON.stringify(x));
-const fresh=(now=Date.now())=>({schemaVersion:1,rulesVersion:3,createdAt:now,revision:0,settings:{strict:true,sleepStart:'23:00',sleepEnd:'08:00',target:180,minStudy:5,dailyCap:480,chatEndpoint:'https://myejuodrhgdxphdkrvsa.supabase.co/functions/v1/wendao-chat/api/chat',chatMode:'mixed',sensitive:false,deadlineMajor:true,targetConfirmed:false},story:{current:'opening',cursors:{},completed:[],choices:{},read:[],unlockedCG:[],flags:{allowPurification:true,allowIllness:true}},character:{injuries:[],health:78,fatigue:22,realm:3,autonomy:0,cultivation:0,recovery:0,interventions:0,activity:'整理功课，安排自己的研习',bond:'彼此守护'},cultivation:{xp:0,realm:0,readiness:0,protection:0},supervision:{mode:'exempt',cursor:now,idle:0,judgements:[],settled:[],intervals:[],observed:[],targets:{},pending:null,deadlines:{watched:{},punishments:[],excused:[]}},chronicle:[],mastery:[],chat:[],chatMemory:[],messages:[],assets:{},approvedChapters:[],outline:'',achievements:[],baseline:{},seenStudy:[],lastDate:day(now)});
+const fresh=(now=Date.now())=>migrateInPlace({schemaVersion:1,rulesVersion:4,createdAt:now,revision:0,settings:{strict:true,sleepStart:'23:00',sleepEnd:'08:00',target:180,minStudy:5,dailyCap:480,chatEndpoint:'https://myejuodrhgdxphdkrvsa.supabase.co/functions/v1/wendao-chat/api/chat',chatMode:'mixed',sensitive:false,deadlineMajor:true,targetConfirmed:false},story:{current:'opening',cursors:{},completed:[],choices:{},read:[],unlockedCG:[],flags:{allowPurification:true,allowIllness:true}},character:{injuries:[],health:78,fatigue:22,realm:3,autonomy:0,cultivation:0,recovery:0,interventions:0,activity:'整理功课，安排自己的研习',bond:'彼此守护'},cultivation:{xp:0,realm:0,readiness:0,protection:0},supervision:{mode:'exempt',cursor:now,idle:0,judgements:[],settled:[],intervals:[],observed:[],targets:{},pending:null,deadlines:{watched:{},punishments:[],excused:[]}},chronicle:[],mastery:[],chat:[],chatMemory:[],messages:[],assets:{},approvedChapters:[],outline:'',achievements:[],baseline:{},seenStudy:[],lastDate:day(now)});
 function log(s,id,title,text,at=Date.now(),kind='system') {if(s.chronicle.some(x=>x.id===id))return false;s.chronicle.push({id,title,text,at,kind});return true}
 function baseline(s,study){s.baseline={sessions:(study.sessions||[]).map(x=>x.id),tasks:(study.events||[]).filter(x=>x.done).map(x=>x.id)};return s}
 function derive(s,study,now=Date.now()){
  migrateInPlace(s);s.seenStudy??=[];
- for(const row of study.sessions||[]){if(s.baseline.sessions?.includes(row.id)||s.seenStudy.includes(row.id))continue;s.seenStudy.push(row.id);if(row.date===day(now)&&row.minutes>=s.settings.minStudy){s.supervision.idle=0;log(s,'study:'+row.id,'有效修炼',`${row.subject} · ${row.minutes}分钟（真实记录/补录）`,now,'study')}}
+ for(const row of uniqueStudy(study.sessions)){if(s.baseline.sessions?.includes(row.id)||s.seenStudy.includes(row.id)||row.minutes<s.settings.minStudy||row.date>day(now))continue;s.seenStudy.push(row.id);if(row.date===day(now)){s.supervision.idle=0;log(s,'study:'+row.id,'有效修炼',`${row.subject} · ${row.minutes}分钟（真实记录/补录）`,now,'study')}}
 
  let xp=0,minutes=0;const totals={};
- const rows=(study.sessions||[]).filter(x=>!s.baseline.sessions?.includes(x.id)&&x.date<=day(now));
+ const rows=uniqueStudy(study.sessions).filter(x=>!s.baseline.sessions?.includes(x.id)&&x.date<=day(now));
  for(const r of rows){const n=Math.max(0,Math.min(Number(r.minutes)||0,s.settings.dailyCap-(totals[r.date]||0)));totals[r.date]=(totals[r.date]||0)+n;xp+=n;minutes+=n}
- const done=(study.events||[]).filter(x=>x.done&&x.completedAt&&!s.baseline.tasks?.includes(x.id));xp+=done.length*12;
+ const done=uniqueStudy(study.events).filter(x=>x.done&&Number.isFinite(Date.parse(x.completedAt))&&Date.parse(x.completedAt)<=now&&!s.baseline.tasks?.includes(x.id));xp+=done.length*12;
  for(const m of s.mastery)xp+=({recall:15,dictation:25,review:30}[m.level]||0);
  s.cultivation={xp:Math.round(xp),realm:s.cultivation.realm,readiness:clamp(Math.floor(xp/15)),protection:clamp(Math.floor(xp/30))};
  const ds=deadlineState(s);s.character.injuries=ds.punishments.map(p=>injuryFor(p,now));
@@ -26,6 +26,7 @@ function derive(s,study,now=Date.now()){
  const groups={};for(const i of activeMajor){const d=day(i.firstAt);groups[d]=Math.min(RULES.dailyDamageCap,(groups[d]||0)+i.contribution)}
  const damage=Object.values(groups).reduce((n,x)=>n+x,0);
  s.character.familyPressure=clamp(20+Math.min(bad*3,18)-relief*2+Math.min(activeMajor.length*26,52));
+ s.character.lifePressure=clamp((s.life.ledger||[]).reduce((n,x)=>n+(x.delta?.pressure||0),0),0,12);s.character.familyPressure=clamp(s.character.familyPressure+s.character.lifePressure);
  // Idle/daily failures are light supervision. Persistent DDL ledger is the only severe source.
  const strain=Math.min(12,s.supervision.judgements.reduce((n,x)=>n+(x.result==='warning'?0:1),0));
  s.character.health=clamp(78-strain+Math.floor(minutes/120)+(s.character.recovery||0)-damage,RULES.healthFloor,100);
@@ -39,7 +40,7 @@ function derive(s,study,now=Date.now()){
 }
 
 // Ledger v3: every tracked task/revision settles once; numeric caps never swallow events.
-const RULES=Object.freeze({healthFloor:35,dailyDamageCap:30,severeDamage:22,acuteHours:48,recoverySteps:4,minHealingDays:3});
+const RULES=Object.freeze({healthFloor:35,dailyDamageCap:30,severeDamage:22,acuteHours:48,recoverySteps:4,minHealingDays:3,idleMinutes:30,autonomySlotsPerDay:4,autonomyBackfillDays:3,clockForwardLimit:31*DAY});
 const EVENTS=Object.freeze(Object.fromEntries(['书案未启','灯尽未成','页角残章','温家问询','令书至门','禁足与责罚','净殿传召','血染衣袖','并肩修行','护在身前','重订修行簿'].map((name,i)=>['EV-'+String(i+1).padStart(2,'0'),name])));
 function dueTime(e){const n=e.dueAt?Date.parse(e.dueAt):dateAt(e.end)+DAY-1;return Number.isFinite(n)?n:NaN}
 const dueISO=e=>new Date(dueTime(e)).toISOString();
@@ -47,6 +48,7 @@ const taskVersion=e=>Number.isSafeInteger(e.taskRevision)&&e.taskRevision>0?e.ta
 const settlementID=e=>'ddl:'+e.id+':'+dueISO(e)+':'+taskVersion(e)+':overdue';
 function deadlineState(s){s.supervision.deadlines??={};const d=s.supervision.deadlines;d.watched??={};d.punishments??=[];d.excused??=[];d.pending??={};return d}
 function migrateInPlace(s){
+ if((s.rulesVersion||3)<4){s.supervision.idle=0;s.supervision.regulationStartedAt=s.supervision.cursor;}
  const ds=deadlineState(s);for(const w of Object.values(ds.watched)){w.end??=w.due;w.dueAt??=dueISO(w);w.taskRevision??=1;w.importance??='important'} s.character.injuries??=[];s.chatMemory??=[];s.memoryTombstones??=[];s.chatTombstones??=[];
  for(const p of ds.punishments){
   p.ids??=p.taskId?[p.taskId]:[];p.taskId??=p.ids[0];p.dueAt??=p.due?new Date(dateAt(p.due)+DAY-1).toISOString():new Date(p.at).toISOString();
@@ -55,7 +57,12 @@ function migrateInPlace(s){
   if(p.status==='corrected')p.correctedAt??=p.resolvedAt||p.at;
   p.injuryId??='injury:'+p.id;p.eventIds??=[p.importance==='critical'?'EV-05':'EV-04',p.result==='summons'?'EV-07':'EV-06','EV-08'];
  }
- s.rulesVersion=3;return s;
+ s.settings.learningReminders??=true;s.settings.sleepReminders??=true;s.settings.wakeReminders??=true;s.settings.dailyMessages??=true;s.settings.reminderIntensity??='normal';s.settings.proactiveEnabled??=true;s.settings.proactiveCooldownMinutes??=30;s.settings.proactiveDailyCap??=6;s.settings.greetingsEnabled??=true;
+ s.life??={cursor:Math.max(s.createdAt||0,s.supervision.cursor||0),ledger:[],clockPending:null};s.life.ledger??=[];
+ s.rhythmState??={temporarySleep:null,greetings:[],recaps:[],napUntil:null};s.rhythmState.greetings??=[];s.rhythmState.recaps??=[];s.rhythmState.wakeConfirmations??=[];s.rhythmState.modeChanges??=[];s.rhythmState.agreements??=[];
+ s.proactiveState??={seen:[...(s.seenStudy||[]).map(id=>({id:'study:'+id,at:s.supervision.cursor})),...(s.mastery||[]).map(x=>({id:'mastery:'+x.id,at:x.at}))],lastAt:0};s.proactiveState.seen??=[];
+ s.supervision.corrections??=[];s.supervision.resetEvidence??=[];
+ s.rulesVersion=4;return s;
 }
 function migrateLegacySave(old){if(!validate(old))throw Error('问道存档无效');return migrateInPlace(copy(old))}
 function injuryFor(p,now){
@@ -161,25 +168,32 @@ function portrait(s,now=Date.now()){
 }
 
 function subtract(start,end,exclusions){let pieces=[[start,end]];for(const x of exclusions){pieces=pieces.flatMap(([a,b])=>x[1]<=a||x[0]>=b?[[a,b]]:[[a,Math.max(a,x[0])],[Math.min(b,x[1]),b]].filter(([u,v])=>v>u))}return pieces}
+// Duplicate transport rows never create duplicate learning credit or notifications.
+function uniqueStudy(rows=[]){return unionRows(rows.filter(x=>x&&typeof x.id==='string'))}
+function scheduleAt(s,now){const t=s.rhythmState?.temporarySleep;return t&&t.from<=now&&now<t.until?{sleepStart:t.sleepStart,sleepEnd:t.sleepEnd}:s.settings}
+function scheduledSleepRanges(s,start,end){const t=s.rhythmState?.temporarySleep;if(!t||t.until<=start||t.from>=end)return sleepRanges(start,end,s.settings);const out=[];for(const [a,b]of [[start,Math.min(end,t.from)],[Math.max(start,t.until),end]])if(b>a)out.push(...sleepRanges(a,b,s.settings).map(([u,v])=>[Math.max(a,u),Math.min(b,v)]).filter(([u,v])=>v>u));const a=Math.max(start,t.from),b=Math.min(end,t.until);out.push(...sleepRanges(a,b,t).map(([u,v])=>[Math.max(a,u),Math.min(b,v)]).filter(([u,v])=>v>u));return out}
 function sleepRanges(start,end,settings){const minutes=v=>{const [h,m]=v.split(':').map(Number);return h*60+m};const a=minutes(settings.sleepStart||'23:00')*60000,b=minutes(settings.sleepEnd||'08:00')*60000,out=[];for(let d=dateAt(day(start))-DAY;d<=end;d+=DAY)out.push([d+a,d+b+(b<=a?DAY:0)]);return out}
-function advance(s,to,study,{confirmed=false,replaying=false}={}){
+function advance(s,to,study,{confirmed=false,replaying=false,idleMinutes=RULES.idleMinutes}={}){
+ migrateInPlace(s);
  const w=s.supervision,from=w.cursor;if(!Number.isFinite(to)||to<from){w.pending={from,to,reason:'设备时钟倒退'};return s}
  if(w.pending&&!confirmed)return s;
  if((to-from>90000||day(from)!==day(to))&&!confirmed&&s.settings.strict&&w.mode==='awake'){w.pending={from,to,reason:'离线、后台或跨日时间需要核对'};return s}
- w.cursor=to;w.pending=null;if(!replaying&&to>from){w.observed??=[];const last=w.observed.at(-1);if(last&&last.end===from&&to-last.start<=3600000&&last.mode===w.mode&&last.strict===s.settings.strict&&last.sleepStart===s.settings.sleepStart&&last.sleepEnd===s.settings.sleepEnd)last.end=to;else w.observed.push({start:from,end:to,mode:w.mode,strict:s.settings.strict,sleepStart:s.settings.sleepStart,sleepEnd:s.settings.sleepEnd});}
- if(!s.settings.strict||w.mode!=='awake')return s;
- const exclusions=[...sleepRanges(from,to,s.settings),...w.intervals.filter(x=>x.kind!=='awake').map(x=>[x.start,x.end])];
- const evidence=(study.sessions||[]).filter(x=>x.minutes>=s.settings.minStudy).flatMap(x=>Array.isArray(x.studyIntervals)?x.studyIntervals:x.startedAt&&x.endedAt?[[Date.parse(x.startedAt),Date.parse(x.endedAt)]]:[]).filter(x=>Array.isArray(x)&&x.length===2&&x.every(Number.isFinite)&&x[1]>x[0]);
+ w.cursor=to;w.pending=null;if(!replaying&&to>from){w.observed??=[];const last=w.observed.at(-1);if(last&&last.end===from&&to-last.start<=3600000&&last.mode===w.mode&&last.strict===s.settings.strict&&last.sleepStart===s.settings.sleepStart&&last.sleepEnd===s.settings.sleepEnd&&last.focus===!!study.focusTimer?.running&&last.ruleMinutes===idleMinutes)last.end=to;else w.observed.push({start:from,end:to,mode:w.mode,strict:s.settings.strict,sleepStart:s.settings.sleepStart,sleepEnd:s.settings.sleepEnd,focus:!!study.focusTimer?.running,ruleMinutes:idleMinutes});}
+ if(!s.settings.strict||w.mode!=='awake'||study.focusTimer?.running)return s;
+ const exclusions=[...scheduledSleepRanges(s,from,to),...w.intervals.filter(x=>x.kind!=='awake').map(x=>[x.start,x.end])];
+ if(study.focusTimer?.running)exclusions.push([from,to]);
+ const evidence=uniqueStudy(study.sessions).filter(x=>x.minutes>=s.settings.minStudy).flatMap(x=>Array.isArray(x.studyIntervals)?x.studyIntervals:x.startedAt&&x.endedAt?[[Date.parse(x.startedAt),Date.parse(x.endedAt)]]:[]).filter(x=>Array.isArray(x)&&x.length===2&&x.every(Number.isFinite)&&x[1]>x[0]);
  const pieces=subtract(from,to,exclusions);let budget=2;
  for(const [a,b] of pieces){
   for(let d=dateAt(day(a));d<b;d+=DAY){if(s.settings.targetConfirmed)w.targets[day(d)]??={minutes:s.settings.target,strict:true}};
   const intervals=subtract(a,b,evidence);
   let cursor=a;
   for(const [u,v] of intervals){if(u>cursor)w.idle=0;w.idle+=(v-u)/60000;cursor=v;
-   while(w.idle>=120){w.idle-=120;if(budget--<=0)continue;
-    const judgementAt=v-w.idle*60000;const id='idle:'+Math.floor(judgementAt);
-    const result=w.judgements.length%2?'fatigue':'warning';
-    w.judgements.push({id,at:judgementAt,result,eventId:'EV-01'});log(s,id,EVENTS['EV-01'],'温家催促增加，姐姐留字提醒；清醒无有效学习累计120分钟。可补记学习、休息或核对误判，不造成DDL严重伤病。',judgementAt,'risk');
+   while(w.idle>=idleMinutes){w.idle-=idleMinutes;if(budget--<=0)continue;
+    const judgementAt=v-w.idle*60000;const id=idleMinutes===120?'idle:'+Math.floor(judgementAt):'idle:v4:'+Math.floor(judgementAt/(idleMinutes*60000));
+    const result=Math.floor(judgementAt/(RULES.idleMinutes*60000))%2?'fatigue':'warning';
+    if(w.judgements.some(x=>x.id===id)||w.corrections.some(x=>x.id===id))continue;
+    w.judgements.push({id,at:judgementAt,result,eventId:'EV-01'});log(s,id,EVENTS['EV-01'],'温家催促增加，姐姐留字提醒；清醒无有效学习累计30分钟。可补记学习、休息或核对误判，不造成DDL严重伤病。',judgementAt,'risk');
    }
   }if(cursor<b)w.idle=0;
  }
@@ -187,34 +201,131 @@ function advance(s,to,study,{confirmed=false,replaying=false}={}){
  return derive(s,study,to);
 }
 function recalculate(s,study,now=Date.now()){
+ migrateInPlace(s);
  const w=s.supervision,observed=[...(w.observed||[])],cursor=w.cursor,mode=w.mode,pending=w.pending,strict=s.settings.strict,sleepStart=s.settings.sleepStart,sleepEnd=s.settings.sleepEnd;
  const oldIDs=new Set(w.judgements.map(x=>x.id));s.chronicle=s.chronicle.filter(x=>!oldIDs.has(x.id));w.judgements=[];w.idle=0;
- for(const x of observed){w.cursor=x.start;w.mode=x.mode;s.settings.strict=x.strict;s.settings.sleepStart=x.sleepStart||'23:00';s.settings.sleepEnd=x.sleepEnd||'08:00';advance(s,x.end,study,{confirmed:true,replaying:true})}
+ for(const x of observed){w.cursor=x.start;w.mode=x.mode;s.settings.strict=x.strict;s.settings.sleepStart=x.sleepStart||'23:00';s.settings.sleepEnd=x.sleepEnd||'08:00';advance(s,x.end,{...study,focusTimer:{...study.focusTimer,running:!!x.focus}},{confirmed:true,replaying:true,idleMinutes:x.ruleMinutes||120})}
+ const retained=new Set(w.judgements.map(x=>x.id));for(const id of oldIDs)if(!retained.has(id)&&!w.corrections.some(x=>x.id===id))w.corrections.push({id,at:now,reason:'核对学习／休息时段'});
+ s.messages=s.messages.filter(x=>!x.evidenceId||!w.corrections.some(c=>c.id===x.evidenceId));
  w.cursor=cursor;w.mode=mode;w.pending=pending;s.settings.strict=strict;s.settings.sleepStart=sleepStart;s.settings.sleepEnd=sleepEnd;derive(s,study,now);return s;
 }
 function settle(s,d,study,now=Date.now()){
  const w=s.supervision;if(w.settled.some(x=>x.date===d)||d>=day(now))return false;
  const active=w.targets[d];if(!active||!active.strict||![...w.intervals,...(w.observed||[]).filter(x=>x.mode==='awake'&&x.strict).map(x=>({...x,kind:'awake'}))].some(x=>x.kind==='awake'&&x.start<dateAt(d)+DAY&&x.end>dateAt(d)))return false;
- const minutes=(study.sessions||[]).filter(x=>x.date===d).reduce((n,x)=>n+x.minutes,0);const met=minutes>=active.minutes||active.exempt;
+ const minutes=uniqueStudy(study.sessions).filter(x=>x.date===d).reduce((n,x)=>n+(Number(x.minutes)||0),0);const met=minutes>=active.minutes||active.exempt;
  w.settled.push({date:d,minutes,target:active.minutes,met});log(s,'daily:'+d,met?EVENTS['EV-09']:EVENTS['EV-02'],`${d}：${minutes}/${active.minutes}分钟。${met?'目标达成或已豁免。':'准备不足，温家压力上升；可以通过后续行动恢复。'}`,now,met?'study':'risk');return true;
 }
-function independent(s,d,now=Date.now()) {const id='sister:'+d;if(s.chronicle.some(x=>x.id===id))return false;s.character.autonomy+=1;s.character.cultivation+=3;const actions=[['研读医理与经脉图','温知遥整理经脉旧伤的记录，给自己的研习留下了笔记。'],['查阅净灵殿传召记录','温知遥核对传召与休养间隔，准备同妹妹商量可行的应对。'],['温养灵息、练习水法','温知遥自行安排了限量修炼，疲劳时便停下来休息。'],['整理药草与功课','温知遥辨认药草、记下医理疑问，没有把自己的一天全耗在等待里。'],['研读学宫规约','温知遥把关于求学的疑问写在纸上，留待与妹妹一起求证。']];const a=actions[s.character.autonomy%actions.length];s.character.activity=a[0];for(const p of deadlineState(s).punishments)if(day(p.at)<d)recoverDeadline(s,p.id,'care',now);log(s,id,'姐姐的独立行动',a[1],now,'sister');return true}
-function proactive(s,study,now=Date.now()){
- s.messages??=[];const d=day(now),used=s.messages.filter(x=>day(x.at)===d).length;if(used>=2)return;
- const total=(study.sessions||[]).filter(x=>x.date===d).reduce((a,x)=>a+x.minutes,0);
- let id,text;if(total>=120){id='message:study:'+d;text='今日功课做得这般认真。先让眼睛歇一歇吧。我也把自己的研习记下了，等会儿我们交换着说说。'}else if(s.chronicle.some(x=>x.id==='sister:'+d)){id='message:care:'+d;text='无缺，我今日也有自己的功课。你安心读书，累了记得歇一歇；我也会照顾好自己。'}
- if(id&&!s.messages.some(x=>x.id===id)){s.messages.push({id,text,at:now,read:false,source:'event'});log(s,id,'姐姐来信',text,now,'message')}
+function independent(s,d,now=Date.now()) {const id='sister:'+d;if(s.chronicle.some(x=>x.id===id))return false;s.character.autonomy+=1;s.character.cultivation+=3;const actions=[['研读医理与经脉图','温知遥整理经脉旧伤的记录，给自己的研习留下了笔记。'],['查阅净灵殿传召记录','温知遥核对传召与休养间隔，准备同妹妹商量可行的应对。'],['温养灵息、练习水法','温知遥自行安排了限量修炼，疲劳时便停下来休息。'],['整理药草与功课','温知遥辨认药草、记下医理疑问，没有把自己的一天全耗在等待里。'],['研读学宫规约','温知遥把关于求学的疑问写在纸上，留待与妹妹一起求证。']];const a=bodyState(s,now)==='injured'||bodyState(s,now)==='ill'?['温养与休息','温知遥量力收起功课，按伤势安排温养；没有独自硬撑。']:actions[s.character.autonomy%actions.length];s.character.activity=a[0];for(const p of deadlineState(s).punishments)if(day(p.at)<d)recoverDeadline(s,p.id,'care',now);log(s,id,'姐姐的独立行动',a[1],now,'sister');return true}
+// All automatic actions are a closed preparation-period vocabulary. They cannot
+// advance chapters, alter the DDL ledger, unlock realms, or create learning facts.
+function bodyState(s,at){return deadlineState(s).punishments.some(p=>p.at<=at&&injuryFor(p,at).active)?'injured':s.character.health<65?'ill':s.character.fatigue>=40?'tired':'normal'}
+const LIFE_ACTIONS=Object.freeze([
+ {kind:'study',activity:'研读医理',text:'温知遥核对医理笔记，记下尚需求证的问题。'},
+ {kind:'rest',activity:'温养与休息',text:'温知遥停下功课，按自己的节奏温养与休息。'},
+ {kind:'social',activity:'整理往来与规约',text:'温知遥整理可供询问的规约和求援问题，尚未作出未经商量的决定。'},
+ {kind:'pressure',activity:'记录温家催问',text:'温家又来催问准备进展。温知遥把问询记下，决定先照顾身体，再与无缺商量。'}
+]);
+function advanceAutonomy(s,now=Date.now()){
+ migrateInPlace(s);const life=s.life,from=life.cursor;
+ if(!Number.isFinite(now)||now<from||now-from>RULES.clockForwardLimit){life.clockPending={from,to:now,reason:'设备时间异常，请核对；自主行动暂停'};return []}
+ if(life.clockPending)return [];
+ const added=[],start=Math.max(from,now-RULES.autonomyBackfillDays*DAY);const slotHours=[0,6,9,12,16,20,23],slots=[];for(let d=dateAt(day(start));d<=now;d+=DAY)for(let slot=0;slot<slotHours.length;slot++){const at=d+slotHours[slot]*3600000;if(at>from&&at>start&&at<=now)slots.push({d,slot,at})}
+ for(const {d,slot,at} of slots.slice(-12)){
+  const id='life:v4:'+day(at)+':'+slot;if(life.ledger.some(x=>x.id===id))continue;
+  const body=bodyState(s,at),pick=(Math.floor(d/DAY)+slot)%LIFE_ACTIONS.length;
+  const night=slotHours[slot]<7||slotHours[slot]>=23;const action=night?LIFE_ACTIONS[1]:body==='injured'||body==='ill'?(LIFE_ACTIONS[pick].kind==='pressure'?{...LIFE_ACTIONS[3],activity:'卧中记下问询',text:'温家送来问询。温知遥先将纸条收好，按伤势继续休息，未因此再受伤。'}:LIFE_ACTIONS[1]):LIFE_ACTIONS[pick];
+  const row={id,at,...action,chapter:'chapter-9-preparation',bodyState:body,delta:{autonomy:1,cultivation:action.kind==='study'?3:0,pressure:action.kind==='pressure'?1:action.kind==='social'?-1:0}};
+  life.ledger.push(row);added.push(row);log(s,id,'姐姐的日常 · '+action.activity,action.text,at,'life');
+ }
+ life.cursor=now;
+ if(now-from>RULES.autonomyBackfillDays*DAY)log(s,'life:summary:'+Math.floor(now/DAY),'离线日常汇总','较早的离线日常已略作汇总；只补记最近三天，不补造学习或推进主线。',now,'life-summary');
+ if(added.length)s.character.activity=added.at(-1).activity;
+ s.character.autonomousStudy=life.ledger.reduce((n,x)=>n+(x.delta?.cultivation||0),0);
+ s.character.lifePressure=clamp(life.ledger.reduce((n,x)=>n+(x.delta?.pressure||0),0),0,12);
+ return added;
 }
+function acknowledgeLifeClock(s,now=Date.now()){migrateInPlace(s);if(!Number.isFinite(now))throw Error('设备时间无效');s.life.cursor=now;s.life.clockPending=null;return s}
+function message(s,id,text,now,trigger,evidenceId){
+ if(s.messages.some(x=>x.id===id))return null;
+ const row={id,text,at:now,read:false,source:'event',trigger,evidenceId};s.messages.push(row);log(s,id,'姐姐来信',text,now,'message');return row;
+}
+function proactive(s,study,now=Date.now()){
+ migrateInPlace(s);if(s.settings.proactiveEnabled===false||study.focusTimer?.running||s.supervision.mode!=='awake'||s.supervision.pending||s.life.clockPending)return null;
+ if(scheduledSleepRanges(s,now,now+1).some(([a,b])=>a<=now&&b>now))return null;
+ const intensity=s.settings.reminderIntensity,limit=intensity==='gentle'?3:intensity==='frequent'?10:6;
+ const cap=Math.max(0,Math.min(limit,Number(s.settings.proactiveDailyCap)||6));
+ const cooldown=Math.max(intensity==='gentle'?60:intensity==='frequent'?15:30,Number(s.settings.proactiveCooldownMinutes)||30)*60000;
+ if(s.messages.filter(x=>x.trigger&&day(x.at)===day(now)).length>=cap||s.proactiveState.lastAt&&now-s.proactiveState.lastAt<cooldown)return null;
+ const candidates=[],ill=bodyState(s,now)!=='normal';
+ if(s.settings.learningReminders!==false){
+  for(const x of s.supervision.judgements.filter(x=>s.settings.strict&&day(x.at)===day(now)&&x.at<=now&&!s.supervision.corrections.some(c=>c.id===x.id)))candidates.push({id:x.id,trigger:'idle',text:ill?'无缺，功课先从一小段开始。我也会按身体状况休息，我们不着急。':'无缺，书卷放了许久了。要不要从五分钟开始？累了也可以先记下休息。'});
+  for(const x of uniqueStudy(study.sessions).filter(x=>x.date===day(now)&&Number(x.minutes)>=s.settings.minStudy&&!s.baseline.sessions?.includes(x.id)))candidates.push({id:'study:'+x.id,trigger:'study',text:ill?'这段真实功课已经记下。我会量力研习，你也让眼睛歇一歇。':'这段功课扎扎实实地做完了。我也记下了自己的疑问，等你歇息时再说。'});
+  for(const x of uniqueStudy(study.events).filter(x=>x.done&&Number.isFinite(Date.parse(x.completedAt))&&Date.parse(x.completedAt)<=now&&day(Date.parse(x.completedAt))===day(now)&&!s.baseline.tasks?.includes(x.id)))candidates.push({id:'task:'+x.id,trigger:'task',text:'这一项做完了，我替你高兴。那些遥远的事，也是这样一步一步走近的。接下来先歇一歇吧。'});
+  for(const x of uniqueStudy(s.mastery).filter(x=>['recall','dictation','review'].includes(x.level)&&Number.isFinite(x.at)&&x.at<=now&&day(x.at)===day(now)))candidates.push({id:'mastery:'+x.id,trigger:'mastery',text:({recall:'能复述出来，这一遍便有收获。别急着往后赶，先看看哪里还不稳。',dictation:'默写完这一段了？能落在纸上，比只觉得自己懂了更踏实。歇一会儿再继续吧。',review:'肯回头温习，旧功课才留得住。今日这番功夫没有白费。'})[x.level]});
+ }
+ if(s.settings.dailyMessages!==false)for(const row of s.life.ledger.filter(x=>['pressure','study'].includes(x.kind)&&x.at<=now&&now-x.at<DAY))candidates.push({id:row.id,trigger:row.kind==='pressure'?'family-event':'sister-task',text:row.text+' 我把这件事记在纪事里了，等你方便时再聊。'});
+ if(s.settings.dailyMessages!==false&&s.chronicle.some(x=>x.id==='sister:'+day(now)))candidates.push({id:'daily:'+day(now),trigger:'daily',text:ill?'我今日也安排了温养，功课会量力而行。你安心读书，也照顾好自己。':'我今日也有自己的功课。你安心读书，累了记得歇一歇；我也会照顾好自己。'});
+ candidates.sort((a,b)=>(a.trigger==='idle'?2:a.trigger==='daily'?3:0)-(b.trigger==='idle'?2:b.trigger==='daily'?3:0));
+ const next=candidates.find(x=>!s.proactiveState.seen.some(r=>r.id===x.id)&&!s.messages.some(m=>m.evidenceId===x.id));if(!next)return null;
+ const row=message(s,'message:'+next.id,next.text,now,next.trigger,next.id);if(row){s.proactiveState.seen.push({id:next.id,at:now});s.proactiveState.lastAt=now}return row;
+}
+function setTemporarySleep(s,value,now=Date.now()){
+ migrateInPlace(s);if(value===null){s.rhythmState.temporarySleep=null;return s}
+ const valid=t=>typeof t==='string'&&/^(?:[01]\d|2[0-3]):[0-5]\d$/.test(t);
+ if(!valid(value?.sleepStart)||!valid(value?.sleepEnd)||value.sleepStart===value.sleepEnd||!Number.isFinite(value.until)||value.until<=now||value.until>now+7*DAY)throw Error('临时作息须为有效时间，结束时间在未来七天内');
+ s.rhythmState.temporarySleep={sleepStart:value.sleepStart,sleepEnd:value.sleepEnd,from:now,until:value.until};return s;
+}
+function planAgreement(s,{id,title,at},now=Date.now()){migrateInPlace(s);if(typeof id!=='string'||!id||typeof title!=='string'||!title.trim()||title.length>120||!Number.isFinite(at)||at<=now||at>now+7*DAY)throw Error('请填写未来七天内的约定');if(s.rhythmState.agreements.some(x=>x.id===id))return false;s.rhythmState.agreements.push({id,title:title.trim(),at,updatedAt:now,status:'confirmed'});return true}
+function cancelAgreement(s,id,now=Date.now()){const row=s.rhythmState.agreements.find(x=>x.id===id);if(!row)return false;row.status='cancelled';row.updatedAt=now;s.messages=s.messages.filter(x=>x.evidenceId!=='agreement:'+id);return true}
+function rhythm(s,study={},now=Date.now()){
+ migrateInPlace(s);const schedule=scheduleAt(s,now),ranges=sleepRanges(now-DAY,now+DAY,schedule),current=ranges.find(([a,b])=>a<=now&&now<b),nap=s.rhythmState.napUntil>now;
+ const inSleep=!!current,confirmed=s.rhythmState.wakeConfirmations.some(x=>x.id==='wake:'+day(now));
+ const asleep=s.supervision.mode==='sleep'||nap||inSleep;
+ const bedtimeDue=s.supervision.mode==='awake'&&inSleep;
+ const wakeRange=ranges.filter(([,b])=>now>=b&&now-b<4*3600000).sort((a,b)=>b[1]-a[1])[0];
+ const morningDue=!nap&&!inSleep&&!confirmed&&!!wakeRange;
+ const phase=nap?'nap':bedtimeDue?'bedtime':asleep?'sleep':morningDue?'morning':'awake';
+ if(s.settings.proactiveEnabled!==false&&s.settings.greetingsEnabled!==false&&!study.focusTimer?.running&&!s.supervision.pending&&!s.life.clockPending){
+  const trigger=bedtimeDue&&s.settings.sleepReminders!==false?'bedtime':morningDue&&s.settings.wakeReminders!==false?'morning':null;
+  if(trigger&&!(trigger==='bedtime'&&s.rhythmState.bedtimeSnoozeUntil>now)){const keyDate=trigger==='bedtime'?day(current[0]):day(wakeRange[1]);const id='greeting:'+trigger+':'+keyDate;
+   if(!s.rhythmState.greetings.some(x=>x.id===id)){
+    const ill=bodyState(s,now)!=='normal';const text=trigger==='bedtime'?(ill?'该收卷歇息了。我也正温养，你把这页的疑问记下，明日再续。':'到了说好歇息的时辰。把书签夹好吧，我也要收起医书了。'):'无缺，天亮了。我替你留了早膳，醒来记得吃些东西。今日的功课，等你自己安排。';
+    message(s,id,text,now,trigger,id);s.rhythmState.greetings.push({id,at:now});s.proactiveState.lastAt=now;
+   }
+  }
+ }
+ if(s.settings.proactiveEnabled!==false&&s.settings.agreementReminders!==false&&s.supervision.mode==='awake'&&!inSleep&&!nap&&!study.focusTimer?.running&&!s.supervision.pending&&!s.life.clockPending)for(const row of s.rhythmState.agreements){if(row.status==='confirmed'&&now>=row.at-15*60000&&now<=row.at+15*60000){const id='agreement:'+row.id;if(message(s,id,'快到我们约好的时候了：'+row.title+'。若今日不方便，也可以重新安排。',now,'agreement',id))s.proactiveState.lastAt=now}}
+ return {phase,asleep,bedtimeDue,morningDue,schedule:{sleepStart:schedule.sleepStart,sleepEnd:schedule.sleepEnd},wakeConfirmed:confirmed};
+}
+function nightRecap(s,now=Date.now()){
+ migrateInPlace(s);const d=day(now-DAY),id='recap:'+d,old=s.rhythmState.recaps.find(x=>x.id===id);if(old)return old;
+ const rows=s.life.ledger.filter(x=>x.at>=dateAt(d)+18*3600000&&x.at<=now&&x.at<dateAt(day(now))+12*3600000);if(!rows.length)return null;
+ const row={id,at:now,date:d,text:'从昨夜到今晨，我'+[...new Set(rows.map(x=>x.activity))].join('，也')+'。这些都是准备期的日常，未有未经确认的主线变化。',eventIds:rows.map(x=>x.id)};
+ s.rhythmState.recaps.push(row);log(s,id,'昨夜与昨日小记',row.text,now,'recap');return row;
+}
+function setMode(s,mode,study={},now=Date.now(),{napUntil=null}={}){
+ migrateInPlace(s);if(!['awake','sleep','exempt'].includes(mode))throw Error('作息状态无效');const w=s.supervision;if(w.pending)throw Error('请先核对未确认的时段');
+ if(napUntil!==null&&(!Number.isFinite(napUntil)||napUntil<=now||napUntil>now+12*3600000))throw Error('午睡结束时间无效');
+ const from=w.modeStart||w.cursor,prior=w.mode;advance(s,now,study);if(w.pending)return false;
+ w.intervals.push({start:from,end:now,kind:prior});
+ if(mode==='awake'&&prior!=='awake'&&now-from>=1800000){const id='rest:'+day(now);if(!s.chronicle.some(x=>x.id===id)){s.character.recovery=(s.character.recovery||0)+4;log(s,id,'休养恢复','合理休息后，姐姐也完成了自己的温养；身体恢复不消除旧伤。',now,'recovery')}}
+ w.mode=mode;w.modeStart=now;w.cursor=now;s.rhythmState.modeChanges=unionRows(s.rhythmState.modeChanges,[{id:'mode:'+now+':'+mode,at:now,mode,napUntil}]);s.rhythmState.napUntil=mode==='sleep'?napUntil:null;
+ if(s.settings.targetConfirmed)w.targets[day(now)]??={minutes:s.settings.target,strict:s.settings.strict};
+ if(mode==='awake'){if(!s.rhythmState.wakeConfirmations.some(x=>x.id==='wake:'+day(now)))s.rhythmState.wakeConfirmations.push({id:'wake:'+day(now),at:now});if(s.settings.proactiveEnabled!==false&&s.settings.wakeReminders!==false){const note=message(s,'wake-confirmed:'+day(now),'醒了？先喝些水，吃点东西，再把今日的功课理一理。你歇好了，我们再慢慢来。',now,'wake-confirmed','wake:'+day(now));if(note)s.proactiveState.lastAt=now;}independent(s,day(now),now);advanceAutonomy(s,now);nightRecap(s,now)}rhythm(s,study,now);return true;
+}
+// AI and offline prose can only append a dialogue row; no provider fields are applied.
+function appendDialogue(s,text,{id,at=Date.now(),source='offline'}={}){if(typeof text!=='string'||!text.trim()||typeof id!=='string'||!id||!Number.isFinite(at))throw Error('对话内容无效');if(s.chat.some(x=>x.id===id))return false;s.chat.push({id,role:'assistant',text:text.slice(0,12000),at,source:source==='ai'?'ai':'offline'});return true}
 
 function eligible(s,c,study,now=Date.now()) {const r=c.requires||{};return (!r.date||day(now)>=r.date)&&(!r.xp||s.cultivation.xp>=r.xp)&&(!r.realm||s.cultivation.realm>=r.realm)&&(!r.health||s.character.health>=r.health)&&(!r.pressure||s.character.familyPressure>=r.pressure)&&(!r.previous||r.previous.every(x=>s.story.completed.includes(x)))&&(!r.choice||s.story.choices[r.choice.key]===r.choice.value)&&(!r.autonomy||s.character.autonomy>=r.autonomy)}
 function choose(s,chapter,node,option,now=Date.now()) {const key=chapter+':'+node;if(s.story.choices[key])return false;s.story.choices[key]=option.id;log(s,'choice:'+key,'剧情选择',option.label,now,'choice');return true}
 function finish(s,id,now=Date.now()){if(s.story.completed.includes(id))return false;s.story.completed.push(id);log(s,'chapter:'+id,'章节完成',id==='opening'?'《灯下问道》试读篇已读。':id,now,'chapter');return true}
-function validExtras(s){if(s.novel!==undefined&&(!root.WendaoNovel||!root.WendaoNovel.valid(s.novel)))return false;const d=s.supervision?.deadlines;if(!d)return true;const object=x=>x&&typeof x==='object'&&!Array.isArray(x);if(!object(d)||d.watched&&!object(d.watched)||d.punishments&&!Array.isArray(d.punishments)||d.excused&&!Array.isArray(d.excused))return false;if(Object.values(d.watched||{}).some(w=>!object(w)||typeof w.id!=='string'||!Number.isFinite(dueTime({...w,end:w.end||w.due}))))return false;if((d.punishments||[]).some(p=>!object(p)||typeof p.id!=='string'||!Number.isFinite(p.at)||p.ids&&!Array.isArray(p.ids)||p.recoveryActions&&(!Array.isArray(p.recoveryActions)||p.recoveryActions.some(a=>!object(a)||typeof a.id!=='string'||!Number.isFinite(a.at)))))return false;return ['chatMemory','memoryTombstones','chatTombstones','messages'].every(k=>s[k]===undefined||Array.isArray(s[k])&&s[k].every(x=>object(x)&&typeof x.id==='string'))}
+function validExtras(s){const obj=x=>x&&typeof x==='object'&&!Array.isArray(x),rows=x=>Array.isArray(x)&&x.every(r=>obj(r)&&typeof r.id==='string'&&Number.isFinite(r.at));if(s.life&&(!obj(s.life)||!Number.isFinite(s.life.cursor)||!rows(s.life.ledger)))return false;if(s.rhythmState&&(!obj(s.rhythmState)||!rows(s.rhythmState.greetings)||!rows(s.rhythmState.recaps)||s.rhythmState.wakeConfirmations&&!rows(s.rhythmState.wakeConfirmations)||s.rhythmState.modeChanges&&(!rows(s.rhythmState.modeChanges)||s.rhythmState.modeChanges.some(x=>!['awake','sleep','exempt'].includes(x.mode)))))return false;if(s.rhythmState?.agreements&&(!rows(s.rhythmState.agreements)||s.rhythmState.agreements.some(x=>typeof x.title!=='string'||!['confirmed','cancelled'].includes(x.status))))return false;if(s.proactiveState&&(!obj(s.proactiveState)||!rows(s.proactiveState.seen)||!Number.isFinite(s.proactiveState.lastAt)))return false;if(s.supervision?.corrections&&!rows(s.supervision.corrections))return false;if(s.novel!==undefined&&(!root.WendaoNovel||!root.WendaoNovel.valid(s.novel)))return false;const d=s.supervision?.deadlines;if(!d)return true;const object=x=>x&&typeof x==='object'&&!Array.isArray(x);if(!object(d)||d.watched&&!object(d.watched)||d.punishments&&!Array.isArray(d.punishments)||d.excused&&!Array.isArray(d.excused))return false;if(Object.values(d.watched||{}).some(w=>!object(w)||typeof w.id!=='string'||!Number.isFinite(dueTime({...w,end:w.end||w.due}))))return false;if((d.punishments||[]).some(p=>!object(p)||typeof p.id!=='string'||!Number.isFinite(p.at)||p.ids&&!Array.isArray(p.ids)||p.recoveryActions&&(!Array.isArray(p.recoveryActions)||p.recoveryActions.some(a=>!object(a)||typeof a.id!=='string'||!Number.isFinite(a.at)))))return false;return ['chatMemory','memoryTombstones','chatTombstones','messages'].every(k=>s[k]===undefined||Array.isArray(s[k])&&s[k].every(x=>object(x)&&typeof x.id==='string'))}
 function validate(s){return !!s&&validExtras(s)&&s.schemaVersion===1&&s.story&&Array.isArray(s.story.completed)&&s.story.cursors&&s.story.choices&&Array.isArray(s.story.read)&&Array.isArray(s.story.unlockedCG)&&s.story.flags&&s.character&&s.cultivation&&s.settings&&s.supervision&&Number.isFinite(s.supervision.cursor)&&Array.isArray(s.supervision.intervals)&&Array.isArray(s.supervision.judgements)&&Array.isArray(s.supervision.settled)&&s.supervision.targets&&Array.isArray(s.chronicle)&&Array.isArray(s.mastery)&&Array.isArray(s.chat)&&s.assets&&Array.isArray(s.approvedChapters)&&Array.isArray(s.achievements)&&!!s.baseline}
 function unionRows(a=[],b=[]){const m=new Map();for(const x of [...a,...b]){const prev=m.get(x.id);if(!prev||(x.updatedAt||0)>(prev.updatedAt||0)||((x.updatedAt||0)===(prev.updatedAt||0)&&JSON.stringify(x)<JSON.stringify(prev)))m.set(x.id,copy(x))}return [...m.values()].sort((x,y)=>(x.at||0)-(y.at||0)||String(x.id).localeCompare(String(y.id)))}
 function merge(a,b){
  if(!validate(a)||!validate(b))throw Error('问道存档无效');const n=migrateLegacySave(a),other=migrateLegacySave(b);
  for(const k of ['chronicle','mastery','chat','messages','chatMemory','memoryTombstones','chatTombstones'])n[k]=unionRows(n[k],other[k]);
+ const readMessages=new Set([...a.messages||[],...b.messages||[]].filter(x=>x.read).map(x=>x.id));for(const x of n.messages)if(readMessages.has(x.id))x.read=true;
  n.chatMemory=n.chatMemory.filter(x=>!n.memoryTombstones.some(t=>t.id===x.id));n.chat=n.chat.filter(x=>!n.chatTombstones.some(t=>t.id===x.id));
  const da=deadlineState(n),db=deadlineState(other);da.watched={...db.watched,...da.watched};
  for(const [id,w]of Object.entries(db.watched))if(!da.watched[id]||w.watchedAt>da.watched[id].watchedAt)da.watched[id]=w;
@@ -236,11 +347,21 @@ function merge(a,b){
  for(const [k,v]of Object.entries(b.story.choices))if(!n.story.choices[k])n.story.choices[k]=v;
  n.achievements=[...new Set([...a.achievements,...b.achievements])].sort();n.seenStudy=[...new Set([...(a.seenStudy||[]),...(b.seenStudy||[])])].sort();
  n.supervision.judgements=unionRows(a.supervision.judgements,b.supervision.judgements);
+ n.supervision.corrections=unionRows(n.supervision.corrections,other.supervision.corrections);
+ const correctedIDs=new Set(n.supervision.corrections.map(x=>x.id));
+ n.supervision.judgements=n.supervision.judgements.filter(x=>!correctedIDs.has(x.id));const suppressed=new Set();let latestIdle=null;n.supervision.judgements=n.supervision.judgements.filter(x=>{if(!x.id.startsWith('idle:v4:'))return true;if(latestIdle!==null&&x.at-latestIdle<30*60000){suppressed.add(x.id);return false}latestIdle=x.at;return true});
+ n.chronicle=n.chronicle.filter(x=>!correctedIDs.has(x.id)&&!suppressed.has(x.id));n.messages=n.messages.filter(x=>!correctedIDs.has(x.evidenceId)&&!suppressed.has(x.evidenceId));
+ n.proactiveState.seen=unionRows(n.proactiveState.seen,other.proactiveState.seen);n.proactiveState.lastAt=Math.max(n.proactiveState.lastAt||0,other.proactiveState.lastAt||0);
+ n.life.ledger=unionRows(n.life.ledger,other.life.ledger);for(const row of n.life.ledger){if(row.kind==='study'&&da.punishments.some(p=>p.at<=row.at&&injuryFor(p,row.at).active)){Object.assign(row,LIFE_ACTIONS[1],{bodyState:'injured',delta:{autonomy:1,cultivation:0,pressure:0}});const log=n.chronicle.find(x=>x.id===row.id);if(log)log.text=row.text}}n.life.cursor=Math.max(n.life.cursor,other.life.cursor);
+ n.rhythmState.greetings=unionRows(n.rhythmState.greetings,other.rhythmState.greetings);n.rhythmState.recaps=unionRows(n.rhythmState.recaps,other.rhythmState.recaps);n.rhythmState.wakeConfirmations=unionRows(n.rhythmState.wakeConfirmations,other.rhythmState.wakeConfirmations);n.rhythmState.modeChanges=unionRows(n.rhythmState.modeChanges,other.rhythmState.modeChanges);n.rhythmState.agreements=unionRows(n.rhythmState.agreements,other.rhythmState.agreements);const cancelled=new Set([...n.rhythmState.agreements,...other.rhythmState.agreements,...(a.rhythmState?.agreements||[])].filter(x=>x.status==='cancelled').map(x=>x.id));for(const row of n.rhythmState.agreements)if(cancelled.has(row.id))row.status='cancelled';n.messages=n.messages.filter(x=>!x.evidenceId?.startsWith('agreement:')||!cancelled.has(x.evidenceId.slice(10)));
+ const temporary=[n.rhythmState.temporarySleep,other.rhythmState.temporarySleep].filter(Boolean).sort((x,y)=>y.from-x.from||JSON.stringify(x).localeCompare(JSON.stringify(y)));n.rhythmState.temporarySleep=temporary[0]||null;
+ scribeLife(n);
  n.supervision.settled=unionRows(a.supervision.settled.map(x=>({...x,id:x.id||x.date})),b.supervision.settled.map(x=>({...x,id:x.id||x.date})));
  const acts=n.chronicle.filter(x=>x.kind==='sister').length;n.character.autonomy=Math.max(a.character.autonomy||0,b.character.autonomy||0,acts);n.character.cultivation=Math.max(a.character.cultivation||0,b.character.cultivation||0,acts*3);
- for(const k of ['recovery','interventions'])n.character[k]=Math.max(a.character[k]||0,b.character[k]||0);
+ for(const k of ['recovery','interventions'])n.character[k]=Math.max(a.character[k]||0,b.character[k]||0,k==='interventions'?n.chronicle.filter(x=>x.id.startsWith('protect:')).length:0);
  n.cultivation.realm=Math.max(a.cultivation.realm,b.cultivation.realm);if(root.WendaoNovel&&(a.novel||b.novel))n.novel=root.WendaoNovel.merge(a.novel,b.novel);return n;
 }
+function scribeLife(s){s.character.autonomousStudy=s.life.ledger.reduce((n,x)=>n+(x.delta?.cultivation||0),0);s.character.lifePressure=clamp(s.life.ledger.reduce((n,x)=>n+(x.delta?.pressure||0),0),0,12)}
 
-root.WendaoEngine={RULES,EVENTS,dueTime,settlementID,migrateLegacySave,recoverDeadline,injuryFor,unionRows,recalculate,proactive,day,dateAt,fresh,baseline,derive,advance,settle,independent,eligible,choose,finish,validate,merge,log,subtract,watchDeadlines,checkDeadlines,untrackedOverdue,confirmMissedDeadline,resolveDeadline,portrait};
+root.WendaoEngine={RULES,EVENTS,planAgreement,cancelAgreement,advanceAutonomy,acknowledgeLifeClock,rhythm,setMode,setTemporarySleep,nightRecap,appendDialogue,dueTime,settlementID,migrateLegacySave,recoverDeadline,injuryFor,unionRows,recalculate,proactive,day,dateAt,fresh,baseline,derive,advance,settle,independent,eligible,choose,finish,validate,merge,log,subtract,watchDeadlines,checkDeadlines,untrackedOverdue,confirmMissedDeadline,resolveDeadline,portrait};
 })(typeof window!=='undefined'?window:globalThis);
