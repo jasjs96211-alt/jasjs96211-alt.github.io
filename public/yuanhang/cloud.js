@@ -82,9 +82,11 @@ const YuanhangCloud = (()=>{
   const [root,second]=parts;
   const allowed=(root==='settings'&&parts.length>=2)||
    (root==='story'&&['choices','flags','cursors'].includes(second)&&parts.length>=3)||
-   (['outline','approvedChapters','baseline'].includes(root)&&parts.length===1)||
+   (['outline','approvedChapters'].includes(root)&&parts.length===1)||
+   (root==='baseline'&&parts.length>=1)||
    (root==='targets'&&parts.length>=2);
   if(!allowed)throw Error('此问道冲突不能自动处理，请保留备份交由维护者核对：'+String(c.id).slice(0,100));
+  if(root==='story'&&['choices','cursors'].includes(second)&&parts.length>3)return ['story',second,parts.slice(2).join('.')];
   return root==='targets'?['supervision',...parts]:parts;
  }
  function conflictValue(data,c){
