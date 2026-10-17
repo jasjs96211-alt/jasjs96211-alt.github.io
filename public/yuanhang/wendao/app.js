@@ -187,9 +187,14 @@ function renderStage(){
  $('wdCG').hidden=true;$('wdStanding').hidden=true;$('wdMissing').hidden=true;
  $('wdAuto').hidden=true;$('wdHistory').hidden=!talking;$('wdSkip').hidden=true;$('wdContinue').hidden=true;$('wdOptions').innerHTML='';$('wdStageChat').hidden=!talking;
  const last=s.chat.at(-1),recent=(s.messages||[]).at(-1);
- $('wdSpeaker').textContent=last?.role==='assistant'?'温知遥':recent?'温知遥':'书房';
- $('wdStageStatus').textContent=talking?(busy?'姐姐正在回应…':chatError|| (last?.source==='ai'?'温知遥 · AI在线回应':s.settings.online?'自由交谈 · 使用现有云端AI':'离线预置台词')):'固定剧情 · 书房';
- $('wdText').textContent=talking?(chatError|| (last?.role==='assistant'?last.text:busy?'姐姐正在回应…':'你可以从刚才的故事说起。')) :recent?.text||'灯下的书页还摊着。姐姐也在做自己的功课；你可以读一段故事，或随时和她说话。';
+ const newLetter=recent&&Number.isFinite(recent.at)&&now()>=recent.at&&now()-recent.at<20*60000;
+ const ambient={dawn:'晨光正沿窗棂慢慢铺开。案头留着几页未读的书，也留着今日的时间。',
+ day:'竹影缓缓移过书案。你可以继续读书，也可以去别处看看姐姐正在做什么。',
+ dusk:'天色渐沉，纸页间还留着一线余光。此刻不必急着作出决定。',
+ night:'夜色落在竹窗外。书页仍在案上，稍后也可以去看看姐姐是否已歇下。'}[scenePhase];
+ $('wdSpeaker').textContent=talking?(last?.role==='assistant'?'温知遥':'自由交谈'):(newLetter?'温知遥':'书房');
+ $('wdStageStatus').textContent=talking?(busy?'姐姐正在回应…':chatError|| (last?.source==='ai'?'温知遥 · AI在线回应':s.settings.online?'自由交谈 · 使用现有云端AI':'离线预置台词')):'书房 · '+({dawn:'清晨',day:'白日',dusk:'黄昏',night:'夜间'}[scenePhase]);
+ $('wdText').textContent=talking?(chatError|| (last?.role==='assistant'?last.text:busy?'姐姐正在回应…':'你可以从刚才的故事说起。')) :(newLetter?recent.text:ambient);
 }
 
 function openDB(){return new Promise((resolve,reject)=>{if(!window.indexedDB)return reject(Error('当前浏览器不支持图片缓存'));const r=indexedDB.open('yuanhang_wendao_media',1);r.onupgradeneeded=()=>r.result.createObjectStore('assets');r.onsuccess=()=>{db=r.result;resolve(db)};r.onerror=()=>reject(r.error)})}
