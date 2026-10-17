@@ -1,0 +1,221 @@
+{
+  "baseline": "d72e8e5d10f1eb46efa6ede51db31dcef07a2c03",
+  "productionBedroomRigReady": false,
+  "missing": [
+    "layered_face",
+    "reclined_body",
+    "book_hands_pages",
+    "medicine_hands_bowl",
+    "pose_transitions",
+    "depth_occluders"
+  ],
+  "assets": [
+    {
+      "path": "public/yuanhang/wendao/assets/lamp-study.webp",
+      "width": 1672,
+      "height": 941,
+      "mode": "RGB",
+      "frames": 1,
+      "bytes": 265124,
+      "sha256": "c76def8143de3907ef94b745c2c0aef0bbacd642a3faa42423fdaea966358feb"
+    },
+    {
+      "path": "public/yuanhang/wendao/assets/sister-calm.webp",
+      "width": 1024,
+      "height": 1536,
+      "mode": "RGBA",
+      "frames": 1,
+      "bytes": 376662,
+      "sha256": "828c805f5b87f7c8a333220dd9f8b486c9c808ae50d3af788ad2e4e16fd489b8"
+    },
+    {
+      "path": "public/yuanhang/wendao/assets/sister-concerned.webp",
+      "width": 1024,
+      "height": 1536,
+      "mode": "RGBA",
+      "frames": 1,
+      "bytes": 1486932,
+      "sha256": "0b5347b7ca21efadd07479bf5ade54e169d678677dc25d967b76c61854ab263f"
+    },
+    {
+      "path": "public/yuanhang/wendao/assets/sister-ill.webp",
+      "width": 1024,
+      "height": 1536,
+      "mode": "RGBA",
+      "frames": 1,
+      "bytes": 1611898,
+      "sha256": "b4c01a1cbb152ae1c173282c6c608f4851f882c3aa14adcb9c207695d101439a"
+    },
+    {
+      "path": "public/yuanhang/wendao/assets/sister-injured.webp",
+      "width": 1024,
+      "height": 1536,
+      "mode": "RGBA",
+      "frames": 1,
+      "bytes": 1737800,
+      "sha256": "27986b4d6d138d76db20db6722ad1192a17fb5d0b009ce4291b3790138ad8b62"
+    },
+    {
+      "path": "public/yuanhang/wendao/assets/sister-relieved.webp",
+      "width": 1024,
+      "height": 1536,
+      "mode": "RGBA",
+      "frames": 1,
+      "bytes": 1425594,
+      "sha256": "9fab0cc9e20f89c903ce10adb563529907e43cf812040b11f39e606a4f272f04"
+    },
+    {
+      "path": "public/yuanhang/wendao/assets/sister-tired.webp",
+      "width": 1024,
+      "height": 1536,
+      "mode": "RGBA",
+      "frames": 1,
+      "bytes": 313980,
+      "sha256": "7b88ffc6a9289a2985ada622065925ddbeb7dacde544aebabb0c59290735626d"
+    },
+    {
+      "path": "public/yuanhang/wendao/assets/study-room.webp",
+      "width": 1672,
+      "height": 941,
+      "mode": "RGB",
+      "frames": 1,
+      "bytes": 359372,
+      "sha256": "2166233ea36121eb2172084e96bbcf05ab140f6e9bb69ea1978d8b87fed9b7e2"
+    },
+    {
+      "path": "public/yuanhang/wendao/assets/world-bedroom.webp",
+      "width": 1536,
+      "height": 1024,
+      "mode": "RGB",
+      "frames": 1,
+      "bytes": 379558,
+      "sha256": "1b790cc0e7782498a010f0af0ccf76817eb6df2cef670ef1a461c463acb93da4"
+    },
+    {
+      "path": "public/yuanhang/wendao/assets/world-corridor.webp",
+      "width": 1536,
+      "height": 1024,
+      "mode": "RGB",
+      "frames": 1,
+      "bytes": 337242,
+      "sha256": "ccedf0784da3729686d92dcf653ae1d30c3caf089bb78c2094618266139733ba"
+    },
+    {
+      "path": "public/yuanhang/wendao/assets/world-garden.webp",
+      "width": 1536,
+      "height": 1024,
+      "mode": "RGB",
+      "frames": 1,
+      "bytes": 477778,
+      "sha256": "6e17da29633184fe8fb3afc8bf93d88215e0d852f8b432343e478a6a65f955a8"
+    },
+    {
+      "path": "public/yuanhang/wendao/assets/world-herbs.webp",
+      "width": 1536,
+      "height": 1024,
+      "mode": "RGB",
+      "frames": 1,
+      "bytes": 344514,
+      "sha256": "c492e840d3a66f2c01a8ff9837c016bebb22a1bd9d23080c7fe4c874effa359c"
+    },
+    {
+      "path": "public/yuanhang/wendao/assets/world-study.webp",
+      "width": 1672,
+      "height": 941,
+      "mode": "RGB",
+      "frames": 1,
+      "bytes": 320268,
+      "sha256": "c9f5a75fc2dcb74d3f28eaeb3b247892c68a8aadb6c4313e6cd0f7a1b28d3dc7"
+    },
+    {
+      "path": "public/yuanhang/wendao/assets/world-terrace.webp",
+      "width": 1536,
+      "height": 1024,
+      "mode": "RGB",
+      "frames": 1,
+      "bytes": 355728,
+      "sha256": "d9f2fc63fcd77883c6bca25c5ece01d1d1f733c008816ed49d86cb0816f8446b"
+    },
+    {
+      "path": "public/yuanhang/wendao/assets/zhiyao-herbs-cycle.webp",
+      "width": 627,
+      "height": 627,
+      "mode": "RGBA",
+      "frames": 4,
+      "bytes": 437356,
+      "sha256": "3774ac269d58b50c76d6aa6a6fb0128ffce39069eb9913ee2ba94e89b231c0b5"
+    },
+    {
+      "path": "public/yuanhang/wendao/assets/zhiyao-herbs-still.webp",
+      "width": 627,
+      "height": 627,
+      "mode": "RGBA",
+      "frames": 1,
+      "bytes": 113452,
+      "sha256": "011fda62b754c4356d92193472d0335550adc8abc08b92188fd01103bc63459e"
+    },
+    {
+      "path": "public/yuanhang/wendao/assets/zhiyao-meditate-cycle.webp",
+      "width": 627,
+      "height": 627,
+      "mode": "RGBA",
+      "frames": 4,
+      "bytes": 452442,
+      "sha256": "a05b7d638f80772103e51cd96b687351d8533a31cb220de63ad2cc891fef4aed"
+    },
+    {
+      "path": "public/yuanhang/wendao/assets/zhiyao-meditate-still.webp",
+      "width": 627,
+      "height": 627,
+      "mode": "RGBA",
+      "frames": 1,
+      "bytes": 116274,
+      "sha256": "b2355e5875a6dce9804502075226aa557bdb0da8ab8ec5bf0a60700914d25dee"
+    },
+    {
+      "path": "public/yuanhang/wendao/assets/zhiyao-read-cycle.webp",
+      "width": 627,
+      "height": 627,
+      "mode": "RGBA",
+      "frames": 4,
+      "bytes": 435772,
+      "sha256": "a68e2057e16a2cad54500fc4c64c2bf91861a6429b817892c97b37696d410d7d"
+    },
+    {
+      "path": "public/yuanhang/wendao/assets/zhiyao-read-still.webp",
+      "width": 627,
+      "height": 627,
+      "mode": "RGBA",
+      "frames": 1,
+      "bytes": 113026,
+      "sha256": "ad2087fc9b7d4a2d4329b2da464fb5dcac92e544db3f9d5dddc0a4c771bd52b2"
+    },
+    {
+      "path": "public/yuanhang/wendao/assets/zhiyao-recovery-cg.webp",
+      "width": 1536,
+      "height": 1024,
+      "mode": "RGB",
+      "frames": 1,
+      "bytes": 280704,
+      "sha256": "183edaf09ea280b22cd0816c0f533f47608da002fbf8790a34002772f7d9d71d"
+    },
+    {
+      "path": "public/yuanhang/wendao/assets/zhiyao-walk-cycle.webp",
+      "width": 627,
+      "height": 627,
+      "mode": "RGBA",
+      "frames": 4,
+      "bytes": 420454,
+      "sha256": "adae33808156c2cfbf5d2be34e1794abfebcecfabd78cf8bc50f2cc1bdb9bae2"
+    },
+    {
+      "path": "public/yuanhang/wendao/assets/zhiyao-walk-still.webp",
+      "width": 627,
+      "height": 627,
+      "mode": "RGBA",
+      "frames": 1,
+      "bytes": 114186,
+      "sha256": "33e71563b0e672ee23eb83c1adf0b4e4f55e7ddebc02fd866f109c0af4aaddcd"
+    }
+  ]
+}
