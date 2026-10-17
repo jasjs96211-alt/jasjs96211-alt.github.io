@@ -5,7 +5,7 @@ const SHELL=[
  './','./index.html','./manifest.webmanifest','./icon.svg',
  './usage.js','./cloud.js?v=20261016-sync-r4',
  './wendao/novel.js?v=20261016-v15','./wendao/story.js?v=20261016-v15','./wendao/transport.js',
- './wendao/engine.js?v=20261017-v16-review-fix','./wendao/app.js?v=20261017-ui3',
+ './wendao/engine.js?v=20261017-ui3','./wendao/app.js?v=20261017-ui3',
  './wendao/world.js?v=20261017-v16-dynamic','./wendao/interaction.js?v=20261017-v16-review-fix',
  './wendao/motion.js?v=20261017-v16-review-fix','./wendao/companion.js?v=20261017-ui3',
  './wendao/style.css?v=20261016-v15','./wendao/companion.css?v=20261016-v15',
