@@ -58,7 +58,12 @@ function update(){
   $('wcActor').hidden=false;
  }
  if(state.vitals?.clockDispute){act.title='等候核对时间';act.text='设备时间需要核对，暂不推进陪伴日程。'}
- if($('wcVitals').innerHTML!==state.hud)$('wcVitals').innerHTML=state.hud||'';
+ const quick=$('wcHeroVitals');if(quick&&quick.innerHTML!==state.mainHud)quick.innerHTML=state.mainHud||'';
+ const detail=$('wcVitals');if(detail&&detail.innerHTML!==state.hud){
+  const opened=[...detail.querySelectorAll('details')].map(d=>d.open);
+  detail.innerHTML=state.hud||'';
+  detail.querySelectorAll('details').forEach((d,i)=>{if(i<opened.length)d.open=opened[i]});
+ }
  const actor=$('wcActor'),photo=$('wcPortrait');
  actor.dataset.place=act.spot||act.place;
  if(motionRenderer)paintMotion();else{
@@ -96,7 +101,7 @@ function mount({stage,focusBridge,getCharacterState,onFocusPage:focusPage,onClos
  worldView=root.WendaoWorld?.readView(viewStore())||{player:'study',following:false};
  const mapMarkup=(root.WendaoWorld?.LOCATIONS||[]).map(x=>'<button type="button" data-wc-travel="'+x.id+'">'+x.name+'</button>').join('');
  layer.innerHTML='<div class="wc-sky"><span id="wcSkyPlace">学宫书房</span><span id="wcSkyDaypart">白日</span></div>'+
- '<div id="wcBackdrop" class="wc-backdrop" data-location="study" data-phase="day" aria-hidden="true"><i class="wc-arch"></i><i class="wc-prop"></i><i class="wc-ground"></i></div>'+
+ '<div id="wcBackdrop" class="wc-backdrop" data-location="study" data-phase="day" aria-hidden="true"><i class="wc-arch"></i><i class="wc-prop"></i><i class="wc-ground"></i></div><div id="wcHeroVitals" class="wc-hero-vitals" aria-label="温知遥主要属性"></div>'+
  '<div class="wc-travel"><div class="wc-travel-actions"><button type="button" id="wcMapToggle" aria-expanded="false" aria-controls="wcMap">◎ 地图</button><button type="button" id="wcFindSister">去找姐姐</button><button type="button" id="wcFollow">邀姐姐同行</button></div><p id="wcSisterWhere" aria-live="polite"></p><p id="wcTravelNotice" aria-live="polite"></p><nav id="wcMap" class="wc-map" aria-label="学宫地点" hidden><div class="wc-map-head">前往何处？ <button type="button" id="wcMapBack">收起地图 ×</button></div><div class="wc-map-places">'+mapMarkup+'</div></nav></div>'+
  '<div class="wc-motion-tools"><button type="button" id="wcAnimation" aria-pressed="true">动作：开</button><button type="button" id="wcLetters" hidden>来信</button><button type="button" id="wcArtRetry" hidden>重试演出图片</button></div><img id="wcRecovery" alt="温知遥卧床休养CG" hidden>' +
  '<div class="wc-world" aria-hidden="true"><span class="wc-spot wc-spot-window">竹窗</span><span class="wc-spot wc-spot-desk">书案</span><span class="wc-spot wc-spot-herbs">药架</span><span class="wc-spot wc-spot-bed">榻边</span>'+
