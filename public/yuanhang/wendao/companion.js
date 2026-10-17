@@ -37,7 +37,7 @@ function update(){
  const world=W?.derive({at:Date.now(),state,focus:timer,playerPlace:worldView.player,following:worldView.following});
  let act;
  if(world){
-  if(worldView.following&&!world.canFollow){worldView.following=false;saveWorldView();travelNotice('姐姐需要静养，已自动结束同行；她仍在寝居休息。')}
+  if(worldView.following&&!world.canFollow){worldView.following=false;saveWorldView();travelNotice(world.unwell?'姐姐需要静养，已结束同行；她留在寝居。':'姐姐需要处理自己的日程，已结束同行。')}
   act=world.activity;
   const backdrop=$('wcBackdrop');
   backdrop.dataset.location=world.player;backdrop.dataset.phase=world.phase;
@@ -121,7 +121,7 @@ function mount({stage,focusBridge,getCharacterState,onFocusPage:focusPage,onClos
   $('wcFollow').onclick=()=>{
    if(worldView.following){worldView.following=false;saveWorldView();travelNotice('姐姐继续按自己的日程行动。');update();return}
    const d=W.derive({at:Date.now(),state:getCharacter?.()||{},focus:focusState(),playerPlace:worldView.player,following:false});
-   if(!d.canFollow){travelNotice('姐姐还在疗伤，不宜离开寝居。');return}
+   if(!d.canFollow){travelNotice(d.unwell?'姐姐还在疗伤，不宜离开寝居。':'姐姐此时需要休息或处理自己的事，暂不同行。');return}
    if(!d.together){travelNotice('请先去找姐姐，再邀请她同行。');return}
    worldView.following=true;saveWorldView();travelNotice('姐姐答应暂且与你同行。');update();
   };
