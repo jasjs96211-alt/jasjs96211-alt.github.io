@@ -63,7 +63,7 @@ test('app save while following uses the current view; closing restores explicit 
  a.run("state.sessions.push({id:'new-view-record',date:'2026-10-17',minutes:30,subject:'622',at:new Date(Date.now()-1).toISOString()});save()");
  let row=a.snapshot().messages.find(m=>m.evidenceId==='study:new-view-record');assert.equal(row.contextSnapshot.locationId,'terrace');assert.equal(row.contextSnapshot.following,true);
  const frozen=clone(row),receiver=open();travel(receiver,'herbs');receiver.run('window.Wendao.cloudApply('+JSON.stringify(a.run('window.Wendao.cloudRead()'))+')');assert.equal(receiver.get('wcBackdrop').dataset.location,'herbs');assert.deepEqual(receiver.snapshot().messages.find(m=>m.id===frozen.id),frozen);
- receiver.get('wcLetters').onclick();assert.match(receiver.get('wdInbox').innerHTML,/写信时：望星台 · 与妹妹同行/);
+ receiver.get('wcLetters').onclick();assert.match(receiver.get('wdInbox').innerHTML,/留笺于 望星台 · 与妹妹同行/);
  a.get('wcClose').onclick();assert.equal(a.run('window.WendaoCompanion.getWorldView()'),null);
  a.clock.set(t+H);a.run("state.sessions.push({id:'after-close',date:'2026-10-17',minutes:30,subject:'822',at:new Date(Date.now()-1).toISOString()});save()");
  row=a.snapshot().messages.find(m=>m.evidenceId==='study:after-close');assert.equal(row.contextSnapshot.locationSource,'autonomous-schedule');assert.equal(row.contextSnapshot.following,false);

@@ -309,7 +309,10 @@ function rhythm(s,study={},now=Date.now()){
 function nightRecap(s,now=Date.now()){
  migrateInPlace(s);const d=day(now-DAY),id='recap:'+d,old=s.rhythmState.recaps.find(x=>x.id===id);if(old)return old;
  const rows=s.life.ledger.filter(x=>x.at>=dateAt(d)+18*3600000&&x.at<=now&&x.at<dateAt(day(now))+12*3600000);if(!rows.length)return null;
- const row={id,at:now,date:d,text:'从昨夜到今晨，我'+[...new Set(rows.map(x=>x.activity))].join('，也')+'。这些都是准备期的日常，未有未经确认的主线变化。',eventIds:rows.map(x=>x.id)};
+ const activities=[...new Set(rows.map(x=>String(x.activity||'整理日常').trim()).filter(Boolean))];
+ const notes=activities.slice(0,4).map(a=>({医理:'查阅医理',温养:'调息温养',休息:'稍作歇息'}[a]||a));
+ const recapText='昨夜至今晨，我陆续做了些事：'+notes.join('、')+'。眼下仍是寻常日子，你不用时时为我挂心。';
+ const row={id,at:now,date:d,text:recapText,eventIds:rows.map(x=>x.id)};
  s.rhythmState.recaps.push(row);log(s,id,'昨夜与昨日小记',row.text,now,'recap');return row;
 }
 function setMode(s,mode,study={},now=Date.now(),{napUntil=null}={}){
