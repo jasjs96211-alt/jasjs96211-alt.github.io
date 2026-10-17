@@ -59,7 +59,7 @@ test('sync renders reuse the same in-flight loaded image instead of resetting it
  assert.match(app,/data-portrait-source/);
  assert.match(app,/wd-portrait-error/);
  assert.match(css,/\.wd-portrait-error\[hidden\]/);
- assert.match(html,/wendao\/app\.js\?v=20261017-v16-ui2/);
+ assert.match(html,/wendao\/app\.js\?v=20261017-ui3/);
  assert.match(html,/wendao\/style\.css\?v=20261016-v15/);
 });
 test('worker installs without downloading large portraits and reuses prior picture cache',async()=>{
