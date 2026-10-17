@@ -1,0 +1,99 @@
+/* v1.6 world exploration stage. Intentionally isolated from the RPG model and workbench UI. */
+.wd-companion .wc-backdrop{
+ position:absolute;inset:0;z-index:0;overflow:hidden;pointer-events:none;
+ background:linear-gradient(125deg,#accbc1 0%,#dbe5cb 44%,#648b85 100%);
+ transition:background-color .8s ease,filter .8s ease;
+}
+.wd-companion .wc-backdrop::before,.wd-companion .wc-backdrop::after{
+ content:"";position:absolute;inset:0;pointer-events:none;
+}
+.wd-companion .wc-backdrop::after{z-index:4;background:transparent;transition:background .8s ease}
+.wd-companion .wc-backdrop[data-phase="dawn"]::after{background:linear-gradient(115deg,#ffce9b40,#ffefb718 50%,#576f9770)}
+.wd-companion .wc-backdrop[data-phase="day"]::after{background:linear-gradient(135deg,#faf8df24,transparent 54%,#3653491c)}
+.wd-companion .wc-backdrop[data-phase="dusk"]::after{background:linear-gradient(95deg,#f9b07175,#b1676553 55%,#363d688f)}
+.wd-companion .wc-backdrop[data-phase="night"]::after{background:linear-gradient(125deg,#071d31af,#0b1c31cd 58%,#091820d1)}
+.wd-companion .wc-backdrop[data-location="study"]{background-image:url("./assets/study-room.webp");background-size:cover;background-position:center}
+.wd-companion .wc-backdrop[data-location="study"] .wc-arch,
+.wd-companion .wc-backdrop[data-location="study"] .wc-prop,
+.wd-companion .wc-backdrop[data-location="study"] .wc-ground{display:none}
+.wd-companion .wc-backdrop[data-location="herbs"]{
+ background:linear-gradient(180deg,#b5d1be 0%,#91b6a4 59%,#3e5043 60%,#263c2e);
+}
+.wd-companion .wc-backdrop[data-location="garden"]{
+ background:radial-gradient(ellipse at 65% 9%,#faf0c4 0%,transparent 34%),linear-gradient(170deg,#a7cece 10%,#8db1a7 51%,#406654 52%,#1c4237);
+}
+.wd-companion .wc-backdrop[data-location="corridor"]{
+ background:linear-gradient(110deg,#253e34 0%,#8eaca3 28%,#d4d6ad 60%,#263c35 100%);
+}
+.wd-companion .wc-backdrop[data-location="bedroom"]{
+ background:linear-gradient(110deg,#293e38,#a3aca0 38%,#d3d6bd 56%,#37483d);
+}
+.wd-companion .wc-backdrop[data-location="terrace"]{
+ background:linear-gradient(180deg,#8dbabd 0%,#b7c9a4 48%,#4a6657 50%,#203b35 100%);
+}
+.wd-companion .wc-backdrop .wc-arch,.wd-companion .wc-backdrop .wc-prop,.wd-companion .wc-backdrop .wc-ground{
+ position:absolute;display:block;pointer-events:none;
+}
+.wd-companion .wc-backdrop .wc-arch{
+ inset:8% 7% 28%;border:clamp(12px,2.5vw,33px) solid #3b5547a8;
+ border-top-width:clamp(22px,4vw,58px);
+ box-shadow:inset 0 0 0 4px #f0dfac50,0 10px 50px #162d2f60;
+}
+.wd-companion .wc-backdrop .wc-ground{
+ inset:auto 0 0;height:29%;background:repeating-linear-gradient(93deg,#142d2480 0 3px,transparent 4px 92px),linear-gradient(#576b5694,#1b3833);
+}
+.wd-companion .wc-backdrop .wc-prop{z-index:2;bottom:21%;right:12%;width:20%;height:40%}
+.wd-companion .wc-backdrop[data-location="herbs"] .wc-arch{
+ inset:14% 8% 26%;background:repeating-linear-gradient(0deg,transparent 0 22%,#48584b 22.5% 25%,transparent 25.5% 47%);
+}
+.wd-companion .wc-backdrop[data-location="herbs"] .wc-prop{
+ width:26%;height:45%;right:8%;background:repeating-linear-gradient(0deg,transparent 0 21%,#3b5943 21.5% 25%);
+ border:10px solid #385443;box-shadow:inset 0 0 0 3px #a9ad7e;
+}
+.wd-companion .wc-backdrop[data-location="garden"] .wc-arch{border:0;box-shadow:none;inset:0;background:repeating-linear-gradient(92deg,transparent 0 9%,#366c56bf 9.5% 10%,transparent 10.5% 24%)}
+.wd-companion .wc-backdrop[data-location="garden"] .wc-prop{border-radius:55% 55% 18% 18%;right:3%;height:51%;background:repeating-linear-gradient(157deg,#396f5195 0 5px,transparent 6px 35px)}
+.wd-companion .wc-backdrop[data-location="corridor"] .wc-arch{border-width:20px 26px;box-shadow:inset 0 0 0 3px #dcd4ad58;background:repeating-linear-gradient(90deg,transparent 0 23%,#253d32a6 23.5% 25%,transparent 25.5% 48%)}
+.wd-companion .wc-backdrop[data-location="corridor"] .wc-prop{height:18%;right:8%;width:84%;border-top:9px solid #344c3c;background:repeating-linear-gradient(90deg,#384a39 0 5px,transparent 6px 15%)}
+.wd-companion .wc-backdrop[data-location="bedroom"] .wc-arch{inset:5% 3% 24%;border-width:15px 22px;background:linear-gradient(90deg,#8eaa9c5e 0 20%,transparent 30% 70%,#8eaa9c5e 80%);border-radius:14px}
+.wd-companion .wc-backdrop[data-location="bedroom"] .wc-prop{bottom:13%;width:55%;height:24%;right:15%;border:9px solid #4c5c4a;border-radius:35% 25% 7% 7%;background:linear-gradient(170deg,#e4e0ce,#9bae9e);box-shadow:0 18px 14px #07190c70}
+.wd-companion .wc-backdrop[data-location="terrace"] .wc-arch{inset:13% 3% 42%;border:0;box-shadow:none;background:repeating-linear-gradient(90deg,transparent 0 20%,#2c5b4ca0 21% 22%,transparent 22.5% 39%)}
+.wd-companion .wc-backdrop[data-location="terrace"] .wc-prop{bottom:18%;right:4%;height:22%;width:90%;border-top:11px solid #47594d;border-bottom:8px solid #47594d;background:repeating-linear-gradient(90deg,#46594c 0 6px,transparent 7px 8%)}
+.wd-companion .wc-world{z-index:1}
+.wd-companion .wc-world .wc-spot{display:none}
+.wd-companion .wc-actor{left:50%;bottom:21%;height:62%;transition:opacity .3s ease}
+.wd-companion .wc-actor[data-place]{left:50%;height:62%}
+.wd-companion[data-location="bedroom"] .wc-actor{bottom:21%;height:54%}
+.wd-companion .wc-actor img{animation:wc-breath 5s ease-in-out infinite;transform-origin:50% 90%}
+@keyframes wc-breath{50%{transform:scale(1.005) translateY(-2px)}}
+.wd-companion .wc-sky{z-index:5}
+.wd-companion .wc-travel{
+ position:absolute;z-index:8;top:clamp(115px,19vh,165px);left:max(20px,env(safe-area-inset-left));
+ width:min(360px,calc(100vw - 40px));color:#eaddbf;
+ background:#0d2b27c9;border:1px solid #b7b58e70;border-radius:8px;
+ padding:10px;box-shadow:0 8px 24px #0418148a;backdrop-filter:blur(7px);
+}
+.wd-companion .wc-travel-actions{display:flex;flex-wrap:wrap;gap:6px}
+.wd-companion .wc-travel button{min-height:42px;padding:7px 10px;background:#234c45;color:#f5ebcc;border-color:#b4a78590}
+.wd-companion .wc-travel p{margin:7px 0 0;font-size:12px;line-height:1.55}
+.wd-companion .wc-travel #wcTravelNotice:empty{display:none}
+.wd-companion .wc-travel #wcTravelNotice{color:#f7df98}
+.wd-companion .wc-map{margin-top:12px;padding-top:8px;border-top:1px solid #d9ca9f55}
+.wd-companion .wc-map-head{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:14px}
+.wd-companion .wc-map-places{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:8px}
+.wd-companion .wc-map-places button{width:100%;min-height:47px}
+.wd-companion .wc-map[hidden]{display:none!important}
+.wd-companion .wc-panel{z-index:4}
+@media(max-width:720px){
+ .wd-companion .wc-travel{top:max(56px,env(safe-area-inset-top) + 45px);left:8px;width:calc(100vw - 16px);padding:8px}
+ .wd-companion .wc-travel-actions{gap:5px}
+ .wd-companion .wc-travel button{min-height:44px;font-size:12px;padding:7px 9px}
+ .wd-companion .wc-travel p{font-size:11px}
+ .wd-companion .wc-map{max-height:39dvh;overflow:auto}
+ .wd-companion .wc-actor[data-place]{height:49%;bottom:28%}
+ .wd-companion .wc-backdrop{background-position:center}
+}
+@media(max-height:560px) and (orientation:landscape){
+ .wd-companion .wc-travel{top:63px;left:max(6px,env(safe-area-inset-left));width:41vw;max-height:calc(100dvh - 70px);overflow:auto}
+ .wd-companion .wc-actor[data-place]{left:50%;bottom:8%;height:75%}
+}
+@media(prefers-reduced-motion:reduce){.wd-companion .wc-actor img{animation:none}.wd-companion .wc-backdrop{transition:none}}
