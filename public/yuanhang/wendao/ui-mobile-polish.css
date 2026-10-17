@@ -124,3 +124,17 @@
  .wd-companion .wc-world{transition:none!important;animation:none!important}
  .wd-companion .wc-backdrop{animation:none!important}
 }
+
+/* Always-available focus action without reopening the large learning form. */
+.wd-companion .wc-heading-actions #wcMiniTime{font:600 14px ui-monospace,Menlo,monospace;white-space:nowrap;color:#ffe2a5}
+.wd-companion .wc-heading-actions #wcQuickFocus{background:#a6caaa;color:#193b2e;border-color:#d1dfb5;font-weight:700;white-space:nowrap}
+.wd-companion.wc-tools-open .wc-heading-actions #wcQuickFocus{display:none}
+@media(max-width:720px){
+ .wd-companion .wc-heading{display:flex;flex-wrap:wrap}
+ .wd-companion .wc-heading>div:first-child{flex:1 1 100%}
+ .wd-companion .wc-heading-actions{display:flex;width:100%;justify-content:space-between;flex-wrap:wrap}
+ .wd-companion .wc-heading-actions #wcMiniTime{font-size:15px}
+ .wd-companion .wc-heading-actions button{font-size:11px}
+ .wd-companion .wc-panel{max-height:calc(100dvh - 110px)}
+ .wd-companion .wc-direction-pad{bottom:clamp(188px,26dvh,280px)}
+}
