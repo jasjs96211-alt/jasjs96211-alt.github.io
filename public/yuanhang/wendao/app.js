@@ -172,7 +172,7 @@ function renderStage(){
   if(box.dataset.renderSignature!==signature){
    const preservedScroll=box.scrollTop;
    box.dataset.renderSignature=signature;
-   box.innerHTML='<header class="wd-mail-header"><div><h3>姐姐的来信</h3><p>翻一翻她寄来的信笺。</p></div><button type="button" id="wdInboxClose">← 返回场景</button></header>'+(s.rhythmState?.recaps||[]).slice(-2).reverse().map(r=>`<article><small>夜间纪事 · ${esc(r.date)}</small><p>${esc(r.text)}</p></article>`).join('')+(s.messages||[]).slice(-30).reverse().map(m=>`<article><small>${esc(new Date(m.at).toLocaleString('zh-CN',{timeZone:'Asia/Shanghai'}))}</small><p>${esc(m.text)}</p>${m.contextSnapshot?.locationScope==='at-creation'?`<small>写信时：${esc(m.contextSnapshot.location)} · ${esc(m.contextSnapshot.activity)}</small>`:''}<small>${m.source==='ai'?'AI来信':'固定事件留言'}</small>${m.trigger==='bedtime'?button('我去休息了','sleep')+button('再学一会儿','sleep-later')+button('调整今晚计划','open-sleep-plan'):m.trigger==='morning'?'<small>早安留言，无需重复确认清醒</small>':''}${button('自由回复','reply-message')}${m.aiStatus==='failed'?button('重试在线台词','retry-message',`data-message="${esc(m.id)}"`):''}</article>`).join('');
+   box.innerHTML='<header class="wd-mail-header"><div><h3>姐姐的来信</h3><p>翻一翻她寄来的信笺。</p></div><button type="button" id="wdInboxClose">← 返回场景</button></header>'+(s.rhythmState?.recaps||[]).slice(-2).reverse().map(r=>`<article><small>夜间纪事 · ${esc(r.date)}</small><p>${esc(r.text)}</p></article>`).join('')+(s.messages||[]).slice(-30).reverse().map(m=>`<article><small>${esc(new Date(m.at).toLocaleString('zh-CN',{timeZone:'Asia/Shanghai'}))}</small><p>${esc(m.text)}</p>${m.contextSnapshot?.locationScope==='at-creation'?`<small>留笺于 ${esc(m.contextSnapshot.location)} · ${esc(m.contextSnapshot.activity)}</small>`:''}${m.trigger==='bedtime'?button('我去休息了','sleep')+button('再学一会儿','sleep-later')+button('调整今晚计划','open-sleep-plan'):m.trigger==='morning'?'<small>早安留言，无需重复确认清醒</small>':''}${button('自由回复','reply-message')}${m.aiStatus==='failed'?button('重试在线台词','retry-message',`data-message="${esc(m.id)}"`):''}</article>`).join('');
    box.scrollTop=preservedScroll;
    $('wdInboxClose').onclick=()=>{box.hidden=true;syncOverlayBack();$('wdInboxButton')?.focus()};
    box.querySelectorAll('[data-wd]').forEach(el=>el.onclick=safe(()=>action(el.dataset.wd,el.dataset)));
@@ -181,7 +181,7 @@ function renderStage(){
  if(player){const art=N.visual(s,player.chapter,player.view,E).portrait,source=getAsset(art);if(source&&img.dataset.portraitSource!==source){img.src=source;img.dataset.portraitSource=source;bindPortraitImage(img)}return;}
  $('wdChapterTitle').textContent='问道 · 学宫书房';
  const scenePhase=window.WendaoWorld?.phase(now())||'night';
- const sceneBackdrop=scenePhase==='night'?(getAsset('study-room')||'./wendao/assets/world-study.webp'):'./wendao/assets/world-study.webp';
+ const sceneBackdrop=s.assets?.['study-room']?.custom?getAsset('study-room'):(scenePhase==='night'?(getAsset('study-room')||'./wendao/assets/world-study.webp'):'./wendao/assets/world-study.webp');
  $('wdScene').dataset.phase=scenePhase;
  if($('wdScene').dataset.backdrop!==sceneBackdrop){$('wdScene').dataset.backdrop=sceneBackdrop;$('wdScene').style.backgroundImage='url("'+sceneBackdrop+'")'}
  $('wdCG').hidden=true;$('wdStanding').hidden=true;$('wdMissing').hidden=true;
