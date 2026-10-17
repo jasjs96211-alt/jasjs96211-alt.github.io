@@ -1,0 +1,43 @@
+{
+  "localNode": "v24.19.0",
+  "fullTests": {
+    "pass": 330,
+    "fail": 0
+  },
+  "timezoneTests": {
+    "TZ": "America/New_York",
+    "pass": 16,
+    "fail": 0
+  },
+  "build": "passed",
+  "browserQA": "not run - control-browser unavailable",
+  "realDeviceQA": "not run",
+  "productionP0": "incomplete - missing approved art and integration",
+  "sources": [
+    {
+      "path": "public/yuanhang/wendao/bedroom-behavior.js",
+      "sha256": "7368c9e0b263da5d19b737df23fc5f4952000331482c5bec25993389195964a6",
+      "bytes": 13327
+    },
+    {
+      "path": "public/yuanhang/tests/vnext-bedroom.mjs",
+      "sha256": "7b203ee14c575c1cec91e6fd0bea8da467694f7b7cb61099744798a6a26f6fa6",
+      "bytes": 13147
+    },
+    {
+      "path": "public/yuanhang/labs/bedroom/index.html",
+      "sha256": "72a1a5b535fdd7bc2a27f9aaaf7dba91c9a793c5a770758b12d8d9b5cc4b5191",
+      "bytes": 2758
+    },
+    {
+      "path": "public/yuanhang/labs/bedroom/lab.css",
+      "sha256": "0af9c2430cdd4c0a4660a44dd1163219970417edfc879e27811a7d3f8c6745f3",
+      "bytes": 1702
+    },
+    {
+      "path": "public/yuanhang/labs/bedroom/lab.js",
+      "sha256": "1a0a096595d0f611d64f607172af8a75295f1cbb8f11bc134e385b0bbb30ffc8",
+      "bytes": 6465
+    }
+  ]
+}
