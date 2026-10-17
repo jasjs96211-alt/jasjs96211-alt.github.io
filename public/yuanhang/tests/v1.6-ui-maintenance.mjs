@@ -62,9 +62,11 @@ test('explicit reasonable rest and untimed sleep are NOT silently overridden',as
  a.clock.set(at+30*60000);a.run('window.Wendao.sync()');assert.equal(a.snapshot().supervision.mode,'exempt');
  await a.action('sleep');a.clock.set(at+90*60000);a.run('window.Wendao.sync()');assert.equal(a.snapshot().supervision.mode,'sleep');
 });
-test('timed nap returns to awake after nap expiry without retroactively punishing sleep',async()=>{
- const a=setup();a.run('window.WendaoEngine.setMode(window.Wendao.cloudRead(),\'sleep\')'); // engine API smoke only
- a.run("const stateNap=window.Wendao.cloudRead();window.WendaoEngine.setMode(stateNap,'sleep',window.WendaoBridge.get(),Date.now(),{napUntil:Date.now()+20*60000});localStorage.setItem('"+WD+"',JSON.stringify({...stateNap,revision:window.Wendao.cloudRead().revision}));window.Wendao.reloadLocal()");
+test('timed nap returns to awake after nap expiry without retroactively punishing sleep',()=>{
+ const a=setup(),fixture=a.snapshot();
+ fixture.supervision.mode='sleep';fixture.supervision.modeStart=at;fixture.supervision.cursor=at;
+ fixture.rhythmState.napUntil=at+20*60000;
+ a.storage.set(WD,JSON.stringify(fixture));a.run('window.Wendao.reloadLocal()');
  const before=a.snapshot().supervision.judgements.length;
  a.clock.set(at+21*60000);a.run('window.Wendao.sync()');
  assert.equal(a.snapshot().supervision.mode,'awake');
