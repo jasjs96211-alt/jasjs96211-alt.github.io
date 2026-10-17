@@ -62,3 +62,16 @@ test('world renderer is read-only and does not mutate original RPG state',()=>{
  w.derive({at:at('12:30:00'),state,focus:{running:true},playerPlace:'garden'});
  assert.equal(JSON.stringify(state),before);
 });
+
+test('recorded autonomy guides visible activity instead of inventing new gains',()=>{
+ const w=world(),t=at('13:20:00');
+ const v=w.derive({at:t,state:{...healthy,schedule:{at:t-60000,kind:'study',text:'温知遥核对医理笔记'}}});
+ assert.equal(v.sister,'study');assert.match(v.activity.title,/研习/);
+});
+test('night sleep and drained mana protect autonomous rest over following',()=>{
+ const w=world();
+ const night=w.derive({at:at('23:00:00'),state:healthy,playerPlace:'terrace',following:true});
+ assert.equal(night.canFollow,false);assert.equal(night.sister,'bedroom');
+ const drained=w.derive({at:at('13:00:00'),state:{portrait:{state:'normal'},vitals:{stamina:80,mp:6}},playerPlace:'terrace',following:true});
+ assert.equal(drained.canFollow,false);assert.equal(drained.sister,'bedroom');
+});
