@@ -1,0 +1,232 @@
+{
+  "kind": "executed-controller-trace",
+  "simulatedDurationMs": 300000,
+  "visualRecording": false,
+  "productionArt": false,
+  "events": [
+    {
+      "elapsedMs": 0,
+      "actionId": "bed_read_note",
+      "phase": "read",
+      "clip": "read_hold",
+      "props": {
+        "book": "held",
+        "bowl": "bedside",
+        "page": 1
+      },
+      "title": "卧榻翻看医札",
+      "text": "她倚枕看着手中的医札。",
+      "assetStatus": "placeholder"
+    },
+    {
+      "elapsedMs": 40000,
+      "actionId": "bed_read_note",
+      "phase": "turn",
+      "clip": "page_turn",
+      "props": {
+        "book": "held",
+        "bowl": "bedside",
+        "page": 1
+      },
+      "title": "卧榻翻看医札",
+      "text": "指尖正缓缓掀过一页。",
+      "assetStatus": "placeholder"
+    },
+    {
+      "elapsedMs": 41400,
+      "actionId": "bed_read_note",
+      "phase": "read_after",
+      "clip": "read_hold",
+      "props": {
+        "book": "held",
+        "bowl": "bedside",
+        "page": 2
+      },
+      "title": "卧榻翻看医札",
+      "text": "她读着刚翻到的这一页。",
+      "assetStatus": "placeholder"
+    },
+    {
+      "elapsedMs": 69400,
+      "actionId": "bed_read_note",
+      "phase": "put_book",
+      "clip": "book_put_down",
+      "props": {
+        "book": "placing",
+        "bowl": "bedside",
+        "page": 2
+      },
+      "title": "收起医札",
+      "text": "她正将医札放向榻侧。",
+      "assetStatus": "placeholder"
+    },
+    {
+      "elapsedMs": 72600,
+      "actionId": "bed_rest_medicine",
+      "phase": "rest",
+      "clip": "rest_pillow",
+      "props": {
+        "book": "bedside",
+        "bowl": "bedside",
+        "page": 2
+      },
+      "title": "歇息",
+      "text": "书已留在榻侧，她靠着软枕休息。",
+      "assetStatus": "placeholder"
+    },
+    {
+      "elapsedMs": 100600,
+      "actionId": "bed_rest_medicine",
+      "phase": "take_bowl",
+      "clip": "bowl_take",
+      "props": {
+        "book": "bedside",
+        "bowl": "taking",
+        "page": 2
+      },
+      "title": "歇息与用药",
+      "text": "她伸手扶住药盏，慢慢端起。",
+      "assetStatus": "placeholder"
+    },
+    {
+      "elapsedMs": 103600,
+      "actionId": "bed_rest_medicine",
+      "phase": "sip",
+      "clip": "bowl_sip",
+      "props": {
+        "book": "bedside",
+        "bowl": "held",
+        "page": 2
+      },
+      "title": "歇息与用药",
+      "text": "她正轻抿盏中的药。",
+      "assetStatus": "placeholder"
+    },
+    {
+      "elapsedMs": 107100,
+      "actionId": "bed_rest_medicine",
+      "phase": "return_bowl",
+      "clip": "bowl_return",
+      "props": {
+        "book": "bedside",
+        "bowl": "placing",
+        "page": 2
+      },
+      "title": "放回药盏",
+      "text": "她将药盏慢慢放回榻边。",
+      "assetStatus": "placeholder"
+    },
+    {
+      "elapsedMs": 110100,
+      "actionId": "bed_warm_recover",
+      "phase": "warm",
+      "clip": "recover_breathe",
+      "props": {
+        "book": "bedside",
+        "bowl": "bedside",
+        "page": 2
+      },
+      "title": "榻边温养",
+      "text": "药盏已放回，她仍倚枕缓缓调息。",
+      "assetStatus": "placeholder"
+    },
+    {
+      "elapsedMs": 160100,
+      "actionId": "bed_light_nap",
+      "phase": "nap_enter",
+      "clip": "nap_enter",
+      "props": {
+        "book": "bedside",
+        "bowl": "bedside",
+        "page": 2
+      },
+      "title": "静养小憩",
+      "text": "她慢慢合上眼，准备小憩。",
+      "assetStatus": "placeholder"
+    },
+    {
+      "elapsedMs": 163100,
+      "actionId": "bed_light_nap",
+      "phase": "nap",
+      "clip": "nap_loop",
+      "props": {
+        "book": "bedside",
+        "bowl": "bedside",
+        "page": 2
+      },
+      "title": "静养小憩",
+      "text": "她安静地睡着，书和药盏都在榻侧。",
+      "assetStatus": "placeholder"
+    },
+    {
+      "elapsedMs": 243100,
+      "actionId": "bed_light_nap",
+      "phase": "wake",
+      "clip": "wake_slow",
+      "props": {
+        "book": "bedside",
+        "bowl": "bedside",
+        "page": 2
+      },
+      "title": "缓缓醒来",
+      "text": "小憩之后，她缓缓睁开眼。",
+      "assetStatus": "placeholder"
+    },
+    {
+      "elapsedMs": 247100,
+      "actionId": "bed_read_note",
+      "phase": "take_book",
+      "clip": "book_take",
+      "props": {
+        "book": "taking",
+        "bowl": "bedside",
+        "page": 2
+      },
+      "title": "取来医札",
+      "text": "她正将榻侧的医札取到手中。",
+      "assetStatus": "placeholder"
+    },
+    {
+      "elapsedMs": 250100,
+      "actionId": "bed_read_note",
+      "phase": "read",
+      "clip": "read_hold",
+      "props": {
+        "book": "held",
+        "bowl": "bedside",
+        "page": 2
+      },
+      "title": "卧榻翻看医札",
+      "text": "她倚枕看着手中的医札。",
+      "assetStatus": "placeholder"
+    },
+    {
+      "elapsedMs": 290100,
+      "actionId": "bed_read_note",
+      "phase": "turn",
+      "clip": "page_turn",
+      "props": {
+        "book": "held",
+        "bowl": "bedside",
+        "page": 2
+      },
+      "title": "卧榻翻看医札",
+      "text": "指尖正缓缓掀过一页。",
+      "assetStatus": "placeholder"
+    },
+    {
+      "elapsedMs": 291500,
+      "actionId": "bed_read_note",
+      "phase": "read_after",
+      "clip": "read_hold",
+      "props": {
+        "book": "held",
+        "bowl": "bedside",
+        "page": 3
+      },
+      "title": "卧榻翻看医札",
+      "text": "她读着刚翻到的这一页。",
+      "assetStatus": "placeholder"
+    }
+  ]
+}

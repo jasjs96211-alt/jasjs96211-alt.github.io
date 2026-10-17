@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="zh-CN">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>知遥寝居 · 行为契约技术排演</title>
+<link rel="stylesheet" href="./lab.css">
+<main>
+  <header><p class="eyebrow">远航 · 问道 / vNext</p><h1>寝居行为技术排演</h1>
+  <p class="warning">技术骨架占位 · 不是温知遥正式美术 · 未通过 P0 视觉验收</p>
+  <p>检查动作、道具与文案的同源驱动。此页面使用内存测试数据，不读写正式存档、不接 AI、不记录学习。</p></header>
+  <div class="layout"><section class="stage">
+    <canvas id="stage" width="1100" height="720" aria-label="技术骨架动作排演：并非正式人物动画"></canvas>
+    <div class="caption"><small id="phase"></small><h2 id="title"></h2><p id="description"></p></div>
+  </section><aside>
+    <h2>隔离场景</h2>
+    <label>身体事实 <select id="health"><option value="weak">非急性病中</option><option value="severe">急性重伤（即使外观病中）</option><option value="healthy">健康</option></select></label>
+    <label><input type="checkbox" id="sleep">姐姐正在睡眠（权威测试输入）</label>
+    <label><input type="checkbox" id="away">玩家离开寝居</label>
+    <label><input type="checkbox" id="missing">缺失 / 加载失败的动作资产</label>
+    <label><input type="checkbox" id="reduced">减少动态效果</label>
+    <button id="look">轻声问候</button>
+    <h2>计时状态输入</h2><p>这里仅模拟原计时器的事件输入；不是第二个学习计时器。</p>
+    <div class="buttons"><button id="start">开始信号</button><button id="pause">暂停信号</button><button id="resume">恢复信号</button><button id="complete">有完成记录</button><button id="reset">无记录结束</button></div>
+    <h2>唯一行为快照</h2><pre id="snapshot"></pre>
+  </aside></div>
+  <section class="notes"><h2>如何检查</h2><p>常速观察约 5 分钟：读书 → 翻页 → 放书 → 歇息 → 取盏 / 轻抿 / 放回 → 温养 → 小憩。问候与计时事件不会中断持物动作，小憩中不回应。重伤始终卧床。快速离开 / 返回不会重复迎接。</p>
+  <p>轮廓、关节、页片与药盏均为程序绘制的调试形状，只用于检查时序与挂点。没有正式人物眼睑、手部、衣袖、卧姿动画源文件；不得用此页面代替角色美术和实机验收。</p>
+  <p><a href="../../vnext/AUDIT.md">现状审计</a> · <a href="../../vnext/ASSET_SPEC.md">正式素材规格</a> · <a href="../../vnext/POC_REPORT.md">测试与限制</a></p></section>
+</main>
+<script src="../../wendao/bedroom-behavior.js"></script><script src="./lab.js"></script>
+</html>
