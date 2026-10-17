@@ -69,9 +69,11 @@ function scheduleActivity(state,at,focus){
  return activities[Math.floor(at/1200000+p.day)%activities.length];
 }
 function derive({at=Date.now(),state={},focus={},playerPlace='study',following=false}={}){
+ const clockDispute=state?.vitals?.clockDispute===true;if(clockDispute)at=Number.isFinite(state.validAt)?state.validAt:0;
  const player=byId[playerPlace]?playerPlace:'study';
  const base=scheduleActivity(state,at,focus),unwell=injury(state),p=parts(at),v=state?.vitals||{};
- const canFollow=!unwell&&p.hour>=7&&p.hour<22&&!(Number.isFinite(v.stamina)&&v.stamina<32)&&!(Number.isFinite(v.mp)&&v.mp<=10);
+ const busy=state.schedule?.kind==='pressure'&&Number.isFinite(state.schedule.at)&&at>=state.schedule.at&&at-state.schedule.at<90*60000;
+ const canFollow=!clockDispute&&!busy&&!unwell&&p.hour>=7&&p.hour<22&&!(Number.isFinite(v.stamina)&&v.stamina<32)&&!(Number.isFinite(v.mp)&&v.mp<=10);
  const follows=!!following&&canFollow;
  const sister=follows?player:base.place;
  return {
@@ -79,7 +81,7 @@ function derive({at=Date.now(),state={},focus={},playerPlace='study',following=f
   together:sister===player,activity:follows?{...base,place:player,title:'与妹妹同行',text:'她放下手边事情，与你一道走走。'}:base,
   phase:phase(at),phaseName:phaseNames[phase(at)],
   location:byId[player],sisterLocation:byId[sister],locations:LOCATIONS,
-  unwell
+  unwell,clockDispute,busy
  };
 }
 const UI_KEY='yuanhang_wendao_world_view_v1';

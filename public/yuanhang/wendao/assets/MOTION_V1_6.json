@@ -1,0 +1,66 @@
+{
+  "walk": {
+    "source": "exec-fc4c4533-54e2-412f-a657-cab79308f500.png",
+    "frames": 4,
+    "width": 627,
+    "height": 627,
+    "durations": [
+      240,
+      240,
+      240,
+      240
+    ],
+    "animated": "zhiyao-walk-cycle.webp",
+    "poster": "zhiyao-walk-still.webp",
+    "bytes": 420454,
+    "sha256": "adae33808156c2cfbf5d2be34e1794abfebcecfabd78cf8bc50f2cc1bdb9bae2"
+  },
+  "read": {
+    "source": "exec-329d5a66-ec36-4afd-a4cb-d73784ab4c76.png",
+    "frames": 4,
+    "width": 627,
+    "height": 627,
+    "durations": [
+      4200,
+      650,
+      700,
+      2450
+    ],
+    "animated": "zhiyao-read-cycle.webp",
+    "poster": "zhiyao-read-still.webp",
+    "bytes": 435772,
+    "sha256": "a68e2057e16a2cad54500fc4c64c2bf91861a6429b817892c97b37696d410d7d"
+  },
+  "herbs": {
+    "source": "exec-db8a89ea-a57f-4e20-a60e-c272997a960e.png",
+    "frames": 4,
+    "width": 627,
+    "height": 627,
+    "durations": [
+      1500,
+      1200,
+      700,
+      2100
+    ],
+    "animated": "zhiyao-herbs-cycle.webp",
+    "poster": "zhiyao-herbs-still.webp",
+    "bytes": 437356,
+    "sha256": "3774ac269d58b50c76d6aa6a6fb0128ffce39069eb9913ee2ba94e89b231c0b5"
+  },
+  "meditate": {
+    "source": "exec-5cf4c12d-246b-412a-91f0-0fa0ff8b6cc5.png",
+    "frames": 4,
+    "width": 627,
+    "height": 627,
+    "durations": [
+      1600,
+      1900,
+      1600,
+      1900
+    ],
+    "animated": "zhiyao-meditate-cycle.webp",
+    "poster": "zhiyao-meditate-still.webp",
+    "bytes": 452442,
+    "sha256": "a05b7d638f80772103e51cd96b687351d8533a31cb220de63ad2cc891fef4aed"
+  }
+}

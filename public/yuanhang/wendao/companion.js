@@ -12,6 +12,10 @@ const STATES={
 const $=id=>document.getElementById(id);
 let layer=null,bridge=null,getCharacter=null,onFocusPage=null,onClose=null,onCare=null,interval=null,activeID=null,finished=false,lastPortraitSrc='';
 let worldView={player:'study',following:false};
+let motionRenderer=null,motionTimer=null,motionEnabled=true,lastWorld=null,worldSnapshot=null,stateSnapshot=null,transit=null,onArtSeen=null;
+function reduced(){return !!root.matchMedia?.('(prefers-reduced-motion: reduce)').matches}
+function paintMotion(hidden=document.hidden){if(!motionRenderer||!stateSnapshot)return;const m=motionRenderer.render({world:worldSnapshot,state:stateSnapshot,at:Date.now(),transit,enabled:motionEnabled,reduced:reduced(),hidden,saveData:root.navigator?.connection?.saveData===true});$('wcArtRetry').hidden=$('wcArtHint').hidden;return m}
+function startMotion(){clearInterval(motionTimer);if(!motionEnabled||reduced()||document.hidden)return;motionTimer=setInterval(()=>{if(!document.hidden)paintMotion()},250)}
 function viewStore(){try{return typeof localStorage!=='undefined'?localStorage:null}catch{return null}}
 function saveWorldView(){root.WendaoWorld?.writeView(viewStore(),worldView)}
 function travelNotice(text){const el=$('wcTravelNotice');if(el)el.textContent=text||''}
@@ -35,6 +39,7 @@ function update(){
  if(active){activeID=timer.id;finished=false}else if(activeID){finished=(bridge.get?.().sessions||[]).some(x=>x.id===activeID&&x.source==='timer');activeID=null}
  const W=root.WendaoWorld;
  const world=W?.derive({at:Date.now(),state,focus:timer,playerPlace:worldView.player,following:worldView.following});
+ stateSnapshot=state;worldSnapshot=world;if(world){const change=root.WendaoMotion?.transition(lastWorld,world,Date.now(),state);if(change)transit=change;lastWorld={world,at:Date.now()};}
  let act;
  if(world){
   if(worldView.following&&!world.canFollow){worldView.following=false;saveWorldView();travelNotice(world.unwell?'姐姐需要静养，已结束同行；她留在寝居。':'姐姐需要处理自己的日程，已结束同行。')}
@@ -47,7 +52,7 @@ function update(){
   $('wcFindSister').hidden=world.together;
   $('wcFollow').textContent=worldView.following?'结束同行':'邀姐姐同行';
   $('wcActor').hidden=!world.together;
-  layer.dataset.location=world.player;
+  layer.dataset.location=world.player;layer.dataset.phase=world.phase;
  }else{
   act=selectAction(portrait,Math.floor(Date.now()/1000),active&&!timer.running);
   $('wcActor').hidden=false;
@@ -56,10 +61,13 @@ function update(){
  if($('wcVitals').innerHTML!==state.hud)$('wcVitals').innerHTML=state.hud||'';
  const actor=$('wcActor'),photo=$('wcPortrait');
  actor.dataset.place=act.spot||act.place;
+ if(motionRenderer)paintMotion();else{
  if(portrait.src){
   if(lastPortraitSrc!==portrait.src){lastPortraitSrc=portrait.src;photo.onerror=()=>{photo.hidden=true;$('wcArtHint').hidden=false;$('wcArtHint').textContent='当前立绘加载失败，请返回书房重试；状态与存档保留。'};photo.src=portrait.src;photo.alt='温知遥 · '+portrait.label}
   photo.hidden=false;$('wcArtHint').hidden=true;
  }else{photo.hidden=true;$('wcArtHint').hidden=false;$('wcArtHint').textContent='当前状态立绘暂未加载';lastPortraitSrc=''}
+ }
+ if($('wcLetters')){const count=state.letters?.length||0;$('wcLetters').hidden=!count;$('wcLetters').textContent='来信 '+count;}
  $('wcName').textContent='温知遥 · '+(portrait.label||'日常');
  $('wcActivity').textContent=act.title;
  $('wcDescription').textContent=act.text;
@@ -79,9 +87,9 @@ function update(){
   }
  }
 }
-function mount({stage,focusBridge,getCharacterState,onFocusPage:focusPage,onClose:closeCallback,onCare:careCallback}={}){
+function mount({stage,focusBridge,getCharacterState,onFocusPage:focusPage,onClose:closeCallback,onCare:careCallback,onArtSeen:artCallback}={}){
  if(layer)return;
- bridge=focusBridge;getCharacter=getCharacterState;onFocusPage=focusPage;onClose=closeCallback;onCare=careCallback;
+ bridge=focusBridge;getCharacter=getCharacterState;onFocusPage=focusPage;onClose=closeCallback;onCare=careCallback;onArtSeen=artCallback;
  layer=document.createElement('section');
  layer.id='wdCompanionLayer';layer.className='wd-companion';layer.hidden=true;
  layer.setAttribute('aria-label','问道 · 陪伴修炼');
@@ -90,14 +98,23 @@ function mount({stage,focusBridge,getCharacterState,onFocusPage:focusPage,onClos
  layer.innerHTML='<div class="wc-sky"><span id="wcSkyPlace">学宫书房</span><span id="wcSkyDaypart">白日</span></div>'+
  '<div id="wcBackdrop" class="wc-backdrop" data-location="study" data-phase="day" aria-hidden="true"><i class="wc-arch"></i><i class="wc-prop"></i><i class="wc-ground"></i></div>'+
  '<div class="wc-travel"><div class="wc-travel-actions"><button type="button" id="wcMapToggle" aria-expanded="false" aria-controls="wcMap">◎ 地图</button><button type="button" id="wcFindSister">去找姐姐</button><button type="button" id="wcFollow">邀姐姐同行</button></div><p id="wcSisterWhere" aria-live="polite"></p><p id="wcTravelNotice" aria-live="polite"></p><nav id="wcMap" class="wc-map" aria-label="学宫地点" hidden><div class="wc-map-head">前往何处？ <button type="button" id="wcMapBack">收起地图 ×</button></div><div class="wc-map-places">'+mapMarkup+'</div></nav></div>'+
+ '<div class="wc-motion-tools"><button type="button" id="wcAnimation" aria-pressed="true">动作：开</button><button type="button" id="wcLetters" hidden>来信</button><button type="button" id="wcArtRetry" hidden>重试演出图片</button></div><img id="wcRecovery" alt="温知遥卧床休养CG" hidden>' +
  '<div class="wc-world" aria-hidden="true"><span class="wc-spot wc-spot-window">竹窗</span><span class="wc-spot wc-spot-desk">书案</span><span class="wc-spot wc-spot-herbs">药架</span><span class="wc-spot wc-spot-bed">榻边</span>'+
  '<div id="wcActor" class="wc-actor" data-place="书案"><img id="wcPortrait" alt="温知遥立绘"><span id="wcArtHint" hidden></span></div></div>'+
  '<div class="wc-panel"><header class="wc-heading"><div><small id="wcName">温知遥</small><h2 id="wcActivity">研读医书</h2><p id="wcDescription"></p></div><button type="button" id="wcClose" aria-label="返回剧情书房">返回书房 ×</button></header>'+
  '<div id="wcVitals"></div><div class="wc-timer"><strong id="wcTime">25:00</strong><span id="wcTrack">准备开始</span></div>'+
  '<div id="wcSetup" class="wc-setup"><label>修炼科目 <select id="wcSubject"></select></label><label>本轮时长 <select id="wcMinutes"><option value="25">25 分钟</option><option value="45">45 分钟</option><option value="60">60 分钟</option></select></label></div>'+
  '<div class="wc-buttons"><button type="button" id="wcStart">▶ 开始与姐姐一同修炼</button><button type="button" id="wcPause" hidden>Ⅱ 暂停</button><button type="button" id="wcReset" hidden>重置本轮</button><button type="button" id="wcCare">疗养／商议</button><button type="button" id="wcTalk">自由交谈</button><button type="button" id="wcStatus">状态／用膳</button><button type="button" id="wcGoTimer">打开原专注页</button></div>'+
- '<p id="wcFinish" class="wc-caveat">使用现有静态立绘缓慢移位，尚无坐卧或步行动画。陪伴场景本身不调用AI；后台按系统能力暂停显示。</p></div>';
+ '<p id="wcFinish" class="wc-caveat">四帧动作演出与独立卧床CG；陪伴本身不调用AI，后台暂停动画。</p></div>';
  stage.append(layer);
+ const M=root.WendaoMotion;if(M){motionEnabled=M.readPreference(viewStore());motionRenderer=M.renderer({actor:$('wcActor'),photo:$('wcPortrait'),bed:$('wcRecovery'),hint:$('wcArtHint'),onArtSeen:id=>onArtSeen?.(id)});}
+ $('wcAnimation').textContent=motionEnabled?'动作：开':'动作：关';$('wcAnimation').setAttribute('aria-pressed',String(motionEnabled));
+ $('wcAnimation').onclick=()=>{motionEnabled=!motionEnabled;M?.writePreference(viewStore(),motionEnabled);$('wcAnimation').textContent=motionEnabled?'动作：开':'动作：关';$('wcAnimation').setAttribute('aria-pressed',String(motionEnabled));paintMotion();startMotion()};
+ $('wcArtRetry').onclick=()=>{motionRenderer?.resetFailures();$('wcPortrait').dataset.artSource='';$('wcRecovery').dataset.artSource='';paintMotion()};
+ $('wcLetters').onclick=()=>onCare?.('letters');
+ document.addEventListener('visibilitychange',()=>{if(!layer||layer.hidden)return;if(document.hidden){clearInterval(motionTimer);paintMotion(true);lastWorld=null;transit=null}else{update();startMotion()}});
+ root.matchMedia?.('(prefers-reduced-motion: reduce)').addEventListener?.('change',()=>{paintMotion();startMotion()});
+
  const official=$('timerSubject');const subject=$('wcSubject');
  if(official){for(const option of official.options){const elem=document.createElement('option');elem.value=option.value;elem.textContent=option.textContent;subject.append(elem)}subject.value=official.value}
  subject.addEventListener('change',()=>{subject.dataset.touched='1'});
@@ -134,9 +151,9 @@ function mount({stage,focusBridge,getCharacterState,onFocusPage:focusPage,onClos
 function open(){
  if(!layer)return;
  layer.hidden=false;layer.parentElement?.classList.add('wd-companion-active');lastPortraitSrc='';const focus=focusState();if(focus.id)activeID=focus.id;
- update();$('wcStart').focus();clearInterval(interval);interval=setInterval(()=>{if(!document.hidden)update()},4000);
+ update();startMotion();$('wcStart').focus();clearInterval(interval);interval=setInterval(()=>{if(!document.hidden)update()},4000);
 }
-function close(){if(!layer)return;if($('wcMap'))$('wcMap').hidden=true;if($('wcMapToggle'))$('wcMapToggle').setAttribute('aria-expanded','false');layer.hidden=true;layer.parentElement?.classList.remove('wd-companion-active');clearInterval(interval);interval=null;onClose?.();$('wdCompanion')?.focus()}
+function close(){if(!layer)return;clearInterval(motionTimer);paintMotion(true);$('wcRecovery').hidden=true;lastWorld=null;transit=null;if($('wcMap'))$('wcMap').hidden=true;if($('wcMapToggle'))$('wcMapToggle').setAttribute('aria-expanded','false');layer.hidden=true;layer.parentElement?.classList.remove('wd-companion-active');clearInterval(interval);interval=null;onClose?.();$('wdCompanion')?.focus()}
 function refresh(){if(layer&&!layer.hidden)update()}
 root.WendaoCompanion={mount,open,close,refresh,selectAction,isOpen:()=>!!layer&&!layer.hidden};
 })(typeof window!=='undefined'?window:globalThis);

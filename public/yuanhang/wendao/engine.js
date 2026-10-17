@@ -262,7 +262,7 @@ function proactive(s,study,now=Date.now()){
  const candidates=[],ill=bodyState(s,now)!=='normal';
  if(s.settings.learningReminders!==false){
   for(const x of s.supervision.judgements.filter(x=>s.settings.strict&&day(x.at)===day(now)&&x.at<=now&&!s.supervision.corrections.some(c=>c.id===x.id)))candidates.push({id:x.id,trigger:'idle',text:ill?'无缺，功课先从一小段开始。我也会按身体状况休息，我们不着急。':'无缺，书卷放了许久了。要不要从五分钟开始？累了也可以先记下休息。'});
-  for(const x of uniqueStudy(study.sessions).filter(x=>x.date===day(now)&&Number(x.minutes)>=s.settings.minStudy&&!s.baseline.sessions?.includes(x.id)))candidates.push({id:'study:'+x.id,trigger:'study',text:ill?'这段真实功课已经记下。我会量力研习，你也让眼睛歇一歇。':'这段功课扎扎实实地做完了。我也记下了自己的疑问，等你歇息时再说。'});
+  for(const x of uniqueStudy(study.sessions).filter(x=>x.date===day(now)&&Number(x.minutes)>=s.settings.minStudy&&(!x.at||Date.parse(x.endedAt||x.at)<=now)&&!s.baseline.sessions?.includes(x.id)))candidates.push({id:'study:'+x.id,trigger:'study',text:ill?'这段真实功课已经记下。我会量力研习，你也让眼睛歇一歇。':'这段功课扎扎实实地做完了。我也记下了自己的疑问，等你歇息时再说。'});
   for(const x of uniqueStudy(study.events).filter(x=>x.done&&Number.isFinite(Date.parse(x.completedAt))&&Date.parse(x.completedAt)<=now&&day(Date.parse(x.completedAt))===day(now)&&!s.baseline.tasks?.includes(x.id)))candidates.push({id:'task:'+x.id,trigger:'task',text:'这一项做完了，我替你高兴。那些遥远的事，也是这样一步一步走近的。接下来先歇一歇吧。'});
   for(const x of uniqueStudy(s.mastery).filter(x=>['recall','dictation','review'].includes(x.level)&&Number.isFinite(x.at)&&x.at<=now&&day(x.at)===day(now)))candidates.push({id:'mastery:'+x.id,trigger:'mastery',text:({recall:'能复述出来，这一遍便有收获。别急着往后赶，先看看哪里还不稳。',dictation:'默写完这一段了？能落在纸上，比只觉得自己懂了更踏实。歇一会儿再继续吧。',review:'肯回头温习，旧功课才留得住。今日这番功夫没有白费。'})[x.level]});
  }
@@ -270,7 +270,8 @@ function proactive(s,study,now=Date.now()){
  if(s.settings.dailyMessages!==false&&s.chronicle.some(x=>x.id==='sister:'+day(now)))candidates.push({id:'daily:'+day(now),trigger:'daily',text:ill?'我今日也安排了温养，功课会量力而行。你安心读书，也照顾好自己。':'我今日也有自己的功课。你安心读书，累了记得歇一歇；我也会照顾好自己。'});
  candidates.sort((a,b)=>(a.trigger==='idle'?2:a.trigger==='daily'?3:0)-(b.trigger==='idle'?2:b.trigger==='daily'?3:0));
  const next=candidates.find(x=>!s.proactiveState.seen.some(r=>r.id===x.id)&&!s.messages.some(m=>m.evidenceId===x.id));if(!next)return null;
- const row=message(s,'message:'+next.id,next.text,now,next.trigger,next.id);if(row){s.proactiveState.seen.push({id:next.id,at:now});s.proactiveState.lastAt=now}return row;
+ const prepared=root.WendaoInteraction?.prepare(s,study,now,next,{portrait:portrait(s,now),vitals:vitals(s,study,now)});
+ const row=message(s,'message:'+next.id,prepared?.text||next.text,now,next.trigger,next.id);if(row&&prepared){row.contextSnapshot=prepared.snapshot;row.theme=prepared.theme;row.variant=prepared.variant;}if(row){s.proactiveState.seen.push({id:next.id,at:now});s.proactiveState.lastAt=now}return row;
 }
 function setTemporarySleep(s,value,now=Date.now()){
  migrateInPlace(s);if(value===null){s.rhythmState.temporarySleep=null;return s}
