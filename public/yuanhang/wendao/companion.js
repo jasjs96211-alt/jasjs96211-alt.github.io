@@ -148,7 +148,7 @@ function mount({stage,focusBridge,getCharacterState,onFocusPage:focusPage,onClos
  const mapMarkup=(root.WendaoWorld?.LOCATIONS||[]).map(x=>'<button type="button" data-wc-travel="'+x.id+'">'+x.name+'</button>').join('');
  layer.innerHTML='<div class="wc-sky"><span id="wcSkyPlace">学宫书房</span><span id="wcSkyDaypart">白日</span></div>'+
  '<div id="wcBackdrop" class="wc-backdrop" data-location="study" data-phase="day" aria-hidden="true"><i class="wc-arch"></i><i class="wc-prop"></i><i class="wc-ground"></i><div class="wc-night-lights" aria-hidden="true"><i class="wc-lantern wc-lantern-a"></i><i class="wc-lantern wc-lantern-b"></i><i class="wc-night-reflection"></i></div></div><div id="wcHeroVitals" class="wc-hero-vitals" aria-label="温知遥主要属性"></div>'+
- '<div class="wc-travel"><div class="wc-travel-actions"><button type="button" id="wcMapToggle" aria-expanded="false" aria-controls="wcMap">◎ 地图</button><button type="button" id="wcFindSister">去找姐姐</button><button type="button" id="wcFollow">邀姐姐同行</button></div><p id="wcSisterWhere" aria-live="polite"></p><p id="wcTravelNotice" aria-live="polite"></p><nav id="wcMap" class="wc-map" aria-label="学宫地点" hidden><div class="wc-map-head">前往何处？ <button type="button" id="wcMapBack">收起地图 ×</button></div><div class="wc-map-places">'+mapMarkup+'</div></nav></div>'+
+ '<div class="wc-travel"><button type="button" id="wcExploreBack" class="wc-explore-back" hidden>← 返回书房</button><div class="wc-travel-actions"><button type="button" id="wcMapToggle" aria-expanded="false" aria-controls="wcMap">◎ 地图</button><button type="button" id="wcFindSister">去找姐姐</button><button type="button" id="wcFollow">邀姐姐同行</button></div><p id="wcSisterWhere" aria-live="polite"></p><p id="wcTravelNotice" aria-live="polite"></p><nav id="wcMap" class="wc-map" aria-label="学宫地点" hidden><div class="wc-map-head">前往何处？ <button type="button" id="wcMapBack">收起地图 ×</button></div><div class="wc-map-places">'+mapMarkup+'</div></nav></div>'+
  '<nav id="wcDirectionPad" class="wc-direction-pad" aria-label="前往相邻场景"><button type="button" id="wcDirUp" data-wc-dir="up">↑ <span>前行</span></button><button type="button" id="wcDirLeft" data-wc-dir="left">← <span>左行</span></button><button type="button" id="wcDirRight" data-wc-dir="right">→ <span>右行</span></button><button type="button" id="wcDirDown" data-wc-dir="down">↓ <span>后退</span></button></nav>'+
  '<div class="wc-motion-tools"><button type="button" id="wcAnimation" aria-pressed="true">动作：开</button><button type="button" id="wcLetters" hidden>来信</button><button type="button" id="wcArtRetry" hidden>重试演出图片</button></div><img id="wcRecovery" alt="温知遥卧床休养CG" hidden>' +
  '<div class="wc-world" aria-hidden="true"><span class="wc-spot wc-spot-window">竹窗</span><span class="wc-spot wc-spot-desk">书案</span><span class="wc-spot wc-spot-herbs">药架</span><span class="wc-spot wc-spot-bed">榻边</span>'+
@@ -196,13 +196,21 @@ function mount({stage,focusBridge,getCharacterState,onFocusPage:focusPage,onClos
  $('wcPause').onclick=()=>{try{const state=focusState();bridge.focusAction(state.running?'pause':'resume');update()}catch(e){bridge.toast?.('未能操作计时器：'+e.message)}};
  $('wcCare').onclick=()=>onCare?.('care');$('wcTalk').onclick=()=>onCare?.('talk');$('wcStatus').onclick=()=>onCare?.('status');$('wcReset').onclick=()=>{bridge.focusAction('reset');update()};
  $('wcGoTimer').onclick=()=>{close();onFocusPage?.()};
+ $('wcExploreBack').onclick=close;
 }
-function open(){
+function open({mode='focus'}={}){
  if(!layer)return;
- setPanelExpanded(false);layer.hidden=false;layer.parentElement?.classList.add('wd-companion-active');lastPortraitSrc='';const focus=focusState();if(focus.id)activeID=focus.id;
- update();startMotion();$('wcStart').focus();clearInterval(interval);interval=setInterval(()=>{if(!document.hidden)update()},4000);
+ const exploring=mode==='explore';
+ setPanelExpanded(false);
+ layer.classList.toggle('wc-explore-mode',exploring);
+ layer.setAttribute('aria-label',exploring?'问道 · 学宫地图探索':'问道 · 陪伴修炼');
+ $('wcExploreBack').hidden=!exploring;
+ $('wcMap').hidden=!exploring;
+ $('wcMapToggle').setAttribute('aria-expanded',String(exploring));
+ layer.hidden=false;layer.parentElement?.classList.add('wd-companion-active');lastPortraitSrc='';const focus=focusState();if(focus.id)activeID=focus.id;
+ update();startMotion();(exploring?$('wcMapToggle'):$('wcStart')).focus();clearInterval(interval);interval=setInterval(()=>{if(!document.hidden)update()},4000);
 }
-function close(){if(!layer)return;cleanTravel();setPanelExpanded(false);clearInterval(motionTimer);paintMotion(true);$('wcRecovery').hidden=true;lastWorld=null;transit=null;if($('wcMap'))$('wcMap').hidden=true;if($('wcMapToggle'))$('wcMapToggle').setAttribute('aria-expanded','false');layer.hidden=true;layer.parentElement?.classList.remove('wd-companion-active');clearInterval(interval);interval=null;onClose?.();$('wdCompanion')?.focus()}
+function close(){if(!layer)return;const wasExplore=layer.classList.contains('wc-explore-mode');cleanTravel();setPanelExpanded(false);clearInterval(motionTimer);paintMotion(true);$('wcRecovery').hidden=true;lastWorld=null;transit=null;if($('wcMap'))$('wcMap').hidden=true;if($('wcMapToggle'))$('wcMapToggle').setAttribute('aria-expanded','false');layer.hidden=true;layer.classList.remove('wc-explore-mode');layer.parentElement?.classList.remove('wd-companion-active');clearInterval(interval);interval=null;onClose?.();(wasExplore?$('wdExploreQuick'):$('wdCultivateQuick'))?.focus()}
 function refresh(){if(layer&&!layer.hidden)update()}
 root.WendaoCompanion={mount,open,close,refresh,selectAction,getWorldView:()=>layer&&!layer.hidden&&!document.hidden?{...worldView}:null,isOpen:()=>!!layer&&!layer.hidden};
 })(typeof window!=='undefined'?window:globalThis);
