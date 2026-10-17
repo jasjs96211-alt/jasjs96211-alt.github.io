@@ -80,7 +80,7 @@ test('worker installs without downloading large portraits and reuses prior pictu
  const {CACHE,SHELL,ARTWORK}=registry(self,caches,()=>{},URL);
  assert.equal(SHELL.some(path=>path.endsWith('.webp')),false);
  assert.ok(ARTWORK.some(path=>path.includes('sister-injured.webp')));
- assert.ok(SHELL.includes('./wendao/app.js?v=20261017-v16-ui2'));
+ assert.ok(SHELL.includes('./wendao/app.js?v=20261017-ui3'));
  assert.ok(SHELL.includes('./wendao/style.css?v=20261016-v15'));
  const cachedPath=ARTWORK.find(path=>path.includes('sister-injured.webp'));
  (await caches.open(old)).put(cachedPath,{ok:true,tag:'previously-cached'});
