@@ -30,7 +30,8 @@
  box-shadow:0 9px 22px #00171077;backdrop-filter:blur(5px);
  color:#f5edd7;font-family:'Noto Serif CJK SC','Songti SC',SimSun,serif;
 }
-.wd-player .wd-hero-stat{--wd-bar:#d45d5a;min-width:0}
+.wd-player .wd-hero-stat{min-width:0}
+.wd-player .wd-hero-stat-hp{--wd-bar:#d45d5a}
 .wd-player .wd-hero-stat-mp{--wd-bar:#73a9e7}
 .wd-player .wd-hero-stat-xp{--wd-bar:#e8bb57}
 .wd-player .wd-hero-stat-caption{display:flex;align-items:center;gap:8px;justify-content:space-between;line-height:1.4;font-size:13px}
