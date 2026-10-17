@@ -117,7 +117,7 @@ function openStage(){
  $('wdPlayer').tabIndex=-1;$('wdPlayer').focus();render();renderStage();
 }
 function exitStage(){
- closeGameMenu();P?.close();
+ $('wdInbox').hidden=true;$('wdSlots').hidden=true;$('wdBacklog').hidden=true;syncOverlayBack();closeGameMenu();P?.close();
  if(player){clearInterval(typeTimer);clearTimeout(autoTimer);player=null}
  closeDrawer();talking=false;skipMode=false;immersed=false;$('wdPlayer').hidden=true;$('wdCG').hidden=true;$('wdSlots').hidden=true;$('wdBacklog').hidden=true;$('wdInbox').hidden=true;
  document.body.classList.remove('wd-immersed');document.body.style.overflow='';
@@ -146,7 +146,13 @@ function threeVitalBars(){
  }).join('')+'</section>';
 }
 function closeGameMenu(){const menu=$('wdGameMenu');if(!menu)return;menu.hidden=true;$('wdMenuToggle')?.setAttribute('aria-expanded','false')}
-function syncOverlayBack(){if(!$('wdOverlayBack'))return;$('wdOverlayBack').hidden=['wdSlots','wdBacklog','wdInbox'].every(id=>$(id).hidden)}
+function syncOverlayBack(){
+ if(!$('wdOverlayBack'))return;
+ const visible=['wdSlots','wdBacklog','wdInbox'].some(id=>!$(id).hidden);
+ $('wdOverlayBack').hidden=!visible;
+ $('wdPlayer').classList.toggle('wd-modal-open',visible);
+ $('wdPlayer').classList.toggle('wd-inbox-open',!$('wdInbox').hidden);
+}
 function openDetails(root){return [...root.querySelectorAll('details')].map(d=>d.open)}
 function restoreDetails(root,opened){root.querySelectorAll('details').forEach((d,i)=>{if(i<opened.length)d.open=opened[i]})}
 function renderStage(){
@@ -160,9 +166,24 @@ function renderStage(){
   if(img.dataset.portraitSource!==p.src){img.dataset.portraitSource=p.src;img.dataset.portraitAutoRetry='0';img.src=p.src;bindPortraitImage(img)}
  }else{img.hidden=true;$('wdPresenceLoading').hidden=true;$('wdPresenceError').hidden=false;$('wdPresenceError').textContent=p.label+'立绘暂缺；人物状态与伤势仍以存档为准。'}
  const unread=(s.messages||[]).filter(m=>!m.read).length;$('wdUnread').textContent=unread?String(unread):'';
- const box=$('wdInbox');if(!box.hidden){box.innerHTML='<h3>姐姐留下的消息</h3><p>安静地留在这里；仅在打开问道时查看。</p>'+(s.rhythmState?.recaps||[]).slice(-2).reverse().map(r=>`<article><small>夜间纪事 · ${esc(r.date)}</small><p>${esc(r.text)}</p></article>`).join('')+(s.messages||[]).slice(-30).reverse().map(m=>`<article><small>${esc(new Date(m.at).toLocaleString('zh-CN',{timeZone:'Asia/Shanghai'}))}</small><p>${esc(m.text)}</p>${m.contextSnapshot?.locationScope==='at-creation'?`<small>写信时：${esc(m.contextSnapshot.location)} · ${esc(m.contextSnapshot.activity)}</small>`:''}<small>${m.source==='ai'?'AI来信':'固定事件留言'}</small>${m.trigger==='bedtime'?button('我去休息了','sleep')+button('再学一会儿','sleep-later')+button('调整今晚计划','open-sleep-plan'):m.trigger==='morning'?'<small>早安留言，无需重复确认清醒</small>':''}${button('自由回复','reply-message')}${m.aiStatus==='failed'?button('重试在线台词','retry-message',`data-message="${esc(m.id)}"`):''}</article>`).join('')+'<button id="wdInboxClose">← 返回场景</button>';$('wdInboxClose').onclick=()=>box.hidden=true;box.querySelectorAll('[data-wd]').forEach(el=>el.onclick=safe(()=>action(el.dataset.wd,el.dataset)))}
+ const box=$('wdInbox');
+ if(!box.hidden){
+  const signature=JSON.stringify([(s.rhythmState?.recaps||[]).slice(-2),(s.messages||[]).slice(-30).map(m=>[m.id,m.at,m.text,m.aiStatus,m.read,m.contextSnapshot?.location,m.source,m.trigger])]);
+  if(box.dataset.renderSignature!==signature){
+   const preservedScroll=box.scrollTop;
+   box.dataset.renderSignature=signature;
+   box.innerHTML='<header class="wd-mail-header"><div><h3>姐姐的来信</h3><p>翻一翻她寄来的信笺。</p></div><button type="button" id="wdInboxClose">← 返回场景</button></header>'+(s.rhythmState?.recaps||[]).slice(-2).reverse().map(r=>`<article><small>夜间纪事 · ${esc(r.date)}</small><p>${esc(r.text)}</p></article>`).join('')+(s.messages||[]).slice(-30).reverse().map(m=>`<article><small>${esc(new Date(m.at).toLocaleString('zh-CN',{timeZone:'Asia/Shanghai'}))}</small><p>${esc(m.text)}</p>${m.contextSnapshot?.locationScope==='at-creation'?`<small>写信时：${esc(m.contextSnapshot.location)} · ${esc(m.contextSnapshot.activity)}</small>`:''}<small>${m.source==='ai'?'AI来信':'固定事件留言'}</small>${m.trigger==='bedtime'?button('我去休息了','sleep')+button('再学一会儿','sleep-later')+button('调整今晚计划','open-sleep-plan'):m.trigger==='morning'?'<small>早安留言，无需重复确认清醒</small>':''}${button('自由回复','reply-message')}${m.aiStatus==='failed'?button('重试在线台词','retry-message',`data-message="${esc(m.id)}"`):''}</article>`).join('');
+   box.scrollTop=preservedScroll;
+   $('wdInboxClose').onclick=()=>{box.hidden=true;syncOverlayBack();$('wdInboxButton')?.focus()};
+   box.querySelectorAll('[data-wd]').forEach(el=>el.onclick=safe(()=>action(el.dataset.wd,el.dataset)));
+  }
+ }
  if(player){const art=N.visual(s,player.chapter,player.view,E).portrait,source=getAsset(art);if(source&&img.dataset.portraitSource!==source){img.src=source;img.dataset.portraitSource=source;bindPortraitImage(img)}return;}
- $('wdChapterTitle').textContent='问道 · 学宫书房';$('wdScene').style.backgroundImage=getAsset('study-room')?`url("${getAsset('study-room')}")`:'';
+ $('wdChapterTitle').textContent='问道 · 学宫书房';
+ const scenePhase=window.WendaoWorld?.phase(now())||'night';
+ const sceneBackdrop=scenePhase==='night'?(getAsset('study-room')||'./wendao/assets/world-study.webp'):'./wendao/assets/world-study.webp';
+ $('wdScene').dataset.phase=scenePhase;
+ if($('wdScene').dataset.backdrop!==sceneBackdrop){$('wdScene').dataset.backdrop=sceneBackdrop;$('wdScene').style.backgroundImage='url("'+sceneBackdrop+'")'}
  $('wdCG').hidden=true;$('wdStanding').hidden=true;$('wdMissing').hidden=true;
  $('wdAuto').hidden=true;$('wdHistory').hidden=!talking;$('wdSkip').hidden=true;$('wdContinue').hidden=true;$('wdOptions').innerHTML='';$('wdStageChat').hidden=!talking;
  const last=s.chat.at(-1),recent=(s.messages||[]).at(-1);
@@ -350,7 +371,7 @@ function openChapter(id,{view,restart=false}={}){
  $('wdStageChat').hidden=true;$('wdAuto').hidden=false;$('wdHistory').hidden=false;$('wdSkip').hidden=false;$('wdContinue').hidden=false;$('wdPlayer').focus();showNode();
 }
 function showNode(){
- clearInterval(typeTimer);clearTimeout(autoTimer);if(!player)return;const c=player.chapter,n=c.nodes[player.view.node];player.node=player.view.node;
+ $('wdScene').dataset.phase='story';clearInterval(typeTimer);clearTimeout(autoTimer);if(!player)return;const c=player.chapter,n=c.nodes[player.view.node];player.node=player.view.node;
  const visual=N.visual(s,c,player.view,E);player.visual=visual;
  if(visual.cg&&!s.story.unlockedCG.includes(visual.cg)){s.story.unlockedCG.push(visual.cg);E.log(s,'cg:'+visual.cg,'浮光收藏','一张已读CG已加入图鉴。',now(),'cg')}
  $('wdScene').style.backgroundImage=getAsset(visual.background)?`url("${getAsset(visual.background)}")`:'';
