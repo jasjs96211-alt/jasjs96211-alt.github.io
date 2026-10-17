@@ -1,0 +1,51 @@
+/* Standalone world exploration and cultivation shortcuts on WenDao's game stage.
+   Presentation-only; buttons delegate to the original companion/world state. */
+.wd-player .wd-shortcuts {
+  position:absolute;z-index:9;
+  top:max(86px,calc(env(safe-area-inset-top) + 72px));
+  left:max(14px,env(safe-area-inset-left));
+  display:flex;gap:9px;align-items:center;
+  max-width:calc(100% - 28px);
+  pointer-events:auto;
+}
+.wd-player .wd-shortcuts button {
+  flex:none;min-height:44px;padding:9px 13px;
+  color:#f6e9c8;background:linear-gradient(145deg,#17372fef,#17342de3);
+  border:1px solid #d3c294ab;border-radius:9px;
+  box-shadow:0 3px 14px #091712aa;backdrop-filter:blur(5px);
+  font-size:13px;letter-spacing:.04em;
+}
+.wd-player .wd-shortcuts button:focus-visible {outline:3px solid #f1daa0;outline-offset:2px}
+.wd-player.wd-companion-active .wd-shortcuts,
+.wd-player.wd-modal-open .wd-shortcuts,
+.wd-player.wd-inbox-open .wd-shortcuts,
+body.wd-drawer-open .wd-shortcuts{display:none!important}
+.wd-companion.wc-explore-mode .wc-panel{display:none!important}
+.wd-companion .wc-explore-back{
+  display:block;width:100%;margin-bottom:8px;
+  min-height:44px;border:1px solid #d5c29790;border-radius:7px;
+  background:#244d42;color:#fff0cd;text-align:left;padding:8px 12px;
+}
+.wd-companion .wc-explore-back[hidden]{display:none!important}
+/* Story-stage windows and distant lanterns already painted in the scene
+   receive a localized warm bounce instead of only a global navy layer. */
+.wd-player #wdScene[data-phase="night"]::after{
+  background:
+    radial-gradient(ellipse at 76% 63%,#ffda9736,transparent 24%),
+    radial-gradient(ellipse at 62% 82%,#f1bb7a1b,transparent 31%),
+    linear-gradient(180deg,#0a19325c,transparent 46%,#0b1c2ab0);
+}
+@media(max-width:720px){
+  .wd-player .wd-shortcuts{
+    top:max(78px,calc(env(safe-area-inset-top) + 68px));
+    left:10px;gap:7px;
+  }
+  .wd-player .wd-shortcuts button{font-size:12px;padding:7px 10px}
+}
+@media(max-height:560px) and (orientation:landscape){
+  .wd-player .wd-shortcuts{
+    top:max(64px,calc(env(safe-area-inset-top) + 45px));
+    left:8px;gap:5px;
+  }
+  .wd-player .wd-shortcuts button{padding:5px 8px}
+}
