@@ -29,7 +29,7 @@ function injury(state){
 }
 function scheduleActivity(state,at,focus){
  const p=parts(at),v=state?.vitals||{},label=state?.portrait?.state||'normal';
- const ill=injury(state),low=(Number.isFinite(v.stamina)&&v.stamina<32)||label==='tired';
+ const ill=injury(state),low=(Number.isFinite(v.stamina)&&v.stamina<32)||(Number.isFinite(v.mp)&&v.mp<=10)||label==='tired';
  const recent=state?.schedule;
  if(ill){
   const activities=[
@@ -45,7 +45,10 @@ function scheduleActivity(state,at,focus){
  if(recent&&Number.isFinite(recent.at)&&at>=recent.at&&at-recent.at<90*60000){
   if(recent.kind==='rest')return {place:'bedroom',title:'依约温养',text:recent.text||'她暂且休息。',spot:'榻边'};
   if(recent.kind==='pressure')return {place:'study',title:'查阅温家来函',text:recent.text||'她正在书房整理来函。',spot:'书案'};
+  if(recent.kind==='study')return {place:'study',title:'自主研习医理',text:recent.text||'她正在书房钻研自己的医理问题。',spot:'书案'};
+  if(recent.kind==='social')return {place:'corridor',title:'处理往来信札',text:recent.text||'她在回廊整理往来信札。',spot:'竹窗'};
  }
+ if(Number.isFinite(v.mood)&&v.mood<25&&p.hour>=8&&p.hour<19)return {place:'garden',title:'独自在竹庭静心',text:'她心事有些重，暂时到庭中安静片刻。',spot:'竹窗'};
  if(p.hour>=22||p.hour<6)return {place:'bedroom',title:'夜间安寝',text:'烛火已低，姐姐也有自己的休息时间。',spot:'榻边'};
  if(focus?.running&&p.hour>=7&&p.hour<22&&p.hour%3===0)return {place:'study',title:'抄录医理',text:'你专注时，她也在书房整理自己的心得。',spot:'书案'};
  const activities=p.hour<9?[
@@ -67,11 +70,12 @@ function scheduleActivity(state,at,focus){
 }
 function derive({at=Date.now(),state={},focus={},playerPlace='study',following=false}={}){
  const player=byId[playerPlace]?playerPlace:'study';
- const base=scheduleActivity(state,at,focus),unwell=injury(state);
- const follows=!!following&&!unwell;
+ const base=scheduleActivity(state,at,focus),unwell=injury(state),p=parts(at),v=state?.vitals||{};
+ const canFollow=!unwell&&p.hour>=7&&p.hour<22&&!(Number.isFinite(v.stamina)&&v.stamina<32)&&!(Number.isFinite(v.mp)&&v.mp<=10);
+ const follows=!!following&&canFollow;
  const sister=follows?player:base.place;
  return {
-  player,sister,following:follows,canFollow:!unwell,
+  player,sister,following:follows,canFollow,
   together:sister===player,activity:follows?{...base,place:player,title:'与妹妹同行',text:'她放下手边事情，与你一道走走。'}:base,
   phase:phase(at),phaseName:phaseNames[phase(at)],
   location:byId[player],sisterLocation:byId[sister],locations:LOCATIONS,
