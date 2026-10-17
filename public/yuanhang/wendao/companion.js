@@ -31,7 +31,7 @@ function setPanelExpanded(v){
 }
 function cleanTravel(){
  clearTimeout(travelTimer);clearTimeout(arrivalTimer);traveling=false;
- layer?.classList.remove('wc-moving-out','wc-moving-in');layer?.removeAttribute('data-travel-dir');
+ layer?.classList.remove('wc-moving-out');layer?.classList.remove('wc-moving-in');if(layer)delete layer.dataset.travelDir;
 }
 function setDestination(place){
  const loc=root.WendaoWorld?.LOCATIONS.find(x=>x.id===place);if(!loc)return false;
@@ -58,7 +58,7 @@ function renderDirections(world){
   const place=dirs[dir],loc=world.locations.find(x=>x.id===place);
   btn.hidden=!place;btn.dataset.destination=place||'';btn.title=loc?'前往'+loc.name:'';
   btn.setAttribute('aria-label',loc?'前往'+loc.name:'没有对应路线');
-  if(loc)btn.querySelector('span').textContent=loc.short;
+  if(loc){const caption=btn.querySelector('span');if(caption)caption.textContent=loc.short;}
  }
 }
 
