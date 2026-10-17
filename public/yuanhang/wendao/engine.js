@@ -159,8 +159,11 @@ function portrait(s,now=Date.now()){
  const states={normal:['sister-calm','温柔·日常','calm'],concerned:['sister-concerned','忧心·担忧','concerned'],tired:['sister-tired','疲惫·倦怠','tired'],ill:['sister-ill','病中·虚弱','ill'],injured:['sister-weakened','受罚·负伤','major'],relieved:['sister-relieved','欣慰·浅笑','relieved']};
  let state='normal',reason='平静的准备期';
  if(s.story.forcedPortrait&&states[s.story.forcedPortrait]&&s.story.forcedUntil>now){state=s.story.forcedPortrait;reason='当前场景明确指定的神情（伤势仍保留）'}
- else if(injuries.some(x=>x.active&&x.phase==='acute')){state='injured';reason='DDL严重伤病的急性期'}
- else if(injuries.some(x=>x.active)||s.character.health<55){state='ill';reason='持续伤势仍需疗养'}
+ // Visual phase is intentionally independent of the 48-hour acute resource penalty.
+ // The first Beijing calendar day displays the immediate punishment; on subsequent
+ // days she looks ill while every original injury and recovery requirement remains.
+ else if(injuries.some(x=>x.active&&x.phase==='acute'&&x.firstAt<=now&&day(x.firstAt)===day(now))){state='injured';reason='DDL逾期当日的重伤演出（伤势持续疗养）'}
+ else if(injuries.some(x=>x.active)||s.character.health<55){state='ill';reason='次日起转为病中演出；原严重伤势与急性数值限制仍有效'}
  else if(s.character.familyPressure>=45){state='concerned';reason='温家压力上升'}
  else if(s.character.fatigue>=30||s.character.health<75){state='tired';reason='研习与身体疲劳'}
  else if(s.chronicle.some(x=>['achievement','protection','recovery'].includes(x.kind)&&now-x.at<6*3600000&&now>=x.at)){state='relieved';reason='近期研习或保护取得进展'}
