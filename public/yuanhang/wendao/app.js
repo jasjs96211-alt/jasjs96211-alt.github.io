@@ -18,7 +18,7 @@ function resumeTimedNap(data,at=now()){
  const mins=str=>{const [h,m]=String(str).split(':').map(Number);return 60*h+m};
  const dayMinute=Number(new Intl.DateTimeFormat('en-GB',{timeZone:'Asia/Shanghai',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).formatToParts(new Date(at)).filter(p=>p.type==='hour'||p.type==='minute').map(p=>p.value).join(''));
  const [hh,mm]=[Math.floor(dayMinute/100),dayMinute%100],m=hh*60+mm,start=mins(schedule.sleepStart),end=mins(schedule.sleepEnd);
- if(start===end||start<end?(m>=start&&m<end):(m>=start||m<end))return false;
+ if(start===end||(start<end?(m>=start&&m<end):(m>=start||m<end)))return false;
  return E.setMode(s,'awake',data,at)===true;
 }
 function dailyUpdates(data){guardClock();resumeTimedNap(data);E.advanceAutonomy(s,now());E.nightRecap(s,now());E.rhythm(s,data,now());const hour=Number(new Intl.DateTimeFormat('en-GB',{timeZone:'Asia/Shanghai',hour:'2-digit',hourCycle:'h23'}).format(new Date()));if(hour>=8&&hour<23)E.independent(s,date());if(!s.supervision.pending)for(const d of Object.keys(s.supervision.targets).sort().slice(-3))E.settle(s,d,data)}
