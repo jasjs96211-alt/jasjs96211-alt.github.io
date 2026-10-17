@@ -4,11 +4,14 @@
 const copy=x=>JSON.parse(JSON.stringify(x));
 function hash(text){let n=2166136261;for(const c of String(text))n=Math.imul(n^c.charCodeAt(0),16777619);return n>>>0}
 function completed(row,at){if(!row||typeof row.id!=='string'||!Number.isFinite(Number(row.minutes))||Number(row.minutes)<=0)return false;const end=row.endedAt||row.at;return !end||Number.isFinite(Date.parse(end))&&Date.parse(end)<=at}
-function snapshot(s,study,at,{portrait,vitals}={}){
+function snapshot(s,study,at,{portrait,vitals,worldView}={}){
  const W=root.WendaoWorld,character={portrait,vitals,schedule:s.life?.ledger?.filter(x=>x.at<=at).at(-1)};
- character.validAt=s.life?.cursor;const world=W?.derive({at,state:character,focus:study.focusTimer||{},playerPlace:'study',following:false});
+ // The caller may supply this device's active companion view. Persist only the
+ // derived creation-time facts in the letter, never a global/cloud player map.
+ const liveView=worldView&&W?.LOCATIONS.some(x=>x.id===worldView.player);
+ character.validAt=s.life?.cursor;const world=W?.derive({at,state:character,focus:study.focusTimer||{},playerPlace:liveView?worldView.player:'study',following:liveView&&worldView.following===true});
  const records=(study.sessions||[]).filter(x=>completed(x,at)&&x.date<=root.WendaoEngine.day(at)).slice(-6).map(x=>({id:x.id,date:x.date,subject:String(x.subject||'功课').slice(0,80),minutes:Number(x.minutes),endedAt:x.endedAt||x.at||null,source:x.source||'record'}));
- return copy({version:1,at,timezone:'Asia/Shanghai',location:world?.sisterLocation?.name||'书房',locationId:world?.sister||'study',activity:world?.activity?.title||character.schedule?.activity||s.character.activity,portrait:{state:portrait.state,label:portrait.label,reason:portrait.reason},vitals,relationship:s.character.bond,chapter:s.story.current,
+ return copy({version:1,at,timezone:'Asia/Shanghai',location:world?.sisterLocation?.name||'书房',locationId:world?.sister||'study',locationSource:liveView?'companion-view':'autonomous-schedule',locationScope:'at-creation',following:world?.following===true,activity:world?.activity?.title||character.schedule?.activity||s.character.activity,portrait:{state:portrait.state,label:portrait.label,reason:portrait.reason},vitals,relationship:s.character.bond,chapter:s.story.current,
   injuries:(s.supervision.deadlines?.punishments||[]).filter(p=>p.at<=at).slice(-3).map(p=>({id:p.id,result:p.result,at:p.at,visualDay:root.WendaoEngine.day(p.at),...root.WendaoEngine.injuryFor(p,at),care:(p.recoveryActions||[]).filter(x=>x.at<=at).slice(-4)})),
   studyRecords:records,recentLife:(s.life?.ledger||[]).filter(x=>x.at<=at).slice(-3).map(x=>({id:x.id,kind:x.kind,at:x.at,activity:x.activity})),
   recentChat:(s.chat||[]).filter(x=>Number.isFinite(x.at)&&x.at<=at).slice(-4).map(x=>({role:x.role,text:String(x.text||'').slice(0,300)})),
@@ -16,7 +19,7 @@ function snapshot(s,study,at,{portrait,vitals}={}){
 }
 function prepare(s,study,at,event,body){
  const ctx=snapshot(s,study,at,body),ill=['injured','ill'].includes(ctx.portrait.state)||ctx.vitals.seriousInjury;
- const location=ctx.location,quiet=ill?'我这里先按时温养，不急着翻下一页。':({herbs:'我在药庐理药签，几味相似的叶子还得细看。',garden:'我在竹庭坐了一会儿，风把书页都翻乱了。',corridor:'我沿廊走走，等会儿便回去整理医札。',terrace:'我在望星台看看天色，稍后便回去。',bedroom:'我先歇一阵，书册就留在枕边。',study:'我手边还摊着医书，也有几处想不明白的地方。'})[ctx.locationId]||'我也有自己要慢慢理清的事。';
+ const location=ctx.location,quiet=ill?'我这里先按时温养，不急着翻下一页。':ctx.following?'我正与你一道，在'+location+'稍停片刻。':({herbs:'我在药庐理药签，几味相似的叶子还得细看。',garden:'我在竹庭坐了一会儿，风把书页都翻乱了。',corridor:'我沿廊走走，等会儿便回去整理医札。',terrace:'我在望星台看看天色，稍后便回去。',bedroom:'我先歇一阵，书册就留在枕边。',study:'我手边还摊着医书，也有几处想不明白的地方。'})[ctx.locationId]||'我也有自己要慢慢理清的事。';
  const fatigue=ctx.recentChat.filter(x=>x.role==='user').some(x=>/累|困|难过|难受|压力|害怕/.test(x.text));
  const recorded=(s.life?.ledger||[]).find(x=>x.id===event.id)?.text||event.text;
  let variants=[];

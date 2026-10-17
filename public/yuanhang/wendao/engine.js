@@ -72,6 +72,11 @@ function injuryFor(p,now){
  const phase=corrected?'corrected':healed?'healed':age<RULES.acuteHours*3600000?'acute':steps?'recovering':'stable';
  return {id:p.injuryId,causeSettlementId:p.id,severity:'severe',phase,active:!healed&&!corrected,firstAt:p.at,lastUpdateAt:Math.max(p.at,...actions.map(a=>a.at)),contribution:corrected||healed?0:Math.max(4,RULES.severeDamage-steps*4),recoveryPath:'疗养／求援／交涉／共同修行'};
 }
+// Gallery eligibility is based on an occurred, still-active ledger injury, never
+// a bedtime schedule, low energy or a presentation-only portrait selection.
+function canViewRecoveryCG(s,now=Date.now()){
+ return Number.isFinite(now)&&!s.life?.clockPending&&(s.supervision?.deadlines?.punishments||[]).some(p=>Number.isFinite(p.at)&&p.at<=now&&injuryFor(p,now).active);
+}
 function watchDeadlines(s,study,now=Date.now()){
  const ds=deadlineState(s);if(s.settings.deadlineMajor===false)return ds;
  for(const e of study.events||[]){
@@ -252,7 +257,7 @@ function message(s,id,text,now,trigger,evidenceId){
  if(s.messages.some(x=>x.id===id))return null;
  const row={id,text,at:now,read:false,source:'event',trigger,evidenceId};s.messages.push(row);log(s,id,'姐姐来信',text,now,'message');return row;
 }
-function proactive(s,study,now=Date.now()){
+function proactive(s,study,now=Date.now(),{worldView}={}){
  migrateInPlace(s);if(s.settings.proactiveEnabled===false||study.focusTimer?.running||s.supervision.mode!=='awake'||s.supervision.pending||s.life.clockPending)return null;
  if(scheduledSleepRanges(s,now,now+1).some(([a,b])=>a<=now&&b>now))return null;
  const intensity=s.settings.reminderIntensity,limit=intensity==='gentle'?3:intensity==='frequent'?10:6;
@@ -270,7 +275,7 @@ function proactive(s,study,now=Date.now()){
  if(s.settings.dailyMessages!==false&&s.chronicle.some(x=>x.id==='sister:'+day(now)))candidates.push({id:'daily:'+day(now),trigger:'daily',text:ill?'我今日也安排了温养，功课会量力而行。你安心读书，也照顾好自己。':'我今日也有自己的功课。你安心读书，累了记得歇一歇；我也会照顾好自己。'});
  candidates.sort((a,b)=>(a.trigger==='idle'?2:a.trigger==='daily'?3:0)-(b.trigger==='idle'?2:b.trigger==='daily'?3:0));
  const next=candidates.find(x=>!s.proactiveState.seen.some(r=>r.id===x.id)&&!s.messages.some(m=>m.evidenceId===x.id));if(!next)return null;
- const prepared=root.WendaoInteraction?.prepare(s,study,now,next,{portrait:portrait(s,now),vitals:vitals(s,study,now)});
+ const prepared=root.WendaoInteraction?.prepare(s,study,now,next,{portrait:portrait(s,now),vitals:vitals(s,study,now),worldView});
  const row=message(s,'message:'+next.id,prepared?.text||next.text,now,next.trigger,next.id);if(row&&prepared){row.contextSnapshot=prepared.snapshot;row.theme=prepared.theme;row.variant=prepared.variant;}if(row){s.proactiveState.seen.push({id:next.id,at:now});s.proactiveState.lastAt=now}return row;
 }
 function setTemporarySleep(s,value,now=Date.now()){
@@ -412,5 +417,5 @@ function companionCare(s,kind,at=Date.now()){
  log(s,id,kind==='meal'?'一同用膳':'灯下关怀',kind==='meal'?'按今日作息安排饮食。姐姐也会自行用膳，不会因妹妹离线挨饿。':'姐妹说了几句宽慰的话；不改变羁绊、伤势或主线。',at,'companion');return true;
 }
 
-root.WendaoEngine={vitals,companionCare,mergeVitals,validVitals,RULES,EVENTS,planAgreement,cancelAgreement,advanceAutonomy,acknowledgeLifeClock,rhythm,setMode,setTemporarySleep,nightRecap,appendDialogue,dueTime,settlementID,migrateLegacySave,recoverDeadline,injuryFor,unionRows,recalculate,proactive,day,dateAt,fresh,baseline,derive,advance,settle,independent,eligible,choose,finish,validate,merge,log,subtract,watchDeadlines,checkDeadlines,untrackedOverdue,confirmMissedDeadline,resolveDeadline,portrait};
+root.WendaoEngine={canViewRecoveryCG,vitals,companionCare,mergeVitals,validVitals,RULES,EVENTS,planAgreement,cancelAgreement,advanceAutonomy,acknowledgeLifeClock,rhythm,setMode,setTemporarySleep,nightRecap,appendDialogue,dueTime,settlementID,migrateLegacySave,recoverDeadline,injuryFor,unionRows,recalculate,proactive,day,dateAt,fresh,baseline,derive,advance,settle,independent,eligible,choose,finish,validate,merge,log,subtract,watchDeadlines,checkDeadlines,untrackedOverdue,confirmMissedDeadline,resolveDeadline,portrait};
 })(typeof window!=='undefined'?window:globalThis);

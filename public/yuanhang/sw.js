@@ -1,13 +1,13 @@
 /* Offline app shell first. Large portraits must not prevent the updated code
    from installing over mobile data. No API responses or user data are cached. */
-const CACHE='yuanhang-static-v22-dynamic-world-20261017';
+const CACHE='yuanhang-static-v23-review-fix-20261017';
 const SHELL=[
  './','./index.html','./manifest.webmanifest','./icon.svg',
  './usage.js','./cloud.js?v=20261016-sync-r4',
  './wendao/novel.js?v=20261016-v15','./wendao/story.js?v=20261016-v15','./wendao/transport.js',
- './wendao/engine.js?v=20261017-v16-dynamic','./wendao/app.js?v=20261017-v16-dynamic',
- './wendao/world.js?v=20261017-v16-dynamic','./wendao/interaction.js?v=20261017-v16-dynamic',
- './wendao/motion.js?v=20261017-v16-dynamic','./wendao/companion.js?v=20261017-v16-dynamic',
+ './wendao/engine.js?v=20261017-v16-review-fix','./wendao/app.js?v=20261017-v16-review-fix',
+ './wendao/world.js?v=20261017-v16-dynamic','./wendao/interaction.js?v=20261017-v16-review-fix',
+ './wendao/motion.js?v=20261017-v16-review-fix','./wendao/companion.js?v=20261017-v16-review-fix',
  './wendao/style.css?v=20261016-v15','./wendao/companion.css?v=20261016-v15',
  './wendao/world.css?v=20261017-v16-dynamic','./wendao/motion.css?v=20261017-v16-dynamic'
 ];

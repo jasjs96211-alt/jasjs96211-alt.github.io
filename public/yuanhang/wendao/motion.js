@@ -22,7 +22,7 @@ function plan({world,state={},at=Date.now(),transit=null,enabled=true,reduced=fa
  const progress=transit&&animate&&!unwell?clamp((at-transit.at)/transit.duration):1;
  if(transit&&progress<1&&at>=transit.at)return {mode:'actor',action:'walk',src:ACTIONS.walk.animated,poster:ACTIONS.walk.poster,x:transit.type==='leave'?50+45*progress:10+40*progress,animate:true,flip:false};
  if(!world.together)return {mode:'absent',action:'absent',animate:false};
- if(world.sister==='bedroom')return {mode:'cg',action:unwell?'recover':'rest',src:CG,cgId:'recovery-bed',animate:false};
+ if(world.sister==='bedroom')return state.recoveryCGAllowed===true?{mode:'cg',action:'recover',src:CG,cgId:'recovery-bed',animate:false}:{mode:'actor',action:'rest',src:state.portrait?.src,x:50,animate:false,flip:false};
  let action='idle',x=50,flip=false;
  if(world.sister==='herbs')action='herbs';
  else if(world.sister==='study')action='read';
@@ -37,11 +37,12 @@ function readPreference(storage){try{return JSON.parse(storage?.getItem(UI_KEY)|
 function writePreference(storage,enabled){try{storage?.setItem(UI_KEY,JSON.stringify({enabled:!!enabled}));return true}catch{return false}}
 function renderer({actor,photo,bed,hint,onArtSeen=()=>{}}){
  const failed=new Set(),seen=new Set();let desiredCG=null;
+ function recordSeen(id){if(onArtSeen(id)!==false)seen.add(id)}
  function source(el,url,fallback){
   if(!url)return false;const selected=failed.has(url)?fallback:url;if(!selected||failed.has(selected))return false;
   if(el.dataset.artSource===selected)return true;
   el.dataset.artSource=selected;el.dataset.ready='0';
-  el.onload=()=>{if(el.dataset.artSource!==selected)return;el.dataset.ready='1';hint.hidden=true;if(el===bed&&!bed.hidden&&desiredCG&&!(root.document?.hidden)&&!seen.has(desiredCG)){seen.add(desiredCG);onArtSeen(desiredCG)}};
+  el.onload=()=>{if(el.dataset.artSource!==selected)return;el.dataset.ready='1';hint.hidden=true;if(el===bed&&!bed.hidden&&desiredCG&&!(root.document?.hidden)&&!seen.has(desiredCG))recordSeen(desiredCG)};
   el.onerror=()=>{if(el.dataset.artSource!==selected)return;failed.add(selected);if(fallback&&fallback!==selected&&!failed.has(fallback)){source(el,fallback,null);return}el.hidden=true;hint.hidden=false;hint.textContent='此动作或CG暂未缓存，请联网后重试；原存档与伤势保留。'};
   el.src=selected;return true;
  }
@@ -49,8 +50,8 @@ function renderer({actor,photo,bed,hint,onArtSeen=()=>{}}){
   const p=plan(options);desiredCG=p.mode==='cg'?p.cgId:null;bed.hidden=p.mode!=='cg';actor.hidden=p.mode!=='actor';actor.dataset.motion=p.action;actor.style.left=p.x+'%';actor.style.setProperty('--motion-facing',p.flip?'-1':'1');
   if(p.mode==='cg'){
    if(!source(bed,p.src,null)){bed.hidden=true;actor.hidden=false;photo.hidden=!source(photo,options.state.portrait?.src,null);hint.hidden=false;hint.textContent='卧床CG未能加载，暂显示原状态立绘。'}
-   else if(bed.dataset.ready==='1'&&!seen.has(p.cgId)&&!options.hidden){seen.add(p.cgId);onArtSeen(p.cgId)}
-  }else if(p.mode==='actor'){const okay=source(photo,p.src,p.poster||options.state.portrait?.src);photo.hidden=!okay;if(!okay){photo.hidden=!source(photo,options.state.portrait?.src,null);actor.dataset.motion='fallback';hint.hidden=false;hint.textContent='动作图片未缓存，暂显示原状态立绘。';photo.alt='温知遥 · 原状态立绘';return {...p,action:'fallback'};}photo.alt='温知遥 · '+({read:'坐姿翻书',herbs:'分拣药草',meditate:'坐姿调息',walk:'步行动作',idle:options.state.portrait?.label||'当前状态'}[p.action]);}
+   else if(bed.dataset.ready==='1'&&!seen.has(p.cgId)&&!options.hidden)recordSeen(p.cgId);
+  }else if(p.mode==='actor'){const okay=source(photo,p.src,p.poster||options.state.portrait?.src);photo.hidden=!okay;if(!okay){photo.hidden=!source(photo,options.state.portrait?.src,null);actor.dataset.motion='fallback';hint.hidden=false;hint.textContent='动作图片未缓存，暂显示原状态立绘。';photo.alt='温知遥 · 原状态立绘';return {...p,action:'fallback'};}photo.alt='温知遥 · '+({read:'坐姿翻书',herbs:'分拣药草',meditate:'坐姿调息',walk:'步行动作',rest:'榻边歇息',idle:options.state.portrait?.label||'当前状态'}[p.action]);}
   return p;
  }
  return {render,resetFailures:()=>failed.clear()};

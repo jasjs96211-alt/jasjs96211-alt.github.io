@@ -155,5 +155,5 @@ function open(){
 }
 function close(){if(!layer)return;clearInterval(motionTimer);paintMotion(true);$('wcRecovery').hidden=true;lastWorld=null;transit=null;if($('wcMap'))$('wcMap').hidden=true;if($('wcMapToggle'))$('wcMapToggle').setAttribute('aria-expanded','false');layer.hidden=true;layer.parentElement?.classList.remove('wd-companion-active');clearInterval(interval);interval=null;onClose?.();$('wdCompanion')?.focus()}
 function refresh(){if(layer&&!layer.hidden)update()}
-root.WendaoCompanion={mount,open,close,refresh,selectAction,isOpen:()=>!!layer&&!layer.hidden};
+root.WendaoCompanion={mount,open,close,refresh,selectAction,getWorldView:()=>layer&&!layer.hidden&&!document.hidden?{...worldView}:null,isOpen:()=>!!layer&&!layer.hidden};
 })(typeof window!=='undefined'?window:globalThis);
