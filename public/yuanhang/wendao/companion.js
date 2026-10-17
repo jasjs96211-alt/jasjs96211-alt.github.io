@@ -121,6 +121,8 @@ function update(){
  $('wcActivity').textContent=act.title;
  $('wcDescription').textContent=act.text;
  $('wcTime').textContent=clock(timer.remaining);
+ $('wcMiniTime').textContent=clock(timer.remaining);
+ $('wcQuickFocus').textContent=active?(timer.running?'Ⅱ 暂停':'▶ 继续'):'▶ 开始修炼';
  $('wcTrack').textContent=active?(timer.subject||'本次修炼')+' · '+(timer.running?'专注进行中':'已暂停'):finished?'本轮已完成 · 已核对原学习记录':'与姐姐各自读书，不必时时交谈';
  const start=$('wcStart'),pause=$('wcPause'),setup=$('wcSetup');
  setup.hidden=active;pause.hidden=!active;start.hidden=active;
@@ -151,7 +153,7 @@ function mount({stage,focusBridge,getCharacterState,onFocusPage:focusPage,onClos
  '<div class="wc-motion-tools"><button type="button" id="wcAnimation" aria-pressed="true">动作：开</button><button type="button" id="wcLetters" hidden>来信</button><button type="button" id="wcArtRetry" hidden>重试演出图片</button></div><img id="wcRecovery" alt="温知遥卧床休养CG" hidden>' +
  '<div class="wc-world" aria-hidden="true"><span class="wc-spot wc-spot-window">竹窗</span><span class="wc-spot wc-spot-desk">书案</span><span class="wc-spot wc-spot-herbs">药架</span><span class="wc-spot wc-spot-bed">榻边</span>'+
  '<div id="wcActor" class="wc-actor" data-place="书案"><img id="wcPortrait" alt="温知遥立绘"><span id="wcArtHint" hidden></span></div></div>'+
- '<div class="wc-panel"><header class="wc-heading"><div><small id="wcName">温知遥</small><h2 id="wcActivity">研读医书</h2><p id="wcDescription"></p></div><div class="wc-heading-actions"><button type="button" id="wcExpandPanel" aria-controls="wcExpanded" aria-expanded="false">修炼设置 ▾</button><button type="button" id="wcClose" aria-label="返回剧情书房">返回书房 ×</button></div></header><div id="wcExpanded">'+
+ '<div class="wc-panel"><header class="wc-heading"><div><small id="wcName">温知遥</small><h2 id="wcActivity">研读医书</h2><p id="wcDescription"></p></div><div class="wc-heading-actions"><small id="wcMiniTime" aria-label="专注剩余时间">25:00</small><button type="button" id="wcQuickFocus">▶ 开始修炼</button><button type="button" id="wcExpandPanel" aria-controls="wcExpanded" aria-expanded="false">修炼设置 ▾</button><button type="button" id="wcClose" aria-label="返回剧情书房">返回书房 ×</button></div></header><div id="wcExpanded">'+
  '<div id="wcVitals"></div><div class="wc-timer"><strong id="wcTime">25:00</strong><span id="wcTrack">准备开始</span></div>'+
  '<div id="wcSetup" class="wc-setup"><label>修炼科目 <select id="wcSubject"></select></label><label>本轮时长 <select id="wcMinutes"><option value="25">25 分钟</option><option value="45">45 分钟</option><option value="60">60 分钟</option></select></label></div>'+
  '<div class="wc-buttons"><button type="button" id="wcStart">▶ 开始与姐姐一同修炼</button><button type="button" id="wcPause" hidden>Ⅱ 暂停</button><button type="button" id="wcReset" hidden>重置本轮</button><button type="button" id="wcCare">疗养／商议</button><button type="button" id="wcTalk">自由交谈</button><button type="button" id="wcStatus">状态／用膳</button><button type="button" id="wcGoTimer">打开原专注页</button></div>'+
@@ -170,6 +172,7 @@ function mount({stage,focusBridge,getCharacterState,onFocusPage:focusPage,onClos
  subject.addEventListener('change',()=>{subject.dataset.touched='1'});
  $('wcMinutes').addEventListener('change',()=>{$('wcMinutes').dataset.touched='1'});
  $('wcClose').onclick=close;$('wcExpandPanel').onclick=()=>setPanelExpanded(!panelExpanded);
+ $('wcQuickFocus').onclick=()=>{const timer=focusState();const target=timer.id?$('wcPause'):$('wcStart');target?.onclick?.()};
  const W=root.WendaoWorld;
  if(W){
   const toggle=()=>{const map=$('wcMap');map.hidden=!map.hidden;$('wcMapToggle').setAttribute('aria-expanded',String(!map.hidden))};
