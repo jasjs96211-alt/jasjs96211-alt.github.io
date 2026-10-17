@@ -146,6 +146,13 @@ function threeVitalBars(){
  }).join('')+'</section>';
 }
 function closeGameMenu(){const menu=$('wdGameMenu');if(!menu)return;menu.hidden=true;$('wdMenuToggle')?.setAttribute('aria-expanded','false')}
+function presentRecap(text){
+ const value=String(text||'');
+ const legacy=value.match(/^从昨夜到今晨，我(.+)。这些都是准备期的日常，未有未经确认的主线变化。$/);
+ if(!legacy)return value;
+ const actions=legacy[1].split('，也').map(a=>({医理:'查阅医理',温养:'调息温养',休息:'稍作歇息'}[a]||a)).filter(Boolean);
+ return '昨夜至今晨，我陆续做了些事：'+actions.join('、')+'。眼下仍是寻常日子，你不必时时为我挂心。';
+}
 function syncOverlayBack(){
  if(!$('wdOverlayBack'))return;
  const visible=['wdSlots','wdBacklog','wdInbox'].some(id=>!$(id).hidden);
@@ -172,7 +179,7 @@ function renderStage(){
   if(box.dataset.renderSignature!==signature){
    const preservedScroll=box.scrollTop;
    box.dataset.renderSignature=signature;
-   box.innerHTML='<header class="wd-mail-header"><div><h3>姐姐的来信</h3><p>翻一翻她寄来的信笺。</p></div><button type="button" id="wdInboxClose">← 返回场景</button></header>'+(s.rhythmState?.recaps||[]).slice(-2).reverse().map(r=>`<article><small>夜间纪事 · ${esc(r.date)}</small><p>${esc(r.text)}</p></article>`).join('')+(s.messages||[]).slice(-30).reverse().map(m=>`<article><small>${esc(new Date(m.at).toLocaleString('zh-CN',{timeZone:'Asia/Shanghai'}))}</small><p>${esc(m.text)}</p>${m.contextSnapshot?.locationScope==='at-creation'?`<small>留笺于 ${esc(m.contextSnapshot.location)} · ${esc(m.contextSnapshot.activity)}</small>`:''}${m.trigger==='bedtime'?button('我去休息了','sleep')+button('再学一会儿','sleep-later')+button('调整今晚计划','open-sleep-plan'):m.trigger==='morning'?'<small>早安留言，无需重复确认清醒</small>':''}${button('自由回复','reply-message')}${m.aiStatus==='failed'?button('重试在线台词','retry-message',`data-message="${esc(m.id)}"`):''}</article>`).join('');
+   box.innerHTML='<header class="wd-mail-header"><div><h3>姐姐的来信</h3><p>翻一翻她寄来的信笺。</p></div><button type="button" id="wdInboxClose">← 返回场景</button></header>'+(s.rhythmState?.recaps||[]).slice(-2).reverse().map(r=>`<article><small>夜间纪事 · ${esc(r.date)}</small><p>${esc(presentRecap(r.text))}</p></article>`).join('')+(s.messages||[]).slice(-30).reverse().map(m=>`<article><small>${esc(new Date(m.at).toLocaleString('zh-CN',{timeZone:'Asia/Shanghai'}))}</small><p>${esc(m.text)}</p>${m.contextSnapshot?.locationScope==='at-creation'?`<small>留笺于 ${esc(m.contextSnapshot.location)} · ${esc(m.contextSnapshot.activity)}</small>`:''}${m.trigger==='bedtime'?button('我去休息了','sleep')+button('再学一会儿','sleep-later')+button('调整今晚计划','open-sleep-plan'):m.trigger==='morning'?'<small>早安留言，无需重复确认清醒</small>':''}${button('自由回复','reply-message')}${m.aiStatus==='failed'?button('重试在线台词','retry-message',`data-message="${esc(m.id)}"`):''}</article>`).join('');
    box.scrollTop=preservedScroll;
    $('wdInboxClose').onclick=()=>{box.hidden=true;syncOverlayBack();$('wdInboxButton')?.focus()};
    box.querySelectorAll('[data-wd]').forEach(el=>el.onclick=safe(()=>action(el.dataset.wd,el.dataset)));
