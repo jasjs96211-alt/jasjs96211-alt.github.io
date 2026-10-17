@@ -38,7 +38,7 @@ test('paper drawer retains open sections and supports a visible return',()=>{
  assert.match(panel.innerHTML,/wd-drawer-close/);
  const details=panel.querySelectorAll('details');
  if(details.length){details[0].open=true;a.run('window.Wendao.sync()');assert.equal(a.get('wendao').querySelectorAll('details')[0].open,true)}
- panel.querySelector('.wd-drawer-close')?.click();
+ panel.querySelector('.wd-drawer-close')?.events.click?.();
  assert.equal(a.document.body.classList.contains('wd-drawer-open'),false);
 });
 test('read backlog and saved slot overlays have explicit return controls',()=>{
@@ -57,7 +57,7 @@ test('fresh installation starts awake without creating learning or DDL events',(
  assert.equal(a.storage.get(WD)!==undefined,true);
 });
 test('explicit reasonable rest and untimed sleep are NOT silently overridden',async()=>{
- const a=setup();
+ const a=setup();a.tab('cultivate');
  await a.action('exempt');assert.equal(a.snapshot().supervision.mode,'exempt');
  a.clock.set(at+30*60000);a.run('window.Wendao.sync()');assert.equal(a.snapshot().supervision.mode,'exempt');
  await a.action('sleep');a.clock.set(at+90*60000);a.run('window.Wendao.sync()');assert.equal(a.snapshot().supervision.mode,'sleep');
