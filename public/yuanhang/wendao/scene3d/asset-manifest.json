@@ -1,0 +1,130 @@
+{
+  "version": "bedroom-space-r1-20261018",
+  "units": "metres",
+  "up": "+Y",
+  "forward": "+Z",
+  "renderer": "Three.js WebGL2, locally vendored 0.180.0",
+  "runtimeModelSource": "bedroom-model.js (procedural); GLB is a reproducible interchange export, not a fetched runtime model",
+  "editableSources": [
+    "bedroom-model.js",
+    "character-adapter.js",
+    "models/bedroom-r1.three.json"
+  ],
+  "exportCommand": "node scripts/wendao-export-bedroom-space.mjs",
+  "textures": [],
+  "textureReason": "R1 solid-material greybox; R2 textures and formal art pending",
+  "thirdPartyReferencePixelsEmbedded": false,
+  "character": "faceless temporary volume proxy; not Zhiyao art",
+  "acceptance": {
+    "browserRecording": "not_tested",
+    "iPhoneSafari": "not_tested",
+    "iPhonePWA": "not_tested",
+    "userVisualApproval": "pending"
+  },
+  "assets": [
+    {
+      "path": "vendor/three.module.min.js",
+      "bytes": 338908,
+      "sha256": "e2b5ee6bccd38fd6d8a2428546b83c5f2426d84b152ef82be8055556e3b40eb6",
+      "source": "three npm 0.180.0",
+      "license": "MIT; see vendor/THREE-LICENSE.txt",
+      "status": "pinned-runtime"
+    },
+    {
+      "path": "vendor/three.core.min.js",
+      "bytes": 381124,
+      "sha256": "61ba0df005b05991361d040d8ff670e1aadfd0ce7aeebd1fdb0725957a8957de",
+      "source": "three npm 0.180.0",
+      "license": "MIT; see vendor/THREE-LICENSE.txt",
+      "status": "pinned-runtime"
+    },
+    {
+      "path": "vendor/THREE-LICENSE.txt",
+      "bytes": 1081,
+      "sha256": "bfe119ea4fd413f5f7ca3fcd63adb0c4a073ed39daa2fe7d3e6b769e21272601",
+      "source": "three npm 0.180.0",
+      "license": "MIT; see vendor/THREE-LICENSE.txt",
+      "status": "pinned-runtime"
+    },
+    {
+      "path": "models/bedroom-r1.glb",
+      "bytes": 488796,
+      "sha256": "bf4e8136c1ada05fd02e9f3d2bcbcf3f2194c3f1df70bd4962efe0f3e9675795",
+      "source": "original editable R1 geometry/code",
+      "license": "project-original",
+      "status": "greybox-not-visually-approved"
+    },
+    {
+      "path": "models/proxy-reclined-r1.glb",
+      "bytes": 44936,
+      "sha256": "0710232758d8ecacdd69c8fefb39ff39f351dc970a8736e1876c6d4a51a0a49f",
+      "source": "original editable R1 geometry/code",
+      "license": "project-original",
+      "status": "greybox-not-visually-approved"
+    },
+    {
+      "path": "models/bedroom-r1.three.json",
+      "bytes": 119303,
+      "sha256": "06c515e91abf78ed127b232ebb1f7ca90982847e2f7b580c59b7b9cc89c54cc1",
+      "source": "original editable R1 geometry/code",
+      "license": "project-original",
+      "status": "greybox-not-visually-approved"
+    },
+    {
+      "path": "anchors.json",
+      "bytes": 1344,
+      "sha256": "1195ff56b5e1d484b0cec4b49e375e693249e7750b1b79be2a64291a0ce26112",
+      "source": "original editable R1 geometry/code",
+      "license": "project-original",
+      "status": "greybox-not-visually-approved"
+    },
+    {
+      "path": "bedroom-model.js",
+      "bytes": 7568,
+      "sha256": "cdafc5923506e3a3f5d06c3f135cfcfb27509c9b9ac6da9d3943ad78c457b575",
+      "source": "original editable R1 geometry/code",
+      "license": "project-original",
+      "status": "greybox-not-visually-approved"
+    },
+    {
+      "path": "camera-rig.js",
+      "bytes": 1799,
+      "sha256": "58fe78312d4cc1b946d8a9844063ba96b078a640835f5795167c4d96ce530f01",
+      "source": "original editable R1 geometry/code",
+      "license": "project-original",
+      "status": "greybox-not-visually-approved"
+    },
+    {
+      "path": "character-adapter.js",
+      "bytes": 3428,
+      "sha256": "7828083b0bdf355486085e453330d7cd488b21c2f379d69bc1d70f0ac2d1c257",
+      "source": "original editable R1 geometry/code",
+      "license": "project-original",
+      "status": "greybox-not-visually-approved"
+    },
+    {
+      "path": "lighting.js",
+      "bytes": 2408,
+      "sha256": "88f7502866e870bd634f1756b917f907c55f129d959af07d3177d35316ce9ef1",
+      "source": "original editable R1 geometry/code",
+      "license": "project-original",
+      "status": "greybox-not-visually-approved"
+    },
+    {
+      "path": "scene-manager.js",
+      "bytes": 6996,
+      "sha256": "0750e2d5294dbc0ac7eb3d9914ff85b3cf12215fa8e535e7a77d11fba92c5251",
+      "source": "original editable R1 geometry/code",
+      "license": "project-original",
+      "status": "greybox-not-visually-approved"
+    },
+    {
+      "path": "contract.js",
+      "bytes": 3254,
+      "sha256": "10748e324f687f4b4ea44df50ba1181b83b605738c61004fae692121b2157d55",
+      "source": "original editable R1 geometry/code",
+      "license": "project-original",
+      "status": "greybox-not-visually-approved"
+    }
+  ]
+}
