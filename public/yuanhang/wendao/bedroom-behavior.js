@@ -49,6 +49,8 @@
     let lastGreet = validSaved ? snapshot.lastGreet : 0, lastClick = validSaved ? snapshot.lastClick : 0;
     let present = false, lastFocus = null, reaction = null, previousMode = null;
     let latest = null, visualTime = 0, lastResponse = 0, wasHidden = false;
+    let breathElapsed = 0, breathIndex = 0, breathLastTime = 0;
+    let breathDuration = 4800 + hash(seed + 311) % 1001;
     let blinkIndex = 0, blinkAt = 4000 + hash(seed) % 5001;
 
     function setPhase(i) { index = i; elapsed = 0; revision++; }
@@ -161,7 +163,20 @@
       const settleProgress = (animTime - settleAt) / 2100;
       const settle = !reducedMotion && !hidden && !disputed && !sleeping && !severe &&
         settleProgress > 0 && settleProgress < 1 ? Math.sin(Math.PI * settleProgress) ** 2 * (weak ? .65 : 1) : 0;
-      const breathingPhase = animTime * Math.PI * 2 / (weak ? 5300 : 4500) + .09 * Math.sin(animTime / 17000);
+      // One shared, continuous foreground breath clock. Cycle boundaries have
+      // zero velocity; varying duration/amplitude never jumps the painted mesh.
+      if (isPresent && !hidden && !disputed && !reducedMotion) breathElapsed += animTime - breathLastTime;
+      breathLastTime = animTime;
+      while (breathElapsed >= breathDuration) {
+        breathElapsed -= breathDuration; breathIndex++;
+        breathDuration = 4800 + hash(seed + 311 + breathIndex * 71) % 1001;
+      }
+      const breathPhase = breathElapsed / breathDuration;
+      const inhale = .35 + (hash(seed + breathIndex * 43) % 701) / 10000;
+      const pause = .04 + (hash(seed + breathIndex * 59) % 501) / 10000;
+      const breathShape = breathPhase < inhale ? smooth(breathPhase / inhale) :
+        breathPhase < 1-pause ? 1-smooth((breathPhase-inhale)/(1-pause-inhale)) : 0;
+      const breathAmplitude = .86 + (hash(seed + breathIndex * 61) % 1401) / 10000;
       const canGesture = isPresent && available && mode === 'routine' && !sleeping &&
         !severe && !hidden && !reducedMotion && !disputed && !reaction;
       // Small, non-periodic-looking gestures, generated only from foreground
@@ -189,7 +204,7 @@
         gaze: reaction ? 'player' : props.book === 'held' ? 'book' : 'down',
         smile: !!reaction && reaction.kind !== 'eyes_only' && ready('weak_smile'),
         breath: reducedMotion || disputed || hidden ? 0 :
-          Math.sin(breathingPhase) * (severe ? .16 : weak ? .58 : .72) * (1-suppressedCough*.48),
+          breathShape * breathAmplitude * (severe ? .16 : sleeping ? .25 : weak ? .58 : .72) * (1-suppressedCough*.65),
         progress: reducedMotion ? (progress >= .5 ? 1 : 0) : progress
       };
       latest = freeze({ version: VERSION, revision, actionId, phase, clip, title, text, props,

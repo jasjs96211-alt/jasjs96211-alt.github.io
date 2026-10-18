@@ -308,21 +308,20 @@ function rhythm(s,study={},now=Date.now()){
 }
 // Read-only projection of recorded world events. Never invent a timestamp or apply a delta.
 function recapTimeline(s,recap){
- if(!recap||!Array.isArray(recap.eventIds)||!s?.life?.ledger)return [];
+ if(!recap||!Array.isArray(recap.eventIds)||!Array.isArray(s?.life?.ledger))return [];
  const ids=new Set(recap.eventIds.filter(id=>typeof id==='string'));
  const start=typeof recap.date==='string'?dateAt(recap.date)+18*3600000:NaN;
  const end=Number.isFinite(start)?Math.min(start+18*3600000,Number.isFinite(recap.at)?recap.at:Infinity):NaN;
  if(!Number.isFinite(start)||!Number.isFinite(end))return [];
- const seen=new Set();
- return s.life.ledger.filter(row=>row&&ids.has(row.id)&&!seen.has(row.id)&&seen.add(row.id)&&Number.isFinite(row.at)&&row.at>=start&&row.at<=end)
+ return unionRows(s.life.ledger.filter(row=>row&&ids.has(row.id)&&Number.isFinite(row.at)&&row.at>=start&&row.at<start+18*3600000&&row.at<=end))
   .sort((a,b)=>a.at-b.at||String(a.id).localeCompare(String(b.id)))
   .map(row=>({eventId:row.id,occurredAt:row.at,kind:row.kind||'ordinary',bodyState:row.bodyState||null,
    factText:String(row.text||row.activity||'日常起居'),sourceType:'engine-ledger',sourceEventId:row.id}));
 }
 function nightRecap(s,now=Date.now()){
- migrateInPlace(s);const d=day(now-DAY),id='recap:'+d,old=s.rhythmState.recaps.find(x=>x.id===id);if(old)return old;
+ migrateInPlace(s);if(!Number.isFinite(now)||s.life.clockPending||now<s.life.cursor)return null;const d=day(now-DAY),id='recap:'+d,old=s.rhythmState.recaps.find(x=>x.id===id);if(old)return old;
  const start=dateAt(d)+18*3600000,end=Math.min(now,start+18*3600000);
- const rows=s.life.ledger.filter(x=>Number.isFinite(x.at)&&x.at>=start&&x.at<=end).sort((a,b)=>a.at-b.at||String(a.id).localeCompare(String(b.id)));
+ const rows=s.life.ledger.filter(x=>Number.isFinite(x.at)&&x.at>=start&&x.at<start+18*3600000&&x.at<=end).sort((a,b)=>a.at-b.at||String(a.id).localeCompare(String(b.id)));
  if(!rows.length)return null;
  const row={id,at:now,date:d,formatVersion:2,text:'夜间纪事已按事件时刻整理。',eventIds:[...new Set(rows.map(x=>x.id))]};
  s.rhythmState.recaps.push(row);log(s,id,'昨夜纪事',row.text,now,'recap');return row;
@@ -377,7 +376,12 @@ function merge(a,b){
  n.chronicle=n.chronicle.filter(x=>!correctedIDs.has(x.id)&&!suppressed.has(x.id));n.messages=n.messages.filter(x=>!correctedIDs.has(x.evidenceId)&&!suppressed.has(x.evidenceId));
  n.proactiveState.seen=unionRows(n.proactiveState.seen,other.proactiveState.seen);n.proactiveState.lastAt=Math.max(n.proactiveState.lastAt||0,other.proactiveState.lastAt||0);
  n.life.ledger=unionRows(n.life.ledger,other.life.ledger);for(const row of n.life.ledger){if(row.kind==='study'&&da.punishments.some(p=>p.at<=row.at&&injuryFor(p,row.at).active)){Object.assign(row,LIFE_ACTIONS[1],{bodyState:'injured',delta:{autonomy:1,cultivation:0,pressure:0}});const log=n.chronicle.find(x=>x.id===row.id);if(log)log.text=row.text}}n.life.cursor=Math.max(n.life.cursor,other.life.cursor);
- n.rhythmState.greetings=unionRows(n.rhythmState.greetings,other.rhythmState.greetings);n.rhythmState.recaps=unionRows(n.rhythmState.recaps,other.rhythmState.recaps);n.rhythmState.wakeConfirmations=unionRows(n.rhythmState.wakeConfirmations,other.rhythmState.wakeConfirmations);n.rhythmState.modeChanges=unionRows(n.rhythmState.modeChanges,other.rhythmState.modeChanges);n.rhythmState.agreements=unionRows(n.rhythmState.agreements,other.rhythmState.agreements);const cancelled=new Set([...n.rhythmState.agreements,...other.rhythmState.agreements,...(a.rhythmState?.agreements||[])].filter(x=>x.status==='cancelled').map(x=>x.id));for(const row of n.rhythmState.agreements)if(cancelled.has(row.id))row.status='cancelled';n.messages=n.messages.filter(x=>!x.evidenceId?.startsWith('agreement:')||!cancelled.has(x.evidenceId.slice(10)));
+ n.rhythmState.greetings=unionRows(n.rhythmState.greetings,other.rhythmState.greetings);n.rhythmState.recaps=unionRows(n.rhythmState.recaps,other.rhythmState.recaps).map(row=>{
+ const versions=[...(a.rhythmState?.recaps||[]),...(b.rhythmState?.recaps||[])].filter(r=>r.id===row.id);
+ // Preserve old summaries verbatim; only v2 snapshots combine their coverage.
+ if(versions.length<2||versions.some(r=>r.formatVersion!==2))return row;
+ return {...row,at:Math.max(...versions.map(r=>r.at)),eventIds:[...new Set(versions.flatMap(r=>r.eventIds||[]))].sort()};
+ });n.rhythmState.wakeConfirmations=unionRows(n.rhythmState.wakeConfirmations,other.rhythmState.wakeConfirmations);n.rhythmState.modeChanges=unionRows(n.rhythmState.modeChanges,other.rhythmState.modeChanges);n.rhythmState.agreements=unionRows(n.rhythmState.agreements,other.rhythmState.agreements);const cancelled=new Set([...n.rhythmState.agreements,...other.rhythmState.agreements,...(a.rhythmState?.agreements||[])].filter(x=>x.status==='cancelled').map(x=>x.id));for(const row of n.rhythmState.agreements)if(cancelled.has(row.id))row.status='cancelled';n.messages=n.messages.filter(x=>!x.evidenceId?.startsWith('agreement:')||!cancelled.has(x.evidenceId.slice(10)));
  const temporary=[n.rhythmState.temporarySleep,other.rhythmState.temporarySleep].filter(Boolean).sort((x,y)=>y.from-x.from||JSON.stringify(x).localeCompare(JSON.stringify(y)));n.rhythmState.temporarySleep=temporary[0]||null;
  scribeLife(n);
  n.supervision.settled=unionRows(a.supervision.settled.map(x=>({...x,id:x.id||x.date})),b.supervision.settled.map(x=>({...x,id:x.id||x.date})));
