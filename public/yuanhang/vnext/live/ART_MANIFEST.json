@@ -1,0 +1,141 @@
+{
+  "scope": "Generated reference edits; original files unchanged. Prompt specifications describe reproducible intent, not a transcript of tool messages.",
+  "conversion": "sharp WebP quality 88; no programmatic repaint of generated artwork",
+  "assets": [
+    {
+      "file": "public/yuanhang/wendao/assets/world-garden-night-v1.webp",
+      "source": "public/yuanhang/wendao/assets/world-garden.webp",
+      "label": "听竹小庭",
+      "generator": "image_gen.imagegen reference edit",
+      "generationOutput": "exec-faa7ae41-fb43-4ba0-8819-1b8f13d9cf24.png",
+      "bytes": 482118,
+      "sha256": "5da78d4819f434e9165f1e73ffe51df93b3f05730c8742864159df742d1a7361",
+      "sourceSha256": "6e17da29633184fe8fb3afc8bf93d88215e0d852f8b432343e478a6a65f955a8",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "reproductionSpecification": "保留庭院镜头、竹林、步道与池水；灯笼有暖光，水面与石径承接光源，窗户透光；远处冷月光，禁止整图蓝色遮罩。"
+    },
+    {
+      "file": "public/yuanhang/wendao/assets/world-terrace-night-v1.webp",
+      "source": "public/yuanhang/wendao/assets/world-terrace.webp",
+      "label": "望星台",
+      "generator": "image_gen.imagegen reference edit",
+      "generationOutput": "exec-862a8060-bd8d-4920-80f8-678d363312be.png",
+      "bytes": 420140,
+      "sha256": "11d82850fc6ef7df640c57dac9f29a2d66d63e120a2461338f208d0a0fd80154",
+      "sourceSha256": "d9f2fc63fcd77883c6bca25c5ece01d1d1f733c008816ed49d86cb0816f8446b",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "reproductionSpecification": "保留山景、望星平台及原有透视；夜空月光与近处灯笼暖光并置，栏杆与地面出现对应的局部照明。"
+    },
+    {
+      "file": "public/yuanhang/wendao/assets/world-study-night-v1.webp",
+      "source": "public/yuanhang/wendao/assets/world-study.webp",
+      "label": "问道书房",
+      "generator": "image_gen.imagegen reference edit",
+      "generationOutput": "exec-6dd406b9-3b64-4a2b-a0c2-7893e395d01f.png",
+      "bytes": 349160,
+      "sha256": "00f983020ca280945f56920af4ccc9575ab20e925f8353632de5af33eacf52d9",
+      "sourceSha256": "c9f5a75fc2dcb74d3f28eaeb3b247892c68a8aadb6c4313e6cd0f7a1b28d3dc7",
+      "dimensions": [
+        1672,
+        941
+      ],
+      "reproductionSpecification": "原书房镜头与家具保持；窗外入夜，案头烛火及室内纸灯形成暖光，书案、地面与木构件有对应受光。"
+    },
+    {
+      "file": "public/yuanhang/wendao/assets/world-herbs-night-v1.webp",
+      "source": "public/yuanhang/wendao/assets/world-herbs.webp",
+      "label": "百草药庐",
+      "generator": "image_gen.imagegen reference edit",
+      "generationOutput": "exec-f4a504a1-2e4b-4565-ae9e-d96a4ca4dfc2.png",
+      "bytes": 370734,
+      "sha256": "96bceb05b8fa678c737bdaddd01e589c329838ec2d8d9f9da82206f9738bfa06",
+      "sourceSha256": "c492e840d3a66f2c01a8ff9837c016bebb22a1bd9d23080c7fe4c874effa359c",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "reproductionSpecification": "保留药庐建筑、草药和路径；窗内灯火与檐下灯笼温暖，地面有受光，周边保留低照度夜色。"
+    },
+    {
+      "file": "public/yuanhang/wendao/assets/world-corridor-night-v1.webp",
+      "source": "public/yuanhang/wendao/assets/world-corridor.webp",
+      "label": "回廊",
+      "generator": "image_gen.imagegen reference edit",
+      "generationOutput": "exec-acf168e1-c4e8-4468-9bc5-f5fad3c07456.png",
+      "bytes": 425014,
+      "sha256": "e48c1fd097a6eca52e0a6720b471fa4abb80e4fcb94642ddd3f974679e88ef20",
+      "sourceSha256": "ccedf0784da3729686d92dcf653ae1d30c3caf089bb78c2094618266139733ba",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "reproductionSpecification": "保留回廊纵深及镜头；沿廊灯笼和窗内暖光，柱子、廊面出现真实来源的光影，远景清冷而非蓝膜。"
+    },
+    {
+      "file": "public/yuanhang/wendao/assets/world-bedroom-night-v1.webp",
+      "source": "public/yuanhang/wendao/assets/world-bedroom.webp",
+      "label": "知遥寝居环境",
+      "generator": "image_gen.imagegen reference edit",
+      "generationOutput": "exec-b7ca3344-b6b4-4e5f-8850-7999b6c6e2f9.png",
+      "bytes": 375080,
+      "sha256": "10c50af1dbe26c89193ccc6414be65d30c8f7367407a7b91fada3bfbe5d8a5de",
+      "sourceSha256": "1b790cc0e7782498a010f0af0ccf76817eb6df2cef670ef1a461c463acb93da4",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "reproductionSpecification": "保留寝居家具、床榻、视角；窗外夜色，床侧灯烛与室内纸灯暖光落在枕被和地板，不添加人物。"
+    },
+    {
+      "file": "public/yuanhang/wendao/assets/bedroom-live-night-v1.webp",
+      "source": "public/yuanhang/wendao/assets/zhiyao-recovery-cg.webp",
+      "label": "病中 CG 夜间底图",
+      "generator": "image_gen.imagegen reference edit",
+      "generationOutput": "exec-7ed062b8-45cb-4d6e-9e32-059f8362879c.png",
+      "bytes": 278894,
+      "sha256": "10baa09d6708f1f481b810127b022e3cd2862dbec33c96be95775921792cb7da",
+      "sourceSha256": "183edaf09ea280b22cd0816c0f533f47608da002fbf8790a34002772f7d9d71d",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "reproductionSpecification": "保持温知遥原有脸型、发型、衣饰、卧姿、手部和构图；只改夜间环境：窗外入夜，脑后纸灯和床边小烛照亮被褥；面部曝光接近原画，方便局部层对齐。"
+    },
+    {
+      "file": "public/yuanhang/wendao/assets/bedroom-live-closed-v1.webp",
+      "source": "public/yuanhang/wendao/assets/zhiyao-recovery-cg.webp",
+      "label": "闭眼素材源",
+      "generator": "image_gen.imagegen reference edit",
+      "generationOutput": "exec-a618e699-d5f6-4b52-9586-f56557791f0e.png",
+      "bytes": 253388,
+      "sha256": "f3c0146ff98295b3b02850186a5e29bd7243981105f8ebbc253ad4f08d4d9b47",
+      "sourceSha256": "183edaf09ea280b22cd0816c0f533f47608da002fbf8790a34002772f7d9d71d",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "reproductionSpecification": "原画精确对齐，只让双眼自然闭合，保持眼睑形态、脸型、头部姿势、嘴与其他全部内容。运行时只使用眼周羽化局部，整张素材不替换背景。"
+    },
+    {
+      "file": "public/yuanhang/wendao/assets/bedroom-live-greet-v1.webp",
+      "source": "public/yuanhang/wendao/assets/zhiyao-recovery-cg.webp",
+      "label": "抬眼和浅笑素材源",
+      "generator": "image_gen.imagegen reference edit",
+      "generationOutput": "exec-93ea578c-57d8-40e8-b796-9c001e76ffff.png",
+      "bytes": 259768,
+      "sha256": "724275779792d4e353b3a00a3a892e738746284e406b4a52870578a4bd942538",
+      "sourceSha256": "183edaf09ea280b22cd0816c0f533f47608da002fbf8790a34002772f7d9d71d",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "reproductionSpecification": "保持原人物外貌、脸型、头部姿势和构图；眼神轻抬看向玩家，嘴角极轻上扬、不露齿、病中倦弱安抚感。运行时分离眼周与嘴角局部权重，不让整张图片移动。"
+    }
+  ]
+}

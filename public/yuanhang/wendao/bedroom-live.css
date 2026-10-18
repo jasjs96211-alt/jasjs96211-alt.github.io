@@ -1,0 +1,27 @@
+/* Painted night light sources, not an all-scene blue veil. */
+.wd-companion .wc-backdrop[data-location="study"][data-phase="night"]{background-image:url('./assets/world-study-night-v1.webp')}
+.wd-companion .wc-backdrop[data-location="herbs"][data-phase="night"]{background-image:url('./assets/world-herbs-night-v1.webp')}
+.wd-companion .wc-backdrop[data-location="garden"][data-phase="night"]{background-image:url('./assets/world-garden-night-v1.webp')}
+.wd-companion .wc-backdrop[data-location="corridor"][data-phase="night"]{background-image:url('./assets/world-corridor-night-v1.webp')}
+.wd-companion .wc-backdrop[data-location="bedroom"][data-phase="night"]{background-image:url('./assets/world-bedroom-night-v1.webp')}
+.wd-companion .wc-backdrop[data-location="terrace"][data-phase="night"]{background-image:url('./assets/world-terrace-night-v1.webp')}
+.wd-companion .wc-backdrop[data-location][data-phase="night"]::after{background:transparent}
+.wd-companion #wcBedroomLive{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:65% 28%;z-index:2;pointer-events:none}
+.wd-companion .wc-bed-touch{position:absolute;left:47%;top:16%;width:45%;height:43%;z-index:3;background:transparent;border:0;box-shadow:none;cursor:pointer;border-radius:40%;-webkit-tap-highlight-color:transparent}
+.wd-companion .wc-bed-touch:focus-visible{outline:2px solid #ead9a5;outline-offset:3px}
+.wd-companion .wc-bed-response{position:absolute;right:14%;top:50%;z-index:3;max-width:50%;margin:0;padding:9px 16px;border:1px solid #dfcc9e88;border-radius:18px;background:#24332de0;color:#fff2d6;font-size:14px;line-height:1.6;pointer-events:none}
+.wd-companion #wcBedroomLive[hidden],.wd-companion .wc-bed-touch[hidden],.wd-companion .wc-bed-response[hidden]{display:none}
+@media(max-width:720px){
+ .wd-companion #wcBedroomLive{top:156px;bottom:auto;height:calc(100% - 300px);min-height:200px;object-position:76% 25%}
+ .wd-companion .wc-bed-touch{left:35%;top:185px;width:62%;height:calc(100% - 365px);min-height:100px}
+ .wd-companion .wc-bed-response{top:auto;bottom:180px;right:12%;max-width:70%;font-size:12px}
+}
+@media(max-height:560px) and (orientation:landscape){
+ .wd-companion #wcBedroomLive{inset:0 auto 0 0;width:60%;height:100%;min-height:0;object-position:76% 28%}
+ .wd-companion .wc-bed-touch{left:29%;top:23%;width:28%;height:40%;min-height:0}
+ .wd-companion .wc-bed-response{right:auto;left:25%;bottom:22%;top:auto;max-width:30%}
+}
+/* #17's provisional lamps remain for dusk; dedicated night paintings already
+   include the correctly placed sources and reflections, so avoid double lamps. */
+.wd-companion .wc-backdrop[data-location][data-phase="night"] .wc-night-lights{display:none}
+.wd-player #wdScene[data-phase="night"]::after{background:none}

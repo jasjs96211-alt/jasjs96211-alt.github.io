@@ -1,0 +1,47 @@
+{
+  "base": "497f62626988e01a1a1936a895d57b20306001f4",
+  "tests": {
+    "command": "node --test public/yuanhang/tests/*.mjs",
+    "pass": 345,
+    "fail": 0,
+    "skipped": 0
+  },
+  "timezoneRegression": {
+    "timezone": "America/New_York",
+    "pass": 23,
+    "fail": 0
+  },
+  "build": "passed",
+  "diffCheck": "passed",
+  "assetDimensions": {
+    "pass": 9,
+    "fail": 0
+  },
+  "videos": [
+    {
+      "file": "bedroom-live-demo.mp4",
+      "seconds": 32.0,
+      "bytes": 989989,
+      "sha256": "98dc53276bdbb3a39fd87f1341c82b548a37968be620b1b5c27eb8ade1247f7d",
+      "kind": "production native Canvas renderer, not browser recording"
+    },
+    {
+      "file": "bedroom-five-minute.mp4",
+      "seconds": 300.0,
+      "bytes": 5096051,
+      "sha256": "7c85e8665a314de50e93414191a4b22c5eaadca34f612a83f958d6979bfa3373",
+      "kind": "production native Canvas renderer, not browser recording"
+    }
+  ],
+  "notVerified": [
+    "real browser / iPhone / PWA visual QA",
+    "online AI provider",
+    "cross-device animation synchronization"
+  ],
+  "notImplemented": [
+    "supported sit-up transitions",
+    "book and page-turn hand assets",
+    "medicine cup hand/sip/return transitions",
+    "2.5D walkable scene depth/navigation"
+  ]
+}

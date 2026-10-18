@@ -32,12 +32,7 @@ function scheduleActivity(state,at,focus){
  const ill=injury(state),low=(Number.isFinite(v.stamina)&&v.stamina<32)||(Number.isFinite(v.mp)&&v.mp<=10)||label==='tired';
  const recent=state?.schedule;
  if(ill){
-  const activities=[
-   {place:'bedroom',title:label==='injured'?'卧榻静养':'榻边温养',text:'她守着药盏缓缓调息，不勉强走动。',spot:'榻边'},
-   {place:'bedroom',title:'歇息与用药',text:'她暂且放下书册，靠枕安静地歇息。',spot:'榻边'},
-   {place:'bedroom',title:'卧榻翻看医札',text:'她只读薄薄几页，便停下来休息。',spot:'榻边'}
-  ];
-  return activities[Math.floor(at/1200000)%activities.length];
+  return {place:'bedroom',title:label==='injured'?'卧榻静养':'卧榻休养',text:'她留在榻上安静歇息，不勉强走动。',spot:'榻边'};
  }
  if(low){
   return {place:'bedroom',title:'按时歇息',text:'她收起手里的事，先养足精神。',spot:'榻边'};

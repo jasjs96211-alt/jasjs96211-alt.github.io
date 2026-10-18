@@ -1,4 +1,4 @@
-/* vNext technical slice. Not loaded by the production shell.
+/* Shared bedroom behavior controller; production capabilities come from decoded art.
  * Only consumes facts; never owns health, study time, location, CG unlocks or storage.
  */
 (function (root) {
@@ -49,6 +49,7 @@
     let lastGreet = validSaved ? snapshot.lastGreet : 0, lastClick = validSaved ? snapshot.lastClick : 0;
     let present = false, lastFocus = null, reaction = null, previousMode = null;
     let latest = null, visualTime = 0, lastResponse = 0, wasHidden = false;
+    let blinkIndex = 0, blinkAt = 4000 + hash(seed) % 5001;
 
     function setPhase(i) { index = i; elapsed = 0; revision++; }
     function next() {
@@ -115,12 +116,12 @@
       }
       lastFocus = f;
       if (cue && (lastResponse === 0 || at - lastResponse >= 8000) && ![1, 3, 5, 6, 7, 12].includes(index)) {
-        lastResponse = at; reaction = { cue, kind: safeReaction(), at, until: at + (weak ? 2400 : 1800) };
+        lastResponse = at; reaction = { cue, kind: safeReaction(), at, until: at + (weak ? 3200 : 2600) };
       }
       if (reaction && (at >= reaction.until || !canReact)) reaction = null;
       const p = phases[index], progress = clamp(elapsed / p.duration);
       let actionId = p.actionId, clip = p.clip, title = p.title, text = p.text, phase = p.id;
-      const props = { book: canRead ? 'bedside' : 'absent', bowl: canMedicate ? 'bedside' : 'absent', page };
+      const props = { book: canRead ? 'bedside' : 'absent', bowl: canMedicate || manifest.props?.bowl === 'bedside' ? 'bedside' : 'absent', page };
       if (mode === 'routine') {
         if (index <= 2) props.book = 'held';
         else if (index === 3) props.book = 'placing';
@@ -128,8 +129,8 @@
         if (index === 5) props.bowl = 'taking';
         else if (index === 6) props.bowl = 'held';
         else if (index === 7) props.bowl = 'placing';
-        if (!canRead && index === 4) text = '她靠着软枕安静歇息。';
-        if (!canMedicate && index === 8) { title = '倚枕调息'; text = '她留在榻上，缓缓调息。'; }
+        if (!canRead && index === 4) text = '她卧在软枕上安静歇息。';
+        if (!canMedicate && index === 8) { title = '榻边温养'; text = '她留在榻上，缓缓调息。'; }
         if (index === 10 && (!canRead || !canMedicate)) text = '她安静地睡着，不打扰她。';
       } else {
         phase = mode; actionId = mode === 'severe' ? 'bed_heavy_injury' : mode === 'sleep' ? 'bed_light_nap' : 'bed_hold';
@@ -141,18 +142,27 @@
       if (mode === 'absent') { props.book = 'absent'; props.bowl = 'absent'; }
       if (!available && mode !== 'absent') { actionId = 'bed_asset_wait'; phase = 'asset_wait'; title = '寝居素材待补齐'; text = '当前没有通过校验的动作素材。'; clip = null; reaction = null; props.book = 'absent'; props.bowl = 'absent'; }
       const animTime = visualTime;
-      // Deterministic, irregular blink windows. Micro motion remains local and is not persisted as fact.
-      const block = Math.floor(animTime / 5000), blinkAt = 400 + hash(block + seed) % 4000;
-      const blinkT = animTime % 5000 - blinkAt;
-      const eyes = sleeping ? 0 : reducedMotion || disputed ? .55 : blinkT >= 0 && blinkT < (weak ? 320 : 200) ? 0 : severe ? .3 : .8;
+      // Inter-blink onset spacing is seeded 4–9 s, with alternating slow blinks.
+      while (animTime >= blinkAt + 1000) { blinkIndex++; blinkAt += 4000 + hash(seed + blinkIndex) % 5001; }
+      const duration = blinkIndex % 2 ? 780 : 520, bt = (animTime - blinkAt) / duration;
+      const smooth = x => { x = clamp(x); return x*x*(3-2*x); };
+      let lidClosure = bt < 0 || bt > 1 ? 0 : bt < .32 ? smooth(bt/.32) : bt < .47 ? 1 : 1-smooth((bt-.47)/.53);
+      if (sleeping) lidClosure = phase === 'nap_enter' ? smooth(progress) : phase === 'wake' ? 1-smooth(progress) : 1;
+      if (reducedMotion || disputed) lidClosure = sleeping ? 1 : 0;
+      const reactionAge = reaction ? at - reaction.at : 0;
+      const fade = reaction ? smooth((reaction.until-at)/600) : 0;
+      const reactionWeight = reaction ? smooth(reactionAge/1100)*fade : 0;
+      const smileWeight = reaction ? smooth((reactionAge-1000)/650)*fade*.75 : 0;
+      const eyes = sleeping ? 0 : lidClosure > .8 ? 0 : severe ? .3 : .8;
       const motion = {
-        eyes, gaze: reaction ? 'player' : props.book === 'held' ? 'book' : 'down',
+        eyes, lidClosure, reactionWeight, smileWeight,
+        gaze: reaction ? 'player' : props.book === 'held' ? 'book' : 'down',
         smile: !!reaction && reaction.kind !== 'eyes_only' && ready('weak_smile'),
-        breath: reducedMotion || disputed || hidden ? 0 : Math.sin(animTime / (weak ? 1200 : 900)) * (severe ? .15 : weak ? .35 : .6),
+        breath: reducedMotion || disputed || hidden ? 0 : Math.sin(animTime * Math.PI * 2 / (weak ? 5100 : 4400)) * (severe ? .15 : weak ? .35 : .5),
         progress: reducedMotion ? (progress >= .5 ? 1 : 0) : progress
       };
       latest = freeze({ version: VERSION, revision, actionId, phase, clip, title, text, props,
-        location: world.sister || null, anchor: atBed ? 'bed' : null, pose: !atBed ? null : severe || sleeping ? 'lying' : 'reclined',
+        location: world.sister || null, anchor: atBed ? 'bed' : null, pose: !atBed ? null : manifest.pose === 'lying' || severe || sleeping ? 'lying' : 'reclined',
         following: world.following === true, visible: isPresent && available, status: available ? assetClass : 'unavailable',
         sleeping, severe, weak, reaction: reaction ? { cue: reaction.cue, kind: reaction.kind } : null, motion,
         focus: { ...f, remaining: finite(focus.remaining) ? focus.remaining : null },
@@ -162,7 +172,7 @@
     function serialize() { return copy({ version: VERSION, assetVersion: manifest.version || null, phase: phases[index].id, elapsed, revision, lastAt: lastAt ?? 0, lastGreet, lastClick, page, cycle }); }
     function forAI() {
       if (!latest) return null;
-      return copy({ source: 'validated-bedroom-presentation', implementation: 'technical-slice-not-production',
+      return copy({ source: 'validated-bedroom-presentation', implementation: assetClass === 'placeholder' ? 'technical-slice-not-production' : 'painted-local-animation',
         location: latest.location, following: latest.following, actionId: latest.actionId, phase: latest.phase,
         description: latest.text, props: latest.props, pose: latest.pose, sleeping: latest.sleeping,
         assetStatus: latest.status, claimVisibleAction: latest.visible,
