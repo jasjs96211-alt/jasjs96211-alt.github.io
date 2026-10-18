@@ -1,0 +1,59 @@
+{
+  "base": "497f62626988e01a1a1936a895d57b20306001f4",
+  "tests": {
+    "command": "node --test public/yuanhang/tests/*.mjs",
+    "pass": 347,
+    "fail": 0,
+    "skipped": 0
+  },
+  "timezoneRegression": {
+    "timezone": "America/New_York",
+    "pass": 25,
+    "fail": 0
+  },
+  "build": "passed",
+  "diffCheck": "passed",
+  "assetDimensions": {
+    "pass": 9,
+    "fail": 0
+  },
+  "videos": [
+    {
+      "file": "bedroom-live-demo.mp4",
+      "seconds": 32.0,
+      "bytes": 1015207,
+      "sha256": "252a5a147722bfa3c7731a27a3fe108ee767c46c752796419d44a5d3b5a47b0a",
+      "kind": "production native Canvas renderer, not browser recording"
+    },
+    {
+      "file": "bedroom-five-minute.mp4",
+      "seconds": 300.0,
+      "bytes": 5241464,
+      "sha256": "0d8500b51076a4458f9d536e1c006479b5505180fa30746f203fbc11d47ba62f",
+      "kind": "production native Canvas renderer, not browser recording"
+    }
+  ],
+  "notVerified": [
+    "real browser / iPhone / PWA visual QA",
+    "online AI provider",
+    "cross-device animation synchronization"
+  ],
+  "notImplemented": [
+    "supported sit-up transitions",
+    "book and page-turn hand assets",
+    "medicine cup hand/sip/return transitions",
+    "2.5D walkable scene depth/navigation"
+  ],
+  "pixelRegression": {
+    "pass": 2,
+    "fail": 0,
+    "checks": [
+      "decoded closed-eye painting replaces eye pixels",
+      "gaze and mouth actually change",
+      "breathing mesh local only",
+      "night eyes remain visible",
+      "background fixed"
+    ],
+    "blockingIssueFixed": "empty transformed radial-gradient alpha mask replaced by explicit cropped alpha raster"
+  }
+}

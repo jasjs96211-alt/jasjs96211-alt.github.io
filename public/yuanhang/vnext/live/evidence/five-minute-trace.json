@@ -1,0 +1,200 @@
+{
+  "kind": "production-renderer-output-not-browser-recording",
+  "seconds": 300,
+  "fps": 12,
+  "renderWallMs": 64873,
+  "trace": [
+    {
+      "ms": 0,
+      "phase": "rest",
+      "clip": "rest_pillow",
+      "title": "歇息",
+      "text": "她卧在软枕上安静歇息。",
+      "props": {
+        "book": "absent",
+        "bowl": "bedside",
+        "page": 1
+      },
+      "reaction": {
+        "cue": "entry",
+        "kind": "weak_acknowledge"
+      }
+    },
+    {
+      "ms": 3250,
+      "phase": "rest",
+      "clip": "rest_pillow",
+      "title": "歇息",
+      "text": "她卧在软枕上安静歇息。",
+      "props": {
+        "book": "absent",
+        "bowl": "bedside",
+        "page": 1
+      },
+      "reaction": null
+    },
+    {
+      "ms": 12000,
+      "phase": "rest",
+      "clip": "rest_pillow",
+      "title": "歇息",
+      "text": "她卧在软枕上安静歇息。",
+      "props": {
+        "book": "absent",
+        "bowl": "bedside",
+        "page": 1
+      },
+      "reaction": {
+        "cue": "touch",
+        "kind": "weak_acknowledge"
+      }
+    },
+    {
+      "ms": 15250,
+      "phase": "rest",
+      "clip": "rest_pillow",
+      "title": "歇息",
+      "text": "她卧在软枕上安静歇息。",
+      "props": {
+        "book": "absent",
+        "bowl": "bedside",
+        "page": 1
+      },
+      "reaction": null
+    },
+    {
+      "ms": 24000,
+      "phase": "rest",
+      "clip": "rest_pillow",
+      "title": "歇息",
+      "text": "她卧在软枕上安静歇息。",
+      "props": {
+        "book": "absent",
+        "bowl": "bedside",
+        "page": 1
+      },
+      "reaction": {
+        "cue": "focus_start",
+        "kind": "weak_acknowledge"
+      }
+    },
+    {
+      "ms": 27250,
+      "phase": "rest",
+      "clip": "rest_pillow",
+      "title": "歇息",
+      "text": "她卧在软枕上安静歇息。",
+      "props": {
+        "book": "absent",
+        "bowl": "bedside",
+        "page": 1
+      },
+      "reaction": null
+    },
+    {
+      "ms": 28000,
+      "phase": "warm",
+      "clip": "recover_breathe",
+      "title": "榻边温养",
+      "text": "她留在榻上，缓缓调息。",
+      "props": {
+        "book": "absent",
+        "bowl": "bedside",
+        "page": 1
+      },
+      "reaction": null
+    },
+    {
+      "ms": 78000,
+      "phase": "nap_enter",
+      "clip": "nap_enter",
+      "title": "静养小憩",
+      "text": "她慢慢合上眼，准备小憩。",
+      "props": {
+        "book": "absent",
+        "bowl": "bedside",
+        "page": 1
+      },
+      "reaction": null
+    },
+    {
+      "ms": 81000,
+      "phase": "nap",
+      "clip": "nap_loop",
+      "title": "静养小憩",
+      "text": "她安静地睡着，不打扰她。",
+      "props": {
+        "book": "absent",
+        "bowl": "bedside",
+        "page": 1
+      },
+      "reaction": null
+    },
+    {
+      "ms": 161000,
+      "phase": "wake",
+      "clip": "wake_slow",
+      "title": "缓缓醒来",
+      "text": "小憩之后，她缓缓睁开眼。",
+      "props": {
+        "book": "absent",
+        "bowl": "bedside",
+        "page": 1
+      },
+      "reaction": null
+    },
+    {
+      "ms": 165000,
+      "phase": "rest",
+      "clip": "rest_pillow",
+      "title": "歇息",
+      "text": "她卧在软枕上安静歇息。",
+      "props": {
+        "book": "absent",
+        "bowl": "bedside",
+        "page": 1
+      },
+      "reaction": null
+    },
+    {
+      "ms": 193000,
+      "phase": "warm",
+      "clip": "recover_breathe",
+      "title": "榻边温养",
+      "text": "她留在榻上，缓缓调息。",
+      "props": {
+        "book": "absent",
+        "bowl": "bedside",
+        "page": 1
+      },
+      "reaction": null
+    },
+    {
+      "ms": 243000,
+      "phase": "nap_enter",
+      "clip": "nap_enter",
+      "title": "静养小憩",
+      "text": "她慢慢合上眼，准备小憩。",
+      "props": {
+        "book": "absent",
+        "bowl": "bedside",
+        "page": 1
+      },
+      "reaction": null
+    },
+    {
+      "ms": 246000,
+      "phase": "nap",
+      "clip": "nap_loop",
+      "title": "静养小憩",
+      "text": "她安静地睡着，不打扰她。",
+      "props": {
+        "book": "absent",
+        "bowl": "bedside",
+        "page": 1
+      },
+      "reaction": null
+    }
+  ],
+  "exportBatchSeconds": 60
+}

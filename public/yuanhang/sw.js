@@ -1,13 +1,14 @@
 /* Offline app shell first. Large portraits must not prevent the updated code
    from installing over mobile data. No API responses or user data are cached. */
-const CACHE='yuanhang-static-v27-map-night-20261017';
+const CACHE='yuanhang-static-v28-bedroom-live-20261018';
 const SHELL=[
  './','./index.html','./manifest.webmanifest','./icon.svg',
  './usage.js','./cloud.js?v=20261016-sync-r4',
- './wendao/novel.js?v=20261016-v15','./wendao/story.js?v=20261016-v15','./wendao/transport.js',
- './wendao/engine.js?v=20261017-ui3','./wendao/app.js?v=20261017-map-quick-1',
- './wendao/world.js?v=20261017-v16-dynamic','./wendao/interaction.js?v=20261017-v16-review-fix',
- './wendao/motion.js?v=20261017-v16-review-fix','./wendao/companion.js?v=20261017-map-quick-1',
+ './wendao/novel.js?v=20261016-v15','./wendao/story.js?v=20261017-live1','./wendao/transport.js',
+ './wendao/engine.js?v=20261017-ui3','./wendao/app.js?v=20261017-live1',
+ './wendao/world.js?v=20261017-live1','./wendao/interaction.js?v=20261017-live1',
+ './wendao/motion.js?v=20261017-v16-review-fix','./wendao/companion.js?v=20261017-live1',
+ './wendao/bedroom-behavior.js?v=20261017-live1','./wendao/bedroom-renderer.js?v=20261017-live1','./wendao/bedroom-live.css?v=20261017-live1',
  './wendao/style.css?v=20261016-v15','./wendao/companion.css?v=20261016-v15',
  './wendao/world.css?v=20261017-v16-dynamic','./wendao/motion.css?v=20261017-v16-dynamic',
  './wendao/night-lighting.css?v=20261017-night-lighting-1',
@@ -15,6 +16,8 @@ const SHELL=[
  './wendao/ui-v16.css?v=20261017-v16-ui2','./wendao/ui-mobile-polish.css?v=20261017-ui3'
 ];
 const ARTWORK=[
+ ...['study','herbs','garden','corridor','bedroom','terrace'].map(id=>'./wendao/assets/world-'+id+'-night-v1.webp'),
+ ...['night','closed','greet'].map(id=>'./wendao/assets/bedroom-live-'+id+'-v1.webp'),
  ...['walk','read','herbs','meditate'].flatMap(id=>['cycle','still'].map(kind=>'./wendao/assets/zhiyao-'+id+'-'+kind+'.webp')),
  ...['study','herbs','garden','corridor','bedroom','terrace'].map(id=>'./wendao/assets/world-'+id+'.webp'),
  './wendao/assets/zhiyao-recovery-cg.webp',
@@ -49,7 +52,7 @@ self.addEventListener('fetch',event=>{
  const req=event.request,url=new URL(req.url);
  if(req.method!=='GET'||url.origin!==self.location.origin||
     !url.pathname.startsWith(new URL(self.registration.scope).pathname)||
-    !/(?:\/wendao\/(?:novel\.js|engine\.js|story\.js|app\.js|transport\.js|companion\.js|world\.js|motion\.js|interaction\.js|style\.css|companion\.css|world\.css|motion\.css|night-lighting\.css|scene-shortcuts\.css|ui-v16\.css|assets\/[a-z0-9-]+\.webp)$|\/(?:cloud\.js|usage\.js|index\.html|manifest\.webmanifest|icon\.svg)?$)/.test(url.pathname))return;
+    !/(?:\/wendao\/(?:novel\.js|engine\.js|story\.js|app\.js|transport\.js|companion\.js|world\.js|motion\.js|bedroom-behavior\.js|bedroom-renderer\.js|bedroom-live\.css|ui-mobile-polish\.css|interaction\.js|style\.css|companion\.css|world\.css|motion\.css|night-lighting\.css|scene-shortcuts\.css|ui-v16\.css|assets\/[a-z0-9-]+\.webp)$|\/(?:cloud\.js|usage\.js|index\.html|manifest\.webmanifest|icon\.svg)?$)/.test(url.pathname))return;
  event.respondWith(fetch(req).then(response=>{
   if(response.ok){
    const copy=response.clone();

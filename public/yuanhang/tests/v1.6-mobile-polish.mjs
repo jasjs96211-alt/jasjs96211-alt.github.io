@@ -12,7 +12,7 @@ test('free-study room changes artwork by Beijing daytime, existing nighttime pre
  assert.match(a.get('wdScene').style.backgroundImage,/world-study\.webp/);
  const night=setup('23:30:00');
  assert.equal(night.get('wdScene').dataset.phase,'night');
- assert.match(night.get('wdScene').style.backgroundImage,/study-room\.webp/);
+ assert.match(night.get('wdScene').style.backgroundImage,/world-study-night-v1\.webp/);
 });
 test('letter collection is a single named modal and hides HUD while open',()=>{
  const a=setup();

@@ -186,10 +186,10 @@ test('25-minute original timer: scene travel, pause, restore and completion pres
   assert.ok(app.storage.get(WD));
 });
 
-test('technical slice is not enabled by production HTML and lab cannot touch persistence or network', () => {
+test('production loads the behavior controller, while the placeholder lab stays isolated', () => {
   const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
   const lab = readFileSync(new URL('../labs/bedroom/lab.js', import.meta.url), 'utf8');
-  assert.doesNotMatch(html, /bedroom-behavior|labs\/bedroom/);
+  assert.match(html, /bedroom-behavior/); assert.match(html, /bedroom-renderer/); assert.doesNotMatch(html, /labs\/bedroom/);
   assert.doesNotMatch(lab, /localStorage|sessionStorage|indexedDB|fetch\(|XMLHttpRequest|WendaoBridge/);
   assert.doesNotMatch(source, /localStorage|sessionStorage|fetch\(|focusAction|unlockedCG\.push/);
 });

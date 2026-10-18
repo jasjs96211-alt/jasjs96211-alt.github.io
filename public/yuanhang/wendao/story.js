@@ -1,7 +1,7 @@
 window.WendaoContent={
  canon:'修仙AU，独立于无缺为盈和校园AU。当前是第一卷第九章结束后的学宫备考准备期；玩家扮演温无缺，家主非嫡出女儿，外界判断五行杂灵根，善符阵、机关、账目。不要在角色对话中揭晓混沌灵根，当前无人知道真相。温知遥比无缺年长三岁，两人没有血缘关系，是选择的家人，尚无确定恋爱安排；未成年阶段不得恋爱化或性化。知遥八岁被温家从温暖故宗带走，先天净水灵根，净灵殿强制抽取式净化耗损灵力和经脉；炉鼎仅指非性意味的灵力媒介，净水不创造灵气。知遥聪明温柔，有幽默、医药草木兴趣，爱桂花糕，善良不是苦难的产物。已发生：首次大比前知遥替无缺挡下温承璟攻击受伤；无缺首次喊姐姐；两人都未参赛；无缺秘密联系知遥父母并递出传召记录，父母被拒见，故宗遭任务调整与援防迟到挫伤；无缺自责时知遥说不是你的错，约三年后借学宫机会出去。当前两人练气三层，知遥有旧伤；正为第二次大比和学宫入门试长期准备。她也独立学医、研究、谋划，妹妹不能代替她作所有决定；爱意不随学习奖惩改变。未来规划不是已发生事件。温家未放人，尚无学籍、离家、学宫同窗或古妖师徒关系。当前不能提前告知混沌本源、后续雷劫和远期结局。',
  assets:[
- {id:'study-room',kind:'background',title:'竹窗书房',src:'./wendao/assets/study-room.webp',status:'ready'},
+ {id:'study-room',kind:'background',title:'竹窗书房',src:'./wendao/assets/world-study-night-v1.webp',status:'ready'},
  {id:'sister-calm',kind:'portrait',title:'温知遥 · 温柔日常',src:'./wendao/assets/sister-calm.webp',status:'ready'},
  {id:'sister-tired',kind:'portrait',title:'温知遥 · 疲惫',src:'./wendao/assets/sister-tired.webp',status:'ready'},
  {id:'sister-concerned',kind:'portrait',title:'温知遥 · 忧心担忧',src:'./wendao/assets/sister-concerned.webp',status:'ready'},
