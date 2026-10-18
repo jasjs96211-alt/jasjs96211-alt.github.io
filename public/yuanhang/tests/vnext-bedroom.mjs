@@ -193,3 +193,21 @@ test('production loads the behavior controller, while the placeholder lab stays 
   assert.doesNotMatch(lab, /localStorage|sessionStorage|indexedDB|fetch\(|XMLHttpRequest|WendaoBridge/);
   assert.doesNotMatch(source, /localStorage|sessionStorage|fetch\(|focusAction|unlockedCG\.push/);
 });
+
+test('asymmetric breath has smooth cycle edges, varied peaks and continues safely asleep',()=>{
+ const a=setup({seed:37}), samples=[];
+ for(let i=0;i<1200;i++)samples.push(a.step(25).motion.breath);
+ const peaks=[];
+ for(let i=1;i<samples.length-1;i++){
+  assert.ok(Math.abs(samples[i]-samples[i-1])<.055,'no discontinuity at 25 ms');
+  if(samples[i]>samples[i-1]&&samples[i]>=samples[i+1])peaks.push(samples[i]);
+ }
+ assert.ok(new Set(peaks.map(x=>x.toFixed(3))).size>2);
+ const sleeping=setup(), values=[];
+ for(let i=0;i<80;i++){
+  const p=sleeping.step(100,{sisterSleeping:true});values.push(p.motion.breath);
+  assert.equal(p.reaction,null);assert.equal(p.motion.suppressedCough,0);
+  assert.ok(p.motion.breath<=.25);
+ }
+ assert.ok(Math.max(...values)>.1);
+});

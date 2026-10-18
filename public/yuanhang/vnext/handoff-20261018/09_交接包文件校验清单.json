@@ -1,0 +1,47 @@
+[
+  {
+    "file": "00_从这里开始_交接总说明.md",
+    "bytes": 5500,
+    "sha256": "ace20ec92c6528faa4473f1b5ec9be4fd249e66d27521bd723f96a850badb156"
+  },
+  {
+    "file": "01_用户已确认需求总账_逐条不得遗漏.md",
+    "bytes": 9967,
+    "sha256": "7f5246064816312f6b156aa7606a9ea6a63af802c0d7bd85c7716c529e79e714"
+  },
+  {
+    "file": "02_2_5D路线与整体体验方针.md",
+    "bytes": 4955,
+    "sha256": "d0b294ee708bacb6a801a0267e5e11189d7af5a6e0de7ec4efca8df383c1282f"
+  },
+  {
+    "file": "03_温知遥_完整动作素材方案.md",
+    "bytes": 12567,
+    "sha256": "0241dc0d13907aa782d55e83a06b4a7f0428da1b8727ffe074e663a87df1fa41"
+  },
+  {
+    "file": "04_夜间纪事_逐时点事件方案.md",
+    "bytes": 8350,
+    "sha256": "216ea45afaabe5b34e9329e182bca9a11fb68c919d8ba2676a569bc0f5fab79a"
+  },
+  {
+    "file": "05_开发实施批次与Codex直接指令.md",
+    "bytes": 9332,
+    "sha256": "524db74bd41b27f5956a46cbcd4dec4209e61cdfab24ac591268effc08a25b63"
+  },
+  {
+    "file": "06_测试验收与交接回执.md",
+    "bytes": 6060,
+    "sha256": "432c15a251c7b63f436a953a8d5bb3f6abaf1ccd415f579682ebeda5f77233aa"
+  },
+  {
+    "file": "07_动作与夜间纪事数据契约.json",
+    "bytes": 5372,
+    "sha256": "6f65c865ebe329915576b251fa580fc26fef98f35f5979a15cbd95fb458f86a7"
+  },
+  {
+    "file": "08_夜间纪事目标表现样例.md",
+    "bytes": 2064,
+    "sha256": "b2b2833d72d46e7037594268b2ef152b5305fedd4c83e8e04f6f893399bf2f81"
+  }
+]

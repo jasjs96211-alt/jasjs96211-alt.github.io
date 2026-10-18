@@ -70,3 +70,16 @@ body.wd-immersed .toast{z-index:900}
 @media(max-width:720px){.wd-player .wd-player-top{display:flex;flex-direction:column;padding: max(8px,env(safe-area-inset-top)) 10px 8px}.wd-player .wd-player-actions{display:flex;flex-wrap:nowrap;overflow-x:auto;width:100%;max-width:100%;padding-bottom:6px;overscroll-behavior:contain}.wd-player .wd-player-actions button{flex:0 0 auto;font-size:12px;padding:8px 12px}.wd-player .wd-player-actions #wdClose{position:fixed;top:max(8px,env(safe-area-inset-top));right:10px;min-height:36px;background:#173a35f5}.wd-player #wdChapterTitle{max-width:calc(100vw - 155px);min-height:28px}.wd-player .wd-presence{height:68%;bottom:20%;width:100vw}.wd-player .wd-dialog{max-height:min(55dvh,calc(var(--wd-viewport,100dvh) - 112px))}.wd-player .wd-dialog-text{max-height:25dvh}.wd-backlog{inset:110px 10px max(18px,env(safe-area-inset-bottom))}.wd-player .wd-presence .wd-state-tag{top:10px;right:12px}.wd-player:has(.wd-stage-chat:focus-within) .wd-presence{height:60%;bottom:15%}}
 @media(max-height:500px) and (orientation:landscape){.wd-player .wd-presence{height:90%;width:45vw;left:26%;bottom:0}.wd-player .wd-dialog{width:53vw;margin:auto 12px 12px auto;max-height:70dvh}.wd-player .wd-dialog-text{max-height:28dvh}.wd-player .wd-stage-chat label{display:none}}
 @media(prefers-reduced-motion:reduce){.wd-player .wd-presence{transition:none}}
+
+/* Night chronicle: short literary beats, chronological and readable on mobile. */
+.wd-night-recap{margin-block:12px;padding:14px;border:1px solid rgba(191,165,111,.35);border-radius:12px;background:rgba(22,36,34,.55)}
+.wd-night-timeline{list-style:none;margin:12px 0 0;padding:0;display:grid;gap:12px}
+.wd-night-event{display:grid;grid-template-columns:3.6em minmax(0,1fr);gap:10px;align-items:start}
+.wd-night-event time{font-variant-numeric:tabular-nums;color:#e5c990;font-weight:600;white-space:nowrap}
+.wd-night-event>div{border-left:1px solid rgba(220,195,140,.45);padding-left:12px;min-width:0}
+.wd-night-event p{margin:0;line-height:1.75;overflow-wrap:anywhere}
+.wd-night-event details{margin-top:4px;font-size:12px;opacity:.78}
+.wd-night-event summary{cursor:pointer;list-style:disclosure-closed}
+.wd-night-event small{overflow-wrap:anywhere}
+.wd-night-note{font-size:12px;opacity:.8}
+@media(max-width:390px){.wd-night-recap{padding:10px}.wd-night-event{gap:6px;grid-template-columns:3.2em minmax(0,1fr)}.wd-night-event>div{padding-left:8px}}

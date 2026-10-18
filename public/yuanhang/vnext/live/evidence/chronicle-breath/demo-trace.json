@@ -1,0 +1,108 @@
+{
+  "kind": "production-renderer-output-not-browser-recording",
+  "seconds": 32,
+  "fps": 30,
+  "renderWallMs": 56208,
+  "trace": [
+    {
+      "ms": 0,
+      "phase": "rest",
+      "clip": "rest_pillow",
+      "title": "歇息",
+      "text": "她卧在软枕上安静歇息。",
+      "props": {
+        "book": "absent",
+        "bowl": "bedside",
+        "page": 1
+      },
+      "reaction": {
+        "cue": "entry",
+        "kind": "weak_acknowledge"
+      }
+    },
+    {
+      "ms": 3200,
+      "phase": "rest",
+      "clip": "rest_pillow",
+      "title": "歇息",
+      "text": "她卧在软枕上安静歇息。",
+      "props": {
+        "book": "absent",
+        "bowl": "bedside",
+        "page": 1
+      },
+      "reaction": null
+    },
+    {
+      "ms": 12000,
+      "phase": "rest",
+      "clip": "rest_pillow",
+      "title": "歇息",
+      "text": "她卧在软枕上安静歇息。",
+      "props": {
+        "book": "absent",
+        "bowl": "bedside",
+        "page": 1
+      },
+      "reaction": {
+        "cue": "touch",
+        "kind": "weak_acknowledge"
+      }
+    },
+    {
+      "ms": 15200,
+      "phase": "rest",
+      "clip": "rest_pillow",
+      "title": "歇息",
+      "text": "她卧在软枕上安静歇息。",
+      "props": {
+        "book": "absent",
+        "bowl": "bedside",
+        "page": 1
+      },
+      "reaction": null
+    },
+    {
+      "ms": 24000,
+      "phase": "rest",
+      "clip": "rest_pillow",
+      "title": "歇息",
+      "text": "她卧在软枕上安静歇息。",
+      "props": {
+        "book": "absent",
+        "bowl": "bedside",
+        "page": 1
+      },
+      "reaction": {
+        "cue": "focus_start",
+        "kind": "weak_acknowledge"
+      }
+    },
+    {
+      "ms": 27200,
+      "phase": "rest",
+      "clip": "rest_pillow",
+      "title": "歇息",
+      "text": "她卧在软枕上安静歇息。",
+      "props": {
+        "book": "absent",
+        "bowl": "bedside",
+        "page": 1
+      },
+      "reaction": null
+    },
+    {
+      "ms": 28000,
+      "phase": "warm",
+      "clip": "recover_breathe",
+      "title": "榻边温养",
+      "text": "她留在榻上，缓缓调息。",
+      "props": {
+        "book": "absent",
+        "bowl": "bedside",
+        "page": 1
+      },
+      "reaction": null
+    }
+  ]
+}

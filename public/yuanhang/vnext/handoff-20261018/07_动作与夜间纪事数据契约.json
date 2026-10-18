@@ -1,0 +1,219 @@
+{
+  "_notice": "示意契约，不是当前生产代码运行 JSON。clip 只有通过资源/画面双验收才可标 approved。",
+  "project": "远航·问道：学宫篇",
+  "asOf": "2026-10-18",
+  "repo": "jasjs96211-alt/jasjs96211-alt.github.io",
+  "baselineMain": "554afdfbd872eafa768b02a7f6f9373a43991f2e",
+  "art": {
+    "baseCG": "public/yuanhang/wendao/assets/zhiyao-recovery-cg.webp",
+    "logicalCanvas": [
+      1536,
+      1024
+    ],
+    "editableSourceRequired": true,
+    "layerAlphaRequired": true,
+    "zOrderRequired": true,
+    "pivotRequired": true,
+    "contactAnchorsRequired": true,
+    "nightAndDayQARequired": true,
+    "sha256Required": true
+  },
+  "clips": [
+    {
+      "id": "recline_breathe",
+      "priority": "T1",
+      "availableInProduction": "yes-needs-natural-rhythm-v3",
+      "status": "already-partial",
+      "rig": [
+        "torso",
+        "shoulders",
+        "quilt",
+        "sleeves"
+      ],
+      "storyGate": "all-bedridden-with-health-reduced-amplitude"
+    },
+    {
+      "id": "cover_mouth_cough",
+      "priority": "T2-P0",
+      "availableInProduction": "no",
+      "status": "blocked_by_art",
+      "phases": [
+        "rest",
+        "onset",
+        "raise-arm",
+        "cover-mouth",
+        "cough",
+        "recover-breath",
+        "lower-arm",
+        "rest"
+      ],
+      "rig": [
+        "head_neck",
+        "shoulders",
+        "upperarm",
+        "forearm",
+        "palm",
+        "fingers",
+        "sleeve_back",
+        "sleeve_front",
+        "mouth_occlusion",
+        "quilt_front"
+      ],
+      "constraints": [
+        "ill-awake-only",
+        "no-severe-autoplay",
+        "no-sleep-autoplay",
+        "no-whole-image-translation"
+      ],
+      "events": [
+        "hand_leaves_quilt",
+        "hand_covers_mouth",
+        "cough_done",
+        "hand_returns_to_quilt"
+      ]
+    },
+    {
+      "id": "recline_to_propped_sit",
+      "priority": "T3-P1",
+      "availableInProduction": "no",
+      "status": "blocked_by_art",
+      "rig": [
+        "lying-body",
+        "seated-body",
+        "pillow",
+        "both-arms",
+        "quilt-occlusion"
+      ],
+      "constraints": [
+        "injury-allows-sitting",
+        "bidirectional-transition"
+      ]
+    },
+    {
+      "id": "book_take",
+      "priority": "T3-P1",
+      "availableInProduction": "no",
+      "status": "blocked_by_art",
+      "events": [
+        "book_gripped"
+      ],
+      "constraints": [
+        "propped-sit",
+        "empty-hand"
+      ]
+    },
+    {
+      "id": "read_hold",
+      "priority": "T3-P1",
+      "availableInProduction": "no",
+      "status": "blocked_by_art",
+      "constraints": [
+        "propped-sit",
+        "book-held"
+      ]
+    },
+    {
+      "id": "page_turn",
+      "priority": "T3-P1",
+      "availableInProduction": "no",
+      "status": "blocked_by_art",
+      "events": [
+        "page_settled"
+      ],
+      "constraints": [
+        "propped-sit",
+        "book-held"
+      ]
+    },
+    {
+      "id": "book_put_down",
+      "priority": "T3-P1",
+      "availableInProduction": "no",
+      "status": "blocked_by_art",
+      "events": [
+        "book_released"
+      ]
+    },
+    {
+      "id": "bowl_take",
+      "priority": "T3-P1",
+      "availableInProduction": "no",
+      "status": "blocked_by_art",
+      "events": [
+        "bowl_gripped"
+      ],
+      "constraints": [
+        "hands-not-occupied"
+      ]
+    },
+    {
+      "id": "bowl_sip",
+      "priority": "T3-P1",
+      "availableInProduction": "no",
+      "status": "blocked_by_art",
+      "events": [
+        "sip_finished"
+      ]
+    },
+    {
+      "id": "bowl_return",
+      "priority": "T3-P1",
+      "availableInProduction": "no",
+      "status": "blocked_by_art",
+      "events": [
+        "bowl_released"
+      ]
+    },
+    {
+      "id": "nap_enter_nap_loop_wake_slow",
+      "priority": "T3-P1",
+      "availableInProduction": "partial",
+      "status": "needs-pose-art",
+      "constraints": [
+        "not-click-wake",
+        "injury-safe"
+      ]
+    }
+  ],
+  "nightChronicle": {
+    "priority": "T1-P0",
+    "currently": "summary-only, needs event timeline UI",
+    "timezone": "Asia/Shanghai",
+    "sort": "occurredAt asc then importance then stable eventId",
+    "sourcePriority": [
+      "engine-life-ledger",
+      "existing-approved-story-event",
+      "verified-chronicle"
+    ],
+    "doNotInventEventTimes": true,
+    "legacyFallback": "show legacy summary if eventIds cannot resolve; no fake timestamps",
+    "eventExampleOnly": {
+      "eventId": "life:v5:YYYY-MM-DD:0000:injury-rest:01",
+      "occurredAt": "2026-10-18T00:00:00+08:00",
+      "kind": "rest",
+      "location": "bedroom",
+      "bodyState": "ill",
+      "sourceEventId": "life:v4:2026-10-18:0",
+      "factText": "卧榻调息",
+      "narration": "温知遥因旧伤浅醒，留在榻上调息。",
+      "delta": {},
+      "importance": "ordinary"
+    },
+    "noExtraStudyOrPunishment": true
+  },
+  "protect": [
+    "existing-study-and-DDL-ledgers",
+    "severe-injury-on-first-actual-DDL-overdue",
+    "persistent-injury",
+    "AI-backend",
+    "cloud-save-and-conflict-merge",
+    "existing-portrait-and-night-assets",
+    "map-and-companion-quick-entry",
+    "original-CG-unmodified"
+  ],
+  "deferred": [
+    "full-scene-transition-smoothing-after-character",
+    "BGM",
+    "dynamic-system-prompt-controls"
+  ]
+}
