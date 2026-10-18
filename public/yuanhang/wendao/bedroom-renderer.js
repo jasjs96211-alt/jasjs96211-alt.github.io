@@ -4,7 +4,7 @@
  */
 (function(root){
 'use strict';
-const WIDTH=1536,HEIGHT=1024,VERSION='bedroom-micro-1';
+const WIDTH=1536,HEIGHT=1024,VERSION='bedroom-micro-2';
 const FILES=Object.freeze({base:'zhiyao-recovery-cg.webp',night:'bedroom-live-night-v1.webp',closed:'bedroom-live-closed-v1.webp',greet:'bedroom-live-greet-v1.webp'});
 const CLIPS=Object.freeze(['recline_breathe','blink','gaze','weak_smile','severe_rest','rest_pillow','recover_breathe','nap_enter','nap_loop','wake_slow']);
 const clamp=x=>Math.max(0,Math.min(1,x));
@@ -29,12 +29,26 @@ function makePainter({images,makeCanvas}){
  function draw(c,s,{width=WIDTH,height=HEIGHT,night=false,time=0,animate=true}={}){
  const m=s.motion||{},l=layers[night?1:0],base=night?images.night:images.base;
  c.save();c.clearRect(0,0,width,height);c.scale(width/WIDTH,height/HEIGHT);c.drawImage(base,0,0,WIDTH,HEIGHT);
- const b=animate?(m.breath||0):0,h=animate&&!s.severe?(m.reactionWeight||0):0;
- if(b)mesh(c,base,[650,270,500,340],([x,y])=>{const r=((x-901)/235)**2+((y-450)/151)**2,w=r<1?(1-r)**2:0;return[x+b*w*.6,y-b*w*4]});
- if(h)mesh(c,base,[1020,190,310,230],([x,y])=>{const r=((x-1175)/149)**2+((y-305)/109)**2,w=r<1?(1-r)**2:0;return[x-.7*h*w,y-1.3*h*w]});
- overlay(c,l.gaze,m.gaze==='player'?(m.reactionWeight??1):0,-.5*h,-.7*h);
- overlay(c,l.smile,m.smile?(m.smileWeight??1):0,-.4*h,-.5*h);
- overlay(c,l.closed,m.lidClosure??(m.eyes===0?1:0),-.5*h,-.7*h);
+ // Independent local deformations, never an image/camera bounce. The original
+ // painted room, bed and props remain fixed; only fabric/shoulder/face may move.
+ // At phone scale the former 1.4-source-pixel breath disappeared (<1 screen px).
+ const b=animate?(m.breath||0):0;
+ const h=animate&&!s.severe?(m.reactionWeight||0):0;
+ const settle=animate&&!s.sleeping&&!s.severe?(m.settle||0):0;
+ if(b){
+  // The shoulder follows a slow exhale. Smooth squared falloff prevents a seam
+  // at the edge of the original painting and preserves the fixed background.
+  mesh(c,base,[650,270,500,340],([x,y])=>{const r=((x-901)/235)**2+((y-450)/151)**2,w=r<1?(1-r)**2:0;return[x+b*w*1.6,y-b*w*9]});
+  // Sleeve/palm settle by a much smaller amount; the bedside medicine never moves.
+  mesh(c,base,[790,535,300,185],([x,y])=>{const r=((x-939)/145)**2+((y-628)/84)**2,w=r<1?(1-r)**2:0;return[x+b*w*.85,y-b*w*3]});
+ }
+ const nx=-3.0*h-3.6*settle,ny=-3.9*h+2.8*settle;
+ if(h||settle)mesh(c,base,[1020,190,310,230],([x,y])=>{const r=((x-1175)/149)**2+((y-305)/109)**2,w=r<1?(1-r)**2:0;return[x+nx*w,y+ny*w]});
+ // The eyelid/gaze/lip paintings follow the local face deformation rather than
+ // sliding against unmoving pupils. Sleep and serious injury block head settling.
+ overlay(c,l.gaze,m.gaze==='player'?(m.reactionWeight??1):0,nx,ny);
+ overlay(c,l.smile,m.smile?(m.smileWeight??1):0,nx,ny);
+ overlay(c,l.closed,m.lidClosure??(m.eyes===0?1:0),nx,ny);
  if(night&&animate){const pulse=.022+.009*Math.sin(time/371)+.006*Math.sin(time/173);const q=c.createRadialGradient(1425,693,2,1425,693,100);q.addColorStop(0,`rgba(255,192,91,${pulse*2})`);q.addColorStop(1,'rgba(255,172,61,0)');c.fillStyle=q;c.fillRect(1320,590,210,210)}
  c.restore();return {phase:s.phase,lidClosure:m.lidClosure||0,night};
  }

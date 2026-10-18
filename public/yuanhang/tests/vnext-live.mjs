@@ -57,3 +57,20 @@ test('six dedicated nights plus night sickroom are included in CSS and offline c
  for(const id of ['study','herbs','garden','corridor','bedroom','terrace']){const f='world-'+id+'-night-v1.webp';assert.ok(css.includes(f));assert.ok(existsSync(new URL('../wendao/assets/'+f,import.meta.url)));}
  assert.ok(existsSync(new URL('../wendao/assets/bedroom-live-night-v1.webp',import.meta.url)));assert.match(css,/\[data-phase="night"\]::after\{background:transparent\}/);assert.match(sw,/bedroom-renderer/);assert.match(sw,/bedroom-live/);
 });
+
+test('bedside life motion is readable on a phone without whole-picture bouncing or forced wake-up',()=>{
+ const d=B.create({manifest:A.manifest(true)});let peak=0,settle=0;
+ for(let ms=0;ms<=28000;ms+=40){
+  const s=d.tick(facts(t+ms));
+  peak=Math.max(peak,Math.abs(s.motion.breath));
+  settle=Math.max(settle,s.motion.settle);
+  if(s.sleeping)assert.equal(s.motion.settle,0);
+ }
+ assert.ok(peak>.55,'ill breathing must remain perceptible after image downscaling');
+ assert.ok(settle>.3,'occasional autonomous small head adjustment should be present');
+ const severe=B.create({manifest:A.manifest(true)});
+ const severeFacts=ms=>({...facts(t+ms),state:{...facts(t+ms).state,portrait:{state:'injured'},vitals:{acuteInjury:true,seriousInjury:true}}});
+ for(let ms=0;ms<22000;ms+=250){const s=severe.tick(severeFacts(ms));assert.equal(s.motion.settle,0);assert.ok(Math.abs(s.motion.breath)<=.161);}
+ const motionOff=B.create({manifest:A.manifest(true)});
+ for(let ms=0;ms<22000;ms+=250){const s=motionOff.tick({...facts(t+ms),reducedMotion:true});assert.equal(s.motion.settle,0);assert.equal(s.motion.breath,0);}
+});
