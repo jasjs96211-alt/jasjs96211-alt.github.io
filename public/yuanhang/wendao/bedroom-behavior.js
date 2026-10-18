@@ -154,11 +154,19 @@
       const reactionWeight = reaction ? smooth(reactionAge/1100)*fade : 0;
       const smileWeight = reaction ? smooth((reactionAge-1000)/650)*fade*.75 : 0;
       const eyes = sleeping ? 0 : lidClosure > .8 ? 0 : severe ? .3 : .8;
+      // Sparse, seed-jittered head re-settling between breaths: not a looping
+      // bob, and never while asleep, heavily injured or in reduced-motion mode.
+      const settleCycle = Math.floor(animTime / 14000);
+      const settleAt = settleCycle * 14000 + 3500 + hash(seed + settleCycle * 73) % 6500;
+      const settleProgress = (animTime - settleAt) / 2100;
+      const settle = !reducedMotion && !hidden && !disputed && !sleeping && !severe &&
+        settleProgress > 0 && settleProgress < 1 ? Math.sin(Math.PI * settleProgress) ** 2 * (weak ? .65 : 1) : 0;
+      const breathingPhase = animTime * Math.PI * 2 / (weak ? 5300 : 4500) + .09 * Math.sin(animTime / 17000);
       const motion = {
-        eyes, lidClosure, reactionWeight, smileWeight,
+        eyes, lidClosure, reactionWeight, smileWeight, settle,
         gaze: reaction ? 'player' : props.book === 'held' ? 'book' : 'down',
         smile: !!reaction && reaction.kind !== 'eyes_only' && ready('weak_smile'),
-        breath: reducedMotion || disputed || hidden ? 0 : Math.sin(animTime * Math.PI * 2 / (weak ? 5100 : 4400)) * (severe ? .15 : weak ? .35 : .5),
+        breath: reducedMotion || disputed || hidden ? 0 : Math.sin(breathingPhase) * (severe ? .16 : weak ? .58 : .72),
         progress: reducedMotion ? (progress >= .5 ? 1 : 0) : progress
       };
       latest = freeze({ version: VERSION, revision, actionId, phase, clip, title, text, props,
