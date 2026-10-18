@@ -112,8 +112,8 @@
     },
     {
       "path": "scene-manager.js",
-      "bytes": 6996,
-      "sha256": "0750e2d5294dbc0ac7eb3d9914ff85b3cf12215fa8e535e7a77d11fba92c5251",
+      "bytes": 8179,
+      "sha256": "65078e1d018786fe69968d36c90cb6807ff3d15e3b8b349dfad8aa7a1a3e7768",
       "source": "original editable R1 geometry/code",
       "license": "project-original",
       "status": "greybox-not-visually-approved"
@@ -122,6 +122,14 @@
       "path": "contract.js",
       "bytes": 3254,
       "sha256": "10748e324f687f4b4ea44df50ba1181b83b605738c61004fae692121b2157d55",
+      "source": "original editable R1 geometry/code",
+      "license": "project-original",
+      "status": "greybox-not-visually-approved"
+    },
+    {
+      "path": "character-visual-state.js",
+      "bytes": 3107,
+      "sha256": "574580f4155338fa2b05ce6b7d7e321146d6faa0b02ee95167dbdd9c14a3399b",
       "source": "original editable R1 geometry/code",
       "license": "project-original",
       "status": "greybox-not-visually-approved"

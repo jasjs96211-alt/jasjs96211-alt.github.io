@@ -1,8 +1,8 @@
 <!doctype html>
 <html lang="zh-CN">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="color-scheme" content="dark"><title>知遥寝居 · 空间灰盒 R1</title><link rel="stylesheet" href="./preview.css"></head>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="color-scheme" content="dark"><title>知遥寝居 · 人物融合 S0</title><link rel="stylesheet" href="./preview.css"></head>
 <body>
-<header><div><small>远航 · 问道 / 空间研究 01</small><h1>竹窗以内<span>知遥寝居</span></h1></div><p>R1 空间灰盒 <i></i> 临时人物代理</p></header>
+<header><div><small>远航 · 问道 / 空间研究 01</small><h1>竹窗以内<span>知遥寝居</span></h1></div><p>人物融合 S0 <i></i> 原画与空间对照</p></header>
 <main>
 <section class="stage" aria-label="实时三维寝居">
   <canvas id="scene" aria-label="真实几何寝居灰盒，可用下方按钮切换三个摄像机与昼夜"></canvas>
@@ -18,7 +18,17 @@
   <p class="note">人物为无面容的体积代理，仅验证比例、床面接触、路径与遮挡；步态和姿势切换均不是正式人物演出。</p>
 </section>
 <section class="review"><div><small>本轮看什么</small><h2>从一幅画，到一个房间。</h2><p>换机位时留意床柱与屏风的前后关系。入场时，代理沿门边绕过屏风；切到夜间，再关灯，观察桌面和地板附近的受光变化。</p></div><div class="checks"><span>真实摄像机</span><span>几何深度遮挡</span><span>局部灯光投影</span><span>同一房间的四种时辰</span></div></section>
+<section class="identity-review" aria-labelledby="identity-title">
+  <div class="identity-heading"><div><small>WEN ZHIYAO / CHARACTER STUDY 01</small><h2 id="identity-title">让房间里的她，仍然是她。</h2></div><p>原立绘是人物依据。新转面图用于建模校准，尚待确认；三维场景中仍为体积代理。</p></div>
+  <div class="identity-grid">
+    <figure class="canonical"><img id="canonical-art" src="../../wendao/scene3d/art/reference/sister-calm.webp" alt="温知遥原始日常立绘"><figcaption>原立绘 · 人物外观依据</figcaption></figure>
+    <figure class="current-art"><img id="narrative-art" src="../../wendao/scene3d/art/reference/sister-calm.webp" alt="与三维代理共享状态的温知遥原画"><p id="art-absence" hidden>她现在不在寝居。</p><figcaption id="art-caption">当前状态对应原画</figcaption></figure>
+  </div>
+  <p id="identity-state" role="status">人物状态尚未读取。</p>
+  <figure class="turnaround"><a href="../../wendao/scene3d/art/zhiyao-turnaround-s0.png" target="_blank" rel="noopener"><img src="../../wendao/scene3d/art/zhiyao-turnaround-s0.webp" loading="lazy" alt="温知遥四角度转面及神态设定候选；是绘制概念图，尚非三维模型"></a><figcaption>新转面设定候选 · 点击放大 · 侧面、背面为依据原立绘推演，尚待确认</figcaption></figure>
+  <details><summary>模型制作进度</summary><p>已完成：原图依据整理、转面设定候选、人物与 CG 共用状态接口。待完成：符合原画的可编辑角色模型、骨骼、表情及自然动作；当前不以无脸代理替代正式人物。</p><p>三维人物上线前仍需检查：是不是温知遥、是否脚底着地、是否穿床穿衣、病中是否按规则休息。此次未进行浏览器与手机视觉实测。</p></details>
+</section>
 <details><summary>试验条件与性能记录</summary><div class="technical"><label>只读模拟状态 <select id="condition"><option value="healthy">清醒健康（可走动）</option><option value="ill">病中（本试验保守卧床）</option><option value="injured">急性重伤（卧床）</option><option value="sleep">睡眠（卧床）</option><option value="absent">人物不在寝居</option><option value="clock">时间待核对</option></select></label><label><input id="motion" type="checkbox" checked> 环境微动</label><label><input id="pause" type="checkbox"> 暂停巡览与动作</label><label><input id="low" type="checkbox"> 低性能模式（重建场景）</label><button id="download">导出本机性能记录</button><pre id="metrics">等待第一帧。</pre><p>FPS 为本浏览器实测；GPU 内存不可直接获取。导出 JSON 不会被当作录屏或 iPhone 验收。</p></div></details>
-<footer>独立空间试验 · 不读取或写入游戏存档 · 正式角色与风格化美术待后续制作</footer>
+<footer>独立空间试验 · 不读取或写入游戏存档 · 原画与三维共用状态 · 正式人物模型待制作</footer>
 </main><script type="module" src="./preview.js"></script>
 </body></html>
