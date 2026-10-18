@@ -3,7 +3,8 @@ import {buildBedroom} from './bedroom-model.js';
 import {createProxy} from './character-adapter.js';
 import {createCameraRig} from './camera-rig.js';
 import {createLighting} from './lighting.js';
-import {adaptSnapshot, samplePath, visualDelta, PATH_LENGTH} from './contract.js';
+import {samplePath, visualDelta, PATH_LENGTH} from './contract.js';
+import {adaptCharacterVisualState, withPresentationPose} from './character-visual-state.js';
 
 export function createBedroomScene(canvas, {low = false, reducedMotion = false, onFailure = () => {}} = {}) {
   const renderer = new THREE.WebGLRenderer({canvas, antialias: !low, alpha: false, powerPreference: 'low-power'});
@@ -13,26 +14,36 @@ export function createBedroomScene(canvas, {low = false, reducedMotion = false, 
   const scene = new THREE.Scene(), camera = new THREE.PerspectiveCamera(42, 1, .1, 65);
   const room = buildBedroom(), character = createProxy(); scene.add(room.root, character.root);
   const rig = createCameraRig(camera), lights = createLighting(scene, room.lamps, {low});
-  let facts = adaptSnapshot(), distance = 0, speed = 0, yaw = 0, moving = false, motion = !reducedMotion, paused = false;
+  let facts = adaptCharacterVisualState(), distance = 0, speed = 0, yaw = 0, moving = false, motion = !reducedMotion, paused = false;
   let last = null, wasVisible = false, time = 0, running = false, disposed = false, raf = 0;
   let fpsFrames = 0, fpsStart = 0, fps = 0, frameMs = 0, error = null;
   let frameHandler = null;
+  character.root.visible = false;
   const startedAt = performance.now(); let firstFrameMs = null;
   function resize() {
     const w = Math.max(1, canvas.clientWidth), h = Math.max(1, canvas.clientHeight);
     renderer.setSize(w, h, false); camera.aspect = w / h; rig.resize();
   }
   const observer = new ResizeObserver(resize); observer.observe(canvas); resize();
+  function presentPose() {
+    character.setPose(facts.pose);
+    if (facts.worldPosition) character.root.position.set(...facts.worldPosition);
+    character.root.rotation.y = facts.facing;
+  }
   function setSnapshot(input) {
-    const next = adaptSnapshot(input); facts = next; lights.apply(next.phase); character.root.visible = next.present;
+    let next = adaptCharacterVisualState(input);
+    if (facts.present && next.present && facts.health.stage === next.health.stage && facts.sleeping === next.sleeping && !next.clockHold) {
+      next = withPresentationPose(next, {pose: facts.pose, position: facts.worldPosition, yaw: facts.facing, moving});
+    }
+    facts = next; lights.apply(next.phase); character.root.visible = next.present;
     if (!next.canMove || !next.present) moving = false;
-    if (!moving) character.setPose(next.pose);
+    if (!moving) presentPose();
     return next;
   }
   function enter() {
     if (!facts.canMove) return false;
-    if (!motion) {moving = false; character.setPose(facts.pose); return false;}
-    distance = 0; speed = 0; yaw = samplePath(0).yaw; moving = true; character.walk(samplePath(0).position, yaw, 0); return true;
+    if (!motion) return false;
+    distance = 0; speed = 0; yaw = samplePath(0).yaw; moving = true; character.walk(samplePath(0).position, yaw, 0); facts = withPresentationPose(facts, {pose: 'walk', position: samplePath(0).position, yaw, moving: true}); return true;
   }
   function step(now) {
     if (!running || disposed) return;
@@ -49,7 +60,8 @@ export function createBedroomScene(canvas, {low = false, reducedMotion = false, 
         const p = samplePath(distance);
         yaw += Math.atan2(Math.sin(p.yaw - yaw), Math.cos(p.yaw - yaw)) * (1 - Math.exp(-dt * 7));
         character.walk(p.position, yaw, distance);
-        if (p.arrived) {moving = false; character.setPose('walk'); character.walk(p.position, p.yaw, 0);}
+        facts = withPresentationPose(facts, {pose: 'walk', position: p.position, yaw, moving: true});
+        if (p.arrived) {moving = false; character.setPose('walk'); character.walk(p.position, p.yaw, 0); facts = withPresentationPose(facts, {pose: 'walk', position: p.position, yaw: p.yaw});}
       }
       lights.update(time, motion && !paused);
       room.curtains.forEach((curtain, n) => {
@@ -64,7 +76,7 @@ export function createBedroomScene(canvas, {low = false, reducedMotion = false, 
         const before = performance.now(); renderer.render(scene, camera); frameMs = performance.now() - before;
         if (firstFrameMs === null) firstFrameMs = performance.now() - startedAt;
         fpsFrames++; if (now - fpsStart >= 1000) {fps = Math.round(fpsFrames * 1000 / (now - fpsStart)); fpsFrames = 0; fpsStart = now;}
-        frameHandler?.({time, moving, distance});
+        frameHandler?.({time, moving, distance, visualState: facts});
       } catch (e) {fail(e); return;}
     }
     raf = requestAnimationFrame(step);
@@ -94,18 +106,26 @@ export function createBedroomScene(canvas, {low = false, reducedMotion = false, 
       geometries: renderer.info.memory.geometries, textures: renderer.info.memory.textures,
       jsHeapBytes: performance.memory?.usedJSHeapSize ?? null, gpuMemoryBytes: null,
       viewport: [canvas.width, canvas.height], phase: lights.phase, camera: rig.active, moving,
-      motion, paused, quality: low ? 'low' : 'standard', error};
+      motion, paused, character: {identity: facts.identity.id, pose: facts.pose, health: facts.health.stage, hair: facts.hair}, quality: low ? 'low' : 'standard', error};
   }
   return {start, stop, dispose, resize, setSnapshot, enter, telemetry,
     camera: id => rig.set(id, reducedMotion || !motion),
     pause: value => {paused = value;},
-    motion: value => {motion = value && !reducedMotion; if (!motion && moving) {moving = false; character.setPose(facts.pose);}},
+    motion: value => {
+      motion = value && !reducedMotion;
+      if (!motion && moving) {
+        moving = false;
+        facts = withPresentationPose(facts, {pose: facts.pose, position: facts.worldPosition, yaw: facts.facing});
+        presentPose();
+      }
+    },
     lamp: value => lights.toggle(value),
     pose: id => {
       if (id === 'seated' && !facts.canSit || id === 'walk' && !facts.canMove || !facts.present) return false;
       if (!['seated', 'reclined', 'walk'].includes(id)) return false;
-      moving = false; character.setPose(id); return true;
+      moving = false; facts = withPresentationPose(facts, {pose: id, yaw: 0}); presentPose(); return true;
     },
+    get visualState() {return facts;},
     onFrame: handler => {frameHandler = handler;}, get time() {return time;}
   };
 }

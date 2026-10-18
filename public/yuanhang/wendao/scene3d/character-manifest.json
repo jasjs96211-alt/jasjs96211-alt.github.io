@@ -1,0 +1,153 @@
+{
+  "version": "zhiyao-fusion-s0-20261018",
+  "identity": "wen-zhiyao",
+  "status": "art-resource-blocked",
+  "defaultWorldRoute": "stylized-3d-rigged",
+  "visualStateModule": "character-visual-state.js",
+  "conceptArt": "art/zhiyao-turnaround-s0.png",
+  "sourcePrompt": "art/turnaround-prompt.txt",
+  "editableModel": null,
+  "runtimeGLB": null,
+  "rig": null,
+  "morphTargets": null,
+  "modelLicense": null,
+  "modelHash": null,
+  "lod": [],
+  "animationClips": {
+    "idle": {
+      "status": "missing",
+      "eventFrames": []
+    },
+    "breathe": {
+      "status": "missing",
+      "eventFrames": []
+    },
+    "blink": {
+      "status": "missing",
+      "eventFrames": []
+    },
+    "look": {
+      "status": "missing",
+      "eventFrames": []
+    },
+    "walk": {
+      "status": "missing",
+      "eventFrames": []
+    },
+    "stop": {
+      "status": "missing",
+      "eventFrames": []
+    },
+    "sit": {
+      "status": "missing",
+      "eventFrames": []
+    },
+    "recline": {
+      "status": "missing",
+      "eventFrames": []
+    },
+    "stand": {
+      "status": "missing",
+      "eventFrames": []
+    },
+    "cover-mouth-cough": {
+      "status": "missing",
+      "eventFrames": []
+    },
+    "hold-book": {
+      "status": "missing",
+      "eventFrames": []
+    },
+    "page-turn": {
+      "status": "missing",
+      "eventFrames": []
+    },
+    "take-bowl": {
+      "status": "missing",
+      "eventFrames": []
+    },
+    "sip": {
+      "status": "missing",
+      "eventFrames": []
+    },
+    "release-bowl": {
+      "status": "missing",
+      "eventFrames": []
+    }
+  },
+  "posePolicy": "external permissions; acute injury and sleep allow reclined only",
+  "fallback": "existing narrative artwork; explicitly labelled faceless proxy in isolated technical review only",
+  "acceptance": {
+    "likeness": "pending",
+    "strictProfile": "needs-correction",
+    "characterInRoom": "missing",
+    "browserGPU": "not_tested",
+    "iPhoneSafari": "not_tested",
+    "iPhonePWA": "not_tested"
+  },
+  "assets": [
+    {
+      "path": "art/zhiyao-turnaround-s0.png",
+      "bytes": 3047511,
+      "sha256": "9af5414c81611c53a62f0f06f4452c0f13bddd9b032e866cc71bc850b3505883",
+      "source": "built-in-imagegen using canonical project artwork",
+      "status": "concept-pending"
+    },
+    {
+      "path": "art/zhiyao-turnaround-s0.webp",
+      "bytes": 470990,
+      "sha256": "1615ca465dff8e56918646c02bb12000447c016dec260891f9a12a75b78af23c",
+      "source": "built-in-imagegen using canonical project artwork",
+      "status": "concept-pending"
+    },
+    {
+      "path": "art/reference/sister-calm.webp",
+      "bytes": 163498,
+      "sha256": "bf6466cb46316d776fc9f7da43e9740b75a2490c44d3e4286fe9ca81ae8a8890",
+      "source": "resized/re-encoded existing project artwork; original remains in ../assets",
+      "status": "reference-only"
+    },
+    {
+      "path": "art/reference/sister-concerned.webp",
+      "bytes": 148566,
+      "sha256": "729e07307c3a2fa3bc19ce3ad85470adc2d6cdb70a82740c6a36069c71072c7a",
+      "source": "resized/re-encoded existing project artwork; original remains in ../assets",
+      "status": "reference-only"
+    },
+    {
+      "path": "art/reference/sister-ill.webp",
+      "bytes": 174618,
+      "sha256": "bded3c1190c430540c12b7e6bd5f0c12733381c5c8b764290e60a2b081b0eea7",
+      "source": "resized/re-encoded existing project artwork; original remains in ../assets",
+      "status": "reference-only"
+    },
+    {
+      "path": "art/reference/sister-injured.webp",
+      "bytes": 187126,
+      "sha256": "21aad1be4e12438121c8960d208d19ef517ca0a536c2457377c5eb76b8b94dce",
+      "source": "resized/re-encoded existing project artwork; original remains in ../assets",
+      "status": "reference-only"
+    },
+    {
+      "path": "art/reference/sister-relieved.webp",
+      "bytes": 141082,
+      "sha256": "c797952f4a1c6fe9c85c878923e15022f0a532219b84b3dcee6777fead236b08",
+      "source": "resized/re-encoded existing project artwork; original remains in ../assets",
+      "status": "reference-only"
+    },
+    {
+      "path": "art/reference/sister-tired.webp",
+      "bytes": 141154,
+      "sha256": "b86da32479e97516884d2c44aaac7c1b61b900615c9953e70204ba932310c6ee",
+      "source": "resized/re-encoded existing project artwork; original remains in ../assets",
+      "status": "reference-only"
+    },
+    {
+      "path": "art/reference/zhiyao-recovery-cg.webp",
+      "bytes": 67392,
+      "sha256": "443ad6c7a5fd3a245f7dcf7fef558d64c23b84bbd3c010e0fafaa3c9daa8fef5",
+      "source": "resized/re-encoded existing project artwork; original remains in ../assets",
+      "status": "reference-only"
+    }
+  ]
+}

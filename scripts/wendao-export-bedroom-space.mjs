@@ -70,7 +70,7 @@ writeFileSync(new URL('bedroom-r1.three.json', folder), JSON.stringify(room.root
 writeFileSync(new URL('anchors.json', base), JSON.stringify({units: 'metres', up: '+Y', anchors: ANCHORS, colliders: COLLIDERS, walkPath: WALK_PATH}, null, 2) + '\n');
 const files = ['vendor/three.module.min.js', 'vendor/three.core.min.js', 'vendor/THREE-LICENSE.txt',
   'models/bedroom-r1.glb', 'models/proxy-reclined-r1.glb', 'models/bedroom-r1.three.json', 'anchors.json',
-  'bedroom-model.js', 'camera-rig.js', 'character-adapter.js', 'lighting.js', 'scene-manager.js', 'contract.js'];
+  'bedroom-model.js', 'camera-rig.js', 'character-adapter.js', 'lighting.js', 'scene-manager.js', 'contract.js', 'character-visual-state.js'];
 const assets = files.map(path => {
   const bytes = readFileSync(new URL(path, base));
   return {path, bytes: bytes.length, sha256: createHash('sha256').update(bytes).digest('hex'),

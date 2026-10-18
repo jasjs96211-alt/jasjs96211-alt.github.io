@@ -1,3 +1,6 @@
+import {adaptCharacterVisualState, selectNarrativeArt} from '../../wendao/scene3d/character-visual-state.js';
+const artURLs = globalThis.WENDAO_REVIEW_ART || {};
+const artSource = name => artURLs[name] || new URL('../../wendao/scene3d/art/reference/' + name, location.href).href;
 const $ = id => document.getElementById(id);
 const all = selector => [...document.querySelectorAll(selector)];
 const reduced = matchMedia('(prefers-reduced-motion: reduce)');
@@ -12,9 +15,23 @@ function snapshot() {
   return {world: {player: 'bedroom', sister: condition === 'absent' ? 'study' : 'bedroom', together: condition !== 'absent', phase},
     state, sisterSleeping: condition === 'sleep', permittedPoses: condition === 'healthy' ? ['walk', 'seated'] : []};
 }
+let lastArt = '', lastFact = '';
+function showCharacterState(visual) {
+  const art = selectNarrativeArt(visual);
+  const names = {healthy: '清醒', injured: '重伤', ill: '病中', tired: '倦怠'};
+  const poses = {walk: '站立 / 走动', seated: '半坐', reclined: '卧床'};
+  const key = JSON.stringify(art);
+  if (key !== lastArt) {
+    lastArt = key; $('narrative-art').hidden = !art.visible; $('art-absence').hidden = art.visible;
+    if (art.path) $('narrative-art').src = artSource(art.path);
+    $('art-caption').textContent = !art.visible ? '人物不在场，原画一同隐藏' : art.kind === 'narrative-cg' ? '卧床 CG · 共用人物事实' : '角色状态原立绘 · 姿势不等同于三维代理';
+  }
+  const fact = !visual.present ? '温知遥 · 不在寝居' : `温知遥 · ${names[visual.health.stage]}${visual.sleeping ? ' · 睡眠' : ''} · ${poses[visual.pose]} · ${visual.hair === 'loose' ? '披发设定' : '日常半束发设定'}`;
+  if (fact !== lastFact) {$('identity-state').textContent = fact; lastFact = fact;}
+}
 function apply() {
+  const f = stage && !failed ? stage.setSnapshot(snapshot()) : adaptCharacterVisualState(snapshot()); showCharacterState(f);
   if (!stage || failed) return;
-  const f = stage.setSnapshot(snapshot());
   $('enter').disabled = !f.canMove || !$('motion').checked || reduced.matches;
   document.querySelector('[data-pose="seated"]').disabled = !f.canSit;
   document.querySelector('[data-pose="reclined"]').disabled = !f.present;
@@ -25,11 +42,17 @@ function camera(id) {if (!stage) return; stage.camera(id); mark('[data-camera]',
 function setPhase(id) {phase = id; apply();}
 function failure(message) {
   failed = true; stopDemo(); $('fallback').hidden = false;
-  $('failure-text').textContent = '三维试验未能运行，当前为原静态 CG。可重新加载，或继续使用原游戏。原因：' + message;
+  const visual = stage?.visualState || adaptCharacterVisualState(snapshot()), art = selectNarrativeArt(visual);
+  const fallbackImage = document.querySelector('#fallback img');
+  fallbackImage.hidden = !art.visible;
+  if (art.path) fallbackImage.src = artSource(art.path);
+  showCharacterState(visual);
+  $('failure-text').textContent = (art.visible ? '三维试验未能运行，当前为同一状态对应的原画。' : '三维试验未能运行，人物不在寝居。') + '可重新加载。原因：' + message;
   $('status').textContent = '三维尚未验证成功。';
   all('.controls button, .technical button, .technical input, .technical select').forEach(b => b.disabled = true);
 }
-function onFrame({time}) {
+function onFrame({time, visualState}) {
+  showCharacterState(visualState);
   if (demo) {
     const elapsed = time - demo.start;
     while (demo && demo.index < demo.cues.length && elapsed >= demo.cues[demo.index][0]) {
@@ -88,4 +111,5 @@ reduced.addEventListener('change', () => {stopDemo(); $('motion').checked = !red
 window.addEventListener('pagehide', () => {stopDemo(); stage?.stop();});
 window.addEventListener('pageshow', event => {if (event.persisted) stage?.start();});
 if (reduced.matches) {$('motion').checked = false; $('motion').disabled = true;}
+apply();
 boot();
