@@ -11,7 +11,12 @@ const clamp=x=>Math.max(0,Math.min(1,x));
 function polygon(c,points){c.beginPath();points.forEach(([x,y],i)=>i?c.lineTo(x,y):c.moveTo(x,y));c.closePath()}
 function makePainter({images,makeCanvas}){
  const eyes=[[1140,282,34,20,.57],[1202,332,30,18,.57]],mouth=[[1124,360,29,18,.5]];
- function face(img,ellipses,night){const out=makeCanvas(250,165);out.width=250;out.height=165;const c=out.getContext('2d');c.translate(-1020,-235);for(const[x,y,rx,ry,a]of ellipses){c.save();c.translate(x,y);c.rotate(a);c.scale(rx,ry);const g=c.createRadialGradient(0,0,.76,0,0,1);g.addColorStop(0,'#fff');g.addColorStop(1,'#ffffff00');c.fillStyle=g;c.fillRect(-1,-1,2,2);c.restore()}c.globalCompositeOperation='source-in';c.drawImage(img,0,0,WIDTH,HEIGHT);
+ function face(img,ellipses,night){const out=makeCanvas(250,165);out.width=250;out.height=165;const c=out.getContext('2d'),mask=c.createImageData(250,165);
+ // Rasterize the small alpha mask explicitly. Transforming a unit radial
+ // gradient to a stretched ellipse produced an empty mask in native Canvas.
+ // Absolute crop coordinates also avoid backend-dependent gradient transforms.
+ for(let yy=0;yy<165;yy++)for(let xx=0;xx<250;xx++){let alpha=0;for(const[x,y,rx,ry,a]of ellipses){const dx=xx+1020-x,dy=yy+235-y,cs=Math.cos(a),sn=Math.sin(a),r=Math.hypot((dx*cs+dy*sn)/rx,(-dx*sn+dy*cs)/ry);alpha=Math.max(alpha,clamp((1-r)/.24))}mask.data[(yy*250+xx)*4+3]=Math.round(alpha*255)}
+ c.putImageData(mask,0,0);c.globalCompositeOperation='source-in';c.drawImage(img,1020,235,250,165,0,0,250,165);
  // Match the night painting's local exposure, without changing eye/lip anatomy.
  if(night){c.globalCompositeOperation='source-atop';c.fillStyle='rgba(111,53,16,.10)';c.fillRect(0,0,WIDTH,HEIGHT)}return out}
  const layers=[false,true].map(n=>({closed:face(images.closed,eyes,n),gaze:face(images.greet,eyes,n),smile:face(images.greet,mouth,n)}));

@@ -60,7 +60,7 @@
 右侧放大面部方便核对，左侧为完整场景；没有用后期视频特效替代游戏动画。
 长视频以 60 秒批次导出以限制 native Canvas 内存；各批重放相同种子和时间线后输出连续帧范围，拼接时不重置动作、不加速、不补造帧。
 
-复做视频需要 Node、`@napi-rs/canvas` 和 ffmpeg（仅开发证据工具，不增加游戏生产依赖）：
+复做视频需要 Node、`@napi-rs/canvas` 和 ffmpeg（Canvas 已固定为开发依赖，不增加浏览器运行依赖）：
 
 ```sh
 # WENDAO_EVIDENCE_FONT 可指向支持中文的本地 OTF/TTF；本次使用 Noto Sans CJK SC。
@@ -70,9 +70,10 @@ node --expose-gc public/yuanhang/vnext/live/render-evidence.cjs public/yuanhang/
 
 ## 验证与边界
 
-- `node --test public/yuanhang/tests/*.mjs`：345/345 通过，0 跳过。
-- `TZ=America/New_York node --test public/yuanhang/tests/vnext-bedroom.mjs public/yuanhang/tests/vnext-live.mjs`：23/23 通过。
+- `node --test public/yuanhang/tests/*.mjs`：347/347 通过，0 跳过。
+- `TZ=America/New_York node --test public/yuanhang/tests/vnext-bedroom.mjs public/yuanhang/tests/vnext-live.mjs public/yuanhang/tests/vnext-pixels.mjs`：25/25 通过。
 - `npm run build`：通过；`git diff --check`：通过。
+- 增加真实 Canvas 像素回归：闭眼时眼周像素必须来自闭眼素材，抬眼/嘴角像素确实变化，呼吸只影响局部网格，日/夜背景不随人物动作移动。这项检查发现并阻止了原遮罩透明的问题，修复后重新导出全部视频。
 - 新集成回归覆盖：加载失败/省流/无 CG 权限降级；文字和实际道具；睡眠/重伤；点击与切入冷却；只读 AI 场景；原计时器 25 分钟暂停 1 分钟后恢复，保留原有 60 分钟记录；六夜景及离线清单。
 - 原 engine、cloud、AI 传输代码和内嵌学习计时逻辑均未改。仅独立 sessionStorage 保存当前标签页的视觉阶段/冷却，不迁移或覆盖学习数据。
 - 绘制器优化后在此 native 环境测得 768×512 的 60 帧平均约 5.42ms/帧、RSS 约 125MB；**这不是浏览器或手机帧率保证**。

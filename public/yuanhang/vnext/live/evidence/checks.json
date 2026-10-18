@@ -2,13 +2,13 @@
   "base": "497f62626988e01a1a1936a895d57b20306001f4",
   "tests": {
     "command": "node --test public/yuanhang/tests/*.mjs",
-    "pass": 345,
+    "pass": 347,
     "fail": 0,
     "skipped": 0
   },
   "timezoneRegression": {
     "timezone": "America/New_York",
-    "pass": 23,
+    "pass": 25,
     "fail": 0
   },
   "build": "passed",
@@ -21,15 +21,15 @@
     {
       "file": "bedroom-live-demo.mp4",
       "seconds": 32.0,
-      "bytes": 989989,
-      "sha256": "98dc53276bdbb3a39fd87f1341c82b548a37968be620b1b5c27eb8ade1247f7d",
+      "bytes": 1015207,
+      "sha256": "252a5a147722bfa3c7731a27a3fe108ee767c46c752796419d44a5d3b5a47b0a",
       "kind": "production native Canvas renderer, not browser recording"
     },
     {
       "file": "bedroom-five-minute.mp4",
       "seconds": 300.0,
-      "bytes": 5096051,
-      "sha256": "7c85e8665a314de50e93414191a4b22c5eaadca34f612a83f958d6979bfa3373",
+      "bytes": 5241464,
+      "sha256": "0d8500b51076a4458f9d536e1c006479b5505180fa30746f203fbc11d47ba62f",
       "kind": "production native Canvas renderer, not browser recording"
     }
   ],
@@ -43,5 +43,17 @@
     "book and page-turn hand assets",
     "medicine cup hand/sip/return transitions",
     "2.5D walkable scene depth/navigation"
-  ]
+  ],
+  "pixelRegression": {
+    "pass": 2,
+    "fail": 0,
+    "checks": [
+      "decoded closed-eye painting replaces eye pixels",
+      "gaze and mouth actually change",
+      "breathing mesh local only",
+      "night eyes remain visible",
+      "background fixed"
+    ],
+    "blockingIssueFixed": "empty transformed radial-gradient alpha mask replaced by explicit cropped alpha raster"
+  }
 }

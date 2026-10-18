@@ -2,7 +2,7 @@
   "kind": "production-renderer-output-not-browser-recording",
   "seconds": 300,
   "fps": 12,
-  "renderWallMs": 61728,
+  "renderWallMs": 64873,
   "trace": [
     {
       "ms": 0,
