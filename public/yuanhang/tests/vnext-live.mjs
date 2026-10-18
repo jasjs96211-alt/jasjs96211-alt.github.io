@@ -74,3 +74,27 @@ test('bedside life motion is readable on a phone without whole-picture bouncing 
  const motionOff=B.create({manifest:A.manifest(true)});
  for(let ms=0;ms<22000;ms+=250){const s=motionOff.tick({...facts(t+ms),reducedMotion:true});assert.equal(s.motion.settle,0);assert.equal(s.motion.breath,0);}
 });
+
+test('autonomous hand, weak cough and glance form distinct visible gestures without waking sister',()=>{
+ const d=B.create({manifest:A.manifest(true)});let hand=0,cough=0,glance=0,seenDescription=false,sawNap=false;
+ for(let ms=0;ms<=118000;ms+=40){
+  const s=d.tick(facts(t+ms));
+  hand=Math.max(hand,s.motion.quiltFingers);
+  cough=Math.max(cough,s.motion.suppressedCough);
+  glance=Math.max(glance,s.motion.idleGlance);
+  if(s.text.includes('轻咳')){seenDescription=true;assert.ok(s.motion.suppressedCough>.2);assert.equal(s.pose,'lying');}
+  if(s.sleeping){sawNap=true;assert.equal(s.motion.quiltFingers,0);assert.equal(s.motion.suppressedCough,0);assert.equal(s.motion.idleGlance,0);}
+  if(s.visible)assert.equal(d.forAI().description,s.text);
+ }
+ assert.ok(hand>.60,'hand on quilt happens while awake');
+ assert.ok(cough>.60,'restrained cough happens during illness and is visible');
+ assert.ok(glance>.5,'subtle autonomous glance happens');
+ assert.ok(seenDescription&&sawNap,'micro gesture wording and sleep state both exercised');
+ const serious=B.create({manifest:A.manifest(true)}),quiet=B.create({manifest:A.manifest(true)});
+ for(let ms=0;ms<=66000;ms+=200){
+  const src=facts(t+ms);
+  const injured=serious.tick({...src,state:{...src.state,portrait:{state:'injured'},vitals:{acuteInjury:true,seriousInjury:true}}});
+  const motionOff=quiet.tick({...src,reducedMotion:true});
+  for(const key of ['quiltFingers','suppressedCough','idleGlance']){assert.equal(injured.motion[key],0);assert.equal(motionOff.motion[key],0);}
+ }
+});

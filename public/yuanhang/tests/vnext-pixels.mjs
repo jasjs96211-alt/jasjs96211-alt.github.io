@@ -37,3 +37,14 @@ test('breathing changes only a local mesh and closed eyelids remain visible over
  assert.ok(difference(nightOpen,nightClosed,1105,262,70,40)>300,'night eyelid layer must remain visible');
  assert.equal(difference(nightOpen,nightClosed,0,0,1000,1024),0);
 });
+
+test('micro gesture pixels are confined to original hand/shoulder/face; bedding and medicine stay fixed',()=>{
+ const hand=render({quiltFingers:.75,lidClosure:0,breath:0});
+ assert.ok(difference(base,hand,820,540,240,120)>120,'painted fingers/quilt must actually change pixels');
+ assert.equal(difference(base,hand,0,0,770,1024),0,'left room and bed never move');
+ assert.equal(difference(base,hand,1160,450,376,574),0,'medicine bowl and table never move');
+ const cough=render({suppressedCough:.8,lidClosure:0,breath:0});
+ assert.ok(difference(base,cough,720,290,400,300)>100,'shoulder and sleeve compress gently');
+ assert.ok(difference(base,cough,1100,270,160,145)>100,'head gives a slight independent response');
+ assert.equal(difference(base,cough,0,0,640,1024),0,'room is not a bouncing camera');
+});

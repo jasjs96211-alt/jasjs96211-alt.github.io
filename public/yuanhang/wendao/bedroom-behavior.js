@@ -162,11 +162,34 @@
       const settle = !reducedMotion && !hidden && !disputed && !sleeping && !severe &&
         settleProgress > 0 && settleProgress < 1 ? Math.sin(Math.PI * settleProgress) ** 2 * (weak ? .65 : 1) : 0;
       const breathingPhase = animTime * Math.PI * 2 / (weak ? 5300 : 4500) + .09 * Math.sin(animTime / 17000);
+      const canGesture = isPresent && available && mode === 'routine' && !sleeping &&
+        !severe && !hidden && !reducedMotion && !disputed && !reaction;
+      // Small, non-periodic-looking gestures, generated only from foreground
+      // visual time. Never add storage events or catch up after app suspension.
+      const gesture = (period, offset, spread, length, salt) => {
+        const slot = Math.floor(animTime / period);
+        const onset = slot * period + offset + hash(seed + salt + slot * 97) % spread;
+        const p = (animTime - onset) / length;
+        return p <= 0 || p >= 1 ? 0 : Math.sin(Math.PI * p) ** 2;
+      };
+      const quiltFingers = canGesture && ready('fingers_on_quilt') ?
+        gesture(25000,6500,6500,2350,41) * (weak ? .72 : 1) : 0;
+      const coughA = canGesture && weak && ready('restrained_cough') ?
+        gesture(66000,16000,7500,1200,173) : 0;
+      const coughB = canGesture && weak && ready('restrained_cough') ?
+        gesture(66000,16900,7500,1250,173) : 0;
+      const suppressedCough = Math.max(coughA*.85,coughB*.66);
+      const idleGlance = canGesture && ready('idle_glance') ?
+        gesture(48000,28500,6000,1800,83) * (weak ? .65 : 1) : 0;
+      if (suppressedCough > .2) text = '她微微蜷起肩背，忍下一阵轻咳，随后缓缓调息。';
+      else if (quiltFingers > .34) text = '她搭在被上的指尖轻轻动了动，随即又放松。';
       const motion = {
         eyes, lidClosure, reactionWeight, smileWeight, settle,
+        quiltFingers, suppressedCough, idleGlance,
         gaze: reaction ? 'player' : props.book === 'held' ? 'book' : 'down',
         smile: !!reaction && reaction.kind !== 'eyes_only' && ready('weak_smile'),
-        breath: reducedMotion || disputed || hidden ? 0 : Math.sin(breathingPhase) * (severe ? .16 : weak ? .58 : .72),
+        breath: reducedMotion || disputed || hidden ? 0 :
+          Math.sin(breathingPhase) * (severe ? .16 : weak ? .58 : .72) * (1-suppressedCough*.48),
         progress: reducedMotion ? (progress >= .5 ? 1 : 0) : progress
       };
       latest = freeze({ version: VERSION, revision, actionId, phase, clip, title, text, props,
