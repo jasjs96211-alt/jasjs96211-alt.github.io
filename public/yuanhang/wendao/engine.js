@@ -306,14 +306,26 @@ function rhythm(s,study={},now=Date.now()){
  if(s.settings.proactiveEnabled!==false&&s.settings.agreementReminders!==false&&s.supervision.mode==='awake'&&!inSleep&&!nap&&!study.focusTimer?.running&&!s.supervision.pending&&!s.life.clockPending)for(const row of s.rhythmState.agreements){if(row.status==='confirmed'&&now>=row.at-15*60000&&now<=row.at+15*60000){const id='agreement:'+row.id;if(message(s,id,'快到我们约好的时候了：'+row.title+'。若今日不方便，也可以重新安排。',now,'agreement',id))s.proactiveState.lastAt=now}}
  return {phase,asleep,bedtimeDue,morningDue,schedule:{sleepStart:schedule.sleepStart,sleepEnd:schedule.sleepEnd},wakeConfirmed:confirmed};
 }
+// Read-only projection of recorded world events. Never invent a timestamp or apply a delta.
+function recapTimeline(s,recap){
+ if(!recap||!Array.isArray(recap.eventIds)||!s?.life?.ledger)return [];
+ const ids=new Set(recap.eventIds.filter(id=>typeof id==='string'));
+ const start=typeof recap.date==='string'?dateAt(recap.date)+18*3600000:NaN;
+ const end=Number.isFinite(start)?Math.min(start+18*3600000,Number.isFinite(recap.at)?recap.at:Infinity):NaN;
+ if(!Number.isFinite(start)||!Number.isFinite(end))return [];
+ const seen=new Set();
+ return s.life.ledger.filter(row=>row&&ids.has(row.id)&&!seen.has(row.id)&&seen.add(row.id)&&Number.isFinite(row.at)&&row.at>=start&&row.at<=end)
+  .sort((a,b)=>a.at-b.at||String(a.id).localeCompare(String(b.id)))
+  .map(row=>({eventId:row.id,occurredAt:row.at,kind:row.kind||'ordinary',bodyState:row.bodyState||null,
+   factText:String(row.text||row.activity||'日常起居'),sourceType:'engine-ledger',sourceEventId:row.id}));
+}
 function nightRecap(s,now=Date.now()){
  migrateInPlace(s);const d=day(now-DAY),id='recap:'+d,old=s.rhythmState.recaps.find(x=>x.id===id);if(old)return old;
- const rows=s.life.ledger.filter(x=>x.at>=dateAt(d)+18*3600000&&x.at<=now&&x.at<dateAt(day(now))+12*3600000);if(!rows.length)return null;
- const activities=[...new Set(rows.map(x=>String(x.activity||'整理日常').trim()).filter(Boolean))];
- const notes=activities.slice(0,4).map(a=>({医理:'查阅医理',温养:'调息温养',休息:'稍作歇息'}[a]||a));
- const recapText='昨夜至今晨，我陆续做了些事：'+notes.join('、')+'。眼下仍是寻常日子，你不用时时为我挂心。';
- const row={id,at:now,date:d,text:recapText,eventIds:rows.map(x=>x.id)};
- s.rhythmState.recaps.push(row);log(s,id,'昨夜与昨日小记',row.text,now,'recap');return row;
+ const start=dateAt(d)+18*3600000,end=Math.min(now,start+18*3600000);
+ const rows=s.life.ledger.filter(x=>Number.isFinite(x.at)&&x.at>=start&&x.at<=end).sort((a,b)=>a.at-b.at||String(a.id).localeCompare(String(b.id)));
+ if(!rows.length)return null;
+ const row={id,at:now,date:d,formatVersion:2,text:'夜间纪事已按事件时刻整理。',eventIds:[...new Set(rows.map(x=>x.id))]};
+ s.rhythmState.recaps.push(row);log(s,id,'昨夜纪事',row.text,now,'recap');return row;
 }
 function setMode(s,mode,study={},now=Date.now(),{napUntil=null}={}){
  migrateInPlace(s);if(!['awake','sleep','exempt'].includes(mode))throw Error('作息状态无效');const w=s.supervision;if(w.pending)throw Error('请先核对未确认的时段');
@@ -420,5 +432,5 @@ function companionCare(s,kind,at=Date.now()){
  log(s,id,kind==='meal'?'一同用膳':'灯下关怀',kind==='meal'?'按今日作息安排饮食。姐姐也会自行用膳，不会因妹妹离线挨饿。':'姐妹说了几句宽慰的话；不改变羁绊、伤势或主线。',at,'companion');return true;
 }
 
-root.WendaoEngine={canViewRecoveryCG,vitals,companionCare,mergeVitals,validVitals,RULES,EVENTS,planAgreement,cancelAgreement,advanceAutonomy,acknowledgeLifeClock,rhythm,setMode,setTemporarySleep,nightRecap,appendDialogue,dueTime,settlementID,migrateLegacySave,recoverDeadline,injuryFor,unionRows,recalculate,proactive,day,dateAt,fresh,baseline,derive,advance,settle,independent,eligible,choose,finish,validate,merge,log,subtract,watchDeadlines,checkDeadlines,untrackedOverdue,confirmMissedDeadline,resolveDeadline,portrait};
+root.WendaoEngine={canViewRecoveryCG,vitals,companionCare,mergeVitals,validVitals,RULES,EVENTS,planAgreement,cancelAgreement,advanceAutonomy,acknowledgeLifeClock,rhythm,setMode,setTemporarySleep,nightRecap,recapTimeline,appendDialogue,dueTime,settlementID,migrateLegacySave,recoverDeadline,injuryFor,unionRows,recalculate,proactive,day,dateAt,fresh,baseline,derive,advance,settle,independent,eligible,choose,finish,validate,merge,log,subtract,watchDeadlines,checkDeadlines,untrackedOverdue,confirmMissedDeadline,resolveDeadline,portrait};
 })(typeof window!=='undefined'?window:globalThis);
