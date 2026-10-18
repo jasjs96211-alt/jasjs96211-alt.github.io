@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="zh-CN">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="color-scheme" content="dark"><title>知遥寝居 · 空间灰盒 R1</title><link rel="stylesheet" href="./preview.css"></head>
+<body>
+<header><div><small>远航 · 问道 / 空间研究 01</small><h1>竹窗以内<span>知遥寝居</span></h1></div><p>R1 空间灰盒 <i></i> 临时人物代理</p></header>
+<main>
+<section class="stage" aria-label="实时三维寝居">
+  <canvas id="scene" aria-label="真实几何寝居灰盒，可用下方按钮切换三个摄像机与昼夜"></canvas>
+  <div id="fallback" hidden><img src="../../wendao/assets/zhiyao-recovery-cg.webp" alt="WebGL 不可用时显示的原静态寝居 CG"><p id="failure-text">三维场景未启动，当前为原静态画面。</p><button id="retry">重新加载</button></div>
+  <div class="stage-label"><span id="phase-label">白日 · 窗光</span><span>1 m 为一单位 / 实时渲染</span></div>
+  <div class="caption"><small id="shot-index">01 / SPACE</small><h2 id="shot-title">空间全景</h2><p id="status" role="status">正在搭起房间…</p></div>
+  <div id="demo-progress" hidden></div>
+</section>
+<section class="controls" aria-label="空间检视">
+  <div class="control-row"><span class="legend">观察位置</span><nav aria-label="镜头"><button data-camera="wide" aria-pressed="true">全景</button><button data-camera="bedside" aria-pressed="false">榻边</button><button data-camera="front" aria-pressed="false">正面微俯</button></nav></div>
+  <div class="control-row"><span class="legend">窗外时辰</span><nav aria-label="光照"><button data-phase="dawn" aria-pressed="false">晨</button><button data-phase="day" aria-pressed="true">昼</button><button data-phase="dusk" aria-pressed="false">暮</button><button data-phase="night" aria-pressed="false">夜</button><button id="lamp" aria-pressed="true">灯火开</button></nav></div>
+  <div class="control-row"><span class="legend">空间关系</span><nav aria-label="人物与路径"><button id="enter">从屏风后入场</button><button data-pose="seated">床面半坐</button><button data-pose="reclined">卧姿代理</button><button id="demo">45 秒空间巡览</button></nav></div>
+  <p class="note">人物为无面容的体积代理，仅验证比例、床面接触、路径与遮挡；步态和姿势切换均不是正式人物演出。</p>
+</section>
+<section class="review"><div><small>本轮看什么</small><h2>从一幅画，到一个房间。</h2><p>换机位时留意床柱与屏风的前后关系。入场时，代理沿门边绕过屏风；切到夜间，再关灯，观察桌面和地板附近的受光变化。</p></div><div class="checks"><span>真实摄像机</span><span>几何深度遮挡</span><span>局部灯光投影</span><span>同一房间的四种时辰</span></div></section>
+<details><summary>试验条件与性能记录</summary><div class="technical"><label>只读模拟状态 <select id="condition"><option value="healthy">清醒健康（可走动）</option><option value="ill">病中（本试验保守卧床）</option><option value="injured">急性重伤（卧床）</option><option value="sleep">睡眠（卧床）</option><option value="absent">人物不在寝居</option><option value="clock">时间待核对</option></select></label><label><input id="motion" type="checkbox" checked> 环境微动</label><label><input id="pause" type="checkbox"> 暂停巡览与动作</label><label><input id="low" type="checkbox"> 低性能模式（重建场景）</label><button id="download">导出本机性能记录</button><pre id="metrics">等待第一帧。</pre><p>FPS 为本浏览器实测；GPU 内存不可直接获取。导出 JSON 不会被当作录屏或 iPhone 验收。</p></div></details>
+<footer>独立空间试验 · 不读取或写入游戏存档 · 正式角色与风格化美术待后续制作</footer>
+</main><script type="module" src="./preview.js"></script>
+</body></html>

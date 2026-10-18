@@ -1,0 +1,69 @@
+{
+  "purpose": "composition, lighting and spatial reference only; no screenshot pixels copied into runtime/model",
+  "sourceAttribution": "URLs transcribed from package or screenshots. Broad domains are not claims of an exact resolved source; authors/licenses unverified.",
+  "references": [
+    {
+      "suppliedFile": "IMG_2966.jpeg",
+      "study": "青蓝寝居、床幔与暖灯",
+      "sourceHint": "https://booth.pm/ja/items/5517162",
+      "license": "unverified-reference-only",
+      "embedded": false
+    },
+    {
+      "suppliedFile": "IMG_2963(1).jpeg",
+      "study": "木构体积与窗光",
+      "sourceHint": "https://pikbest.com/backgrounds/interior-design-renderings-rendered-3d-of-a-chinese-themed-room_9845980.html",
+      "license": "unverified-reference-only",
+      "embedded": false
+    },
+    {
+      "suppliedFile": "IMG_2961.jpeg",
+      "study": "床前沿、木窗与日照",
+      "sourceHint": "https://jp.pinterest.com/",
+      "license": "unverified-reference-only",
+      "embedded": false
+    },
+    {
+      "suppliedFile": "IMG_2964.jpeg",
+      "study": "回廊柱列与纵深",
+      "sourceHint": "https://www.turbosquid.com/3d-models/3d-chinese-architecture-01-1961640",
+      "license": "unverified-reference-only",
+      "embedded": false
+    },
+    {
+      "suppliedFile": "IMG_2967.jpeg",
+      "study": "药庐柜台内外空间",
+      "sourceHint": "https://www.singaporetech.edu.sg/undergraduate-programmes/design-and-media-degrees",
+      "license": "unverified-reference-only",
+      "embedded": false
+    },
+    {
+      "suppliedFile": "IMG_2965.jpeg",
+      "study": "药柜、窗光与器皿层次",
+      "sourceHint": "https://medium.com/",
+      "license": "unverified-reference-only",
+      "embedded": false
+    },
+    {
+      "suppliedFile": "IMG_2962(1).jpeg",
+      "study": "药柜与暖灯体积",
+      "sourceHint": "https://open3dlab.com/",
+      "license": "unverified-reference-only",
+      "embedded": false
+    },
+    {
+      "suppliedFile": "IMG_2968(1).jpeg",
+      "study": "竹庭前中后景与栈道",
+      "sourceHint": "https://game.yzz.cn/",
+      "license": "unverified-reference-only",
+      "embedded": false
+    },
+    {
+      "suppliedFile": "IMG_2969.jpeg",
+      "study": "竹林与建筑空间连续性",
+      "sourceHint": null,
+      "license": "unverified-reference-only",
+      "embedded": false
+    }
+  ]
+}
