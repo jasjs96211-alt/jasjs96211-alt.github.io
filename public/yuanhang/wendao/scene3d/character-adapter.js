@@ -24,9 +24,17 @@ export function createProxy() {
     const foot = part(new THREE.BoxGeometry(.12, .065, .23), robe, [0, -.535, .04], pivot);
     return {pivot, foot};
   });
+  const heldBook = part(new THREE.BoxGeometry(.3,.035,.22), robe, [0,1.02,.34]);
+  const heldBowl = part(new THREE.SphereGeometry(.09,12,8), neutral, [0,1.4,.25]);
+  heldBowl.scale.y=.5; heldBook.visible=false;heldBowl.visible=false;
+  function activity(id) {
+    heldBook.visible=id==='read'; heldBowl.visible=id==='medicine';
+    if(id==='read') arms.forEach(a=>a.rotation.x=-.9);
+    if(id==='medicine') arms.forEach(a=>a.rotation.x=-1.8);
+  }
   let pose = 'reclined';
   function setPose(id) {
-    pose = id; joints.rotation.set(0, 0, 0); joints.position.set(0, 0, 0);
+    activity(null); pose = id; joints.rotation.set(0, 0, 0); joints.position.set(0, 0, 0);
     head.position.z = 0; hair.position.z = -.04;
     torso.position.y = 1.12; skirt.visible = true; hair.visible = true;
     legs.forEach(l => {l.pivot.rotation.set(0, 0, 0);}); arms.forEach(a => a.rotation.set(0, 0, 0));
@@ -56,5 +64,5 @@ export function createProxy() {
     arms.forEach((a, i) => {a.rotation.x = Math.sin(cycle + i * Math.PI) * -.17;});
   }
   setPose('reclined');
-  return {root, setPose, walk, head, get pose() {return pose;}};
+  return {root, setPose, walk, head, activity, get pose() {return pose;}};
 }

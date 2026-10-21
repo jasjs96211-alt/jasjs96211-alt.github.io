@@ -1,3 +1,4 @@
+import {allowsActivity} from '../../wendao/scene3d/interactions.js';
 import {adaptCharacterVisualState, selectNarrativeArt} from '../../wendao/scene3d/character-visual-state.js';
 const artURLs = globalThis.WENDAO_REVIEW_ART || {};
 const artSource = name => artURLs[name] || new URL('../../wendao/scene3d/art/reference/' + name, location.href).href;
@@ -32,6 +33,7 @@ function showCharacterState(visual) {
 function apply() {
   const f = stage && !failed ? stage.setSnapshot(snapshot()) : adaptCharacterVisualState(snapshot()); showCharacterState(f);
   if (!stage || failed) return;
+  all('[data-activity]').forEach(b => b.disabled = !allowsActivity(f, b.dataset.activity));
   $('enter').disabled = !f.canMove || !$('motion').checked || reduced.matches;
   document.querySelector('[data-pose="seated"]').disabled = !f.canSit;
   document.querySelector('[data-pose="reclined"]').disabled = !f.present;
@@ -75,6 +77,7 @@ async function boot() {
     apply(); camera('wide'); stage.start();
   } catch (e) {if (current === generation) failure(String(e.message || e));}
 }
+all('[data-activity]').forEach(b => b.addEventListener('click', () => {stopDemo(); camera('wide'); if (stage?.requestActivity(b.dataset.activity)) $('status').textContent = b.textContent + '：占位动作测试，坐卧过渡为体位切换，不结算游戏效果。';}));
 all('[data-camera]').forEach(b => b.addEventListener('click', () => {stopDemo(); camera(b.dataset.camera);}));
 all('[data-phase]').forEach(b => b.addEventListener('click', () => {stopDemo(); setPhase(b.dataset.phase);}));
 all('[data-pose]').forEach(b => b.addEventListener('click', () => {stopDemo(); if (stage?.pose(b.dataset.pose)) $('status').textContent = '静态体位代理：瞬时切换用于接触检查，不是卧坐过渡动画。';}));
@@ -111,5 +114,6 @@ reduced.addEventListener('change', () => {stopDemo(); $('motion').checked = !red
 window.addEventListener('pagehide', () => {stopDemo(); stage?.stop();});
 window.addEventListener('pageshow', event => {if (event.persisted) stage?.start();});
 if (reduced.matches) {$('motion').checked = false; $('motion').disabled = true;}
+$('low').checked = matchMedia('(max-width: 700px)').matches;
 apply();
 boot();

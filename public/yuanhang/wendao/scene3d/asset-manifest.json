@@ -80,8 +80,8 @@
     },
     {
       "path": "bedroom-model.js",
-      "bytes": 7568,
-      "sha256": "cdafc5923506e3a3f5d06c3f135cfcfb27509c9b9ac6da9d3943ad78c457b575",
+      "bytes": 8494,
+      "sha256": "42bcb475d2f623235d282bb7146d17125c958ab7308e8f63f5181df07fe19799",
       "source": "original editable R1 geometry/code",
       "license": "project-original",
       "status": "greybox-not-visually-approved"
@@ -89,15 +89,15 @@
     {
       "path": "camera-rig.js",
       "bytes": 1799,
-      "sha256": "58fe78312d4cc1b946d8a9844063ba96b078a640835f5795167c4d96ce530f01",
+      "sha256": "39c162629632700d543ac95bce4dc9aaf3fadaf0ec49680c184dedcc88d185f5",
       "source": "original editable R1 geometry/code",
       "license": "project-original",
       "status": "greybox-not-visually-approved"
     },
     {
       "path": "character-adapter.js",
-      "bytes": 3428,
-      "sha256": "7828083b0bdf355486085e453330d7cd488b21c2f379d69bc1d70f0ac2d1c257",
+      "bytes": 3901,
+      "sha256": "a19343e343da16e7014c9f3417353d142280a3139cb34b9c978ec44c446c75a6",
       "source": "original editable R1 geometry/code",
       "license": "project-original",
       "status": "greybox-not-visually-approved"
@@ -112,16 +112,16 @@
     },
     {
       "path": "scene-manager.js",
-      "bytes": 8179,
-      "sha256": "65078e1d018786fe69968d36c90cb6807ff3d15e3b8b349dfad8aa7a1a3e7768",
+      "bytes": 10137,
+      "sha256": "501c7d0eb3bf50068ba0fde464b62ac0c6e895de3d428d9de78f7264b9feb8a7",
       "source": "original editable R1 geometry/code",
       "license": "project-original",
       "status": "greybox-not-visually-approved"
     },
     {
       "path": "contract.js",
-      "bytes": 3254,
-      "sha256": "10748e324f687f4b4ea44df50ba1181b83b605738c61004fae692121b2157d55",
+      "bytes": 3582,
+      "sha256": "32061c4520e156ccc07dcb444063ca6ae61ca29193b906af6b84631e29bf97cc",
       "source": "original editable R1 geometry/code",
       "license": "project-original",
       "status": "greybox-not-visually-approved"
@@ -134,5 +134,7 @@
       "license": "project-original",
       "status": "greybox-not-visually-approved"
     }
-  ]
+  ],
+  "scopeUpdate": "NEXT_SCOPE_20261021.md",
+  "historicalExports": "models/*-r1.* remain unchanged R1 exports; current runtime includes R2 furniture"
 }

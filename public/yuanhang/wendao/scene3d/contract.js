@@ -9,6 +9,10 @@ export const ANCHORS = Object.freeze(Object.fromEntries(Object.entries({
 export const WALK_PATH = Object.freeze(['door', 'behindScreen', 'screenExit', 'passage', 'bedApproach', 'bedside'].map(k => ANCHORS[k]));
 export const PATH_LENGTH = WALK_PATH.slice(1).reduce((total, p, i) => total + Math.hypot(p[0] - WALK_PATH[i][0], p[2] - WALK_PATH[i][2]), 0);
 export const COLLIDERS = Object.freeze([
+  Object.freeze({id: 'desk', minX: -4.3, maxX: -3.02, minZ: 1.23, maxZ: 2.47}),
+  Object.freeze({id: 'stool', minX: -2.99, maxX: -2.51, minZ: 1.61, maxZ: 2.09}),
+  Object.freeze({id: 'cabinet', minX: 1.02, maxX: 2.08, minZ: -3.23, maxZ: -2.71}),
+  Object.freeze({id: 'console', minX: 1.57, maxX: 3.83, minZ: 2.37, maxZ: 2.93}),
   Object.freeze({id: 'bed', minX: -2.78, maxX: -.02, minZ: -2.82, maxZ: .32}),
   Object.freeze({id: 'screen', minX: 1.02, maxX: 3.7, minZ: -.37, maxZ: -.13}),
   Object.freeze({id: 'table', minX: .04, maxX: 1.04, minZ: -2.2, maxZ: -1.42})

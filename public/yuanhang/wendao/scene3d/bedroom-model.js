@@ -84,6 +84,19 @@ export function buildBedroom() {
     for (let j = 0; j < 4; j++) box('screen-slat', [x - .3 + j * .2, 1.75, -.183], [.024, .85, .02], m.paleWood);
   }
   box('rug', [-1.2, .015, 1.02], [3.5, .018, 1.22], m.cloth);
+  // Functional study and medicine stations; character clearance stays in the centre aisle.
+  box('writing-desk', [-3.65, .82, 1.85], [1.25, .1, 1.15], m.paleWood);
+  for (const x of [-4.18, -3.12]) for (const z of [1.36, 2.34]) box('desk-leg', [x, .4, z], [.08, .8, .08]);
+  box('desk-paper', [-3.65, .883, 1.85], [.65, .015, .55], m.paper);
+  box('desk-inkstone', [-3.65, .92, 1.48], [.25, .06, .16], m.stone);
+  box('reading-stool', [-2.75, .48, 1.85], [.48, .08, .48]);
+  for (const x of [-2.92, -2.58]) for (const z of [1.68, 2.02]) box('stool-leg', [x, .23, z], [.06, .46, .06]);
+  box('medicine-cabinet', [1.55, 1.05, -2.97], [1.05, 2.1, .52], m.edge);
+  for (let row = 0; row < 5; row++) for (let col = 0; col < 3; col++) {
+    const x = 1.22 + col * .33, y = .23 + row * .4;
+    box('medicine-drawer', [x, y, -2.69], [.3, .36, .06], m.paleWood);
+    box('drawer-label', [x, y, -2.65], [.12, .06, .015], m.paper);
+  }
   // A near foreground table supplies a second distinct depth/occlusion plane.
   box('foreground-console', [2.7, .75, 2.65], [2.25, .09, .55]);
   for (const x of [1.68, 3.72]) box('console-leg', [x, .36, 2.65], [.1, .72, .4], m.edge);
