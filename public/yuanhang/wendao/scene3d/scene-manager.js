@@ -4,6 +4,7 @@ import {createProxy} from './character-adapter.js';
 import {createCameraRig} from './camera-rig.js';
 import {createLighting} from './lighting.js';
 import {samplePath, visualDelta, PATH_LENGTH, ANCHORS} from './contract.js';
+import {createReadability} from './visibility.js';
 import {createGLBCharacter} from './glb-character.js';
 import {ACTIVITIES, allowsActivity, planRoute, routeLength, sampleRoute} from './interactions.js';
 import {adaptCharacterVisualState, withPresentationPose} from './character-visual-state.js';
@@ -15,6 +16,7 @@ export function createBedroomScene(canvas, {low = false, reducedMotion = false, 
   renderer.outputColorSpace = THREE.SRGBColorSpace; renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1;
   const scene = new THREE.Scene(), camera = new THREE.PerspectiveCamera(42, 1, .1, 65);
   const room = buildBedroom(); let character = createProxy(); const retired = []; scene.add(room.root, character.root);
+  const readability = createReadability(room.root,camera);
   const rig = createCameraRig(camera), lights = createLighting(scene, room.lamps, {low});
   let facts = adaptCharacterVisualState(), distance = 0, speed = 0, yaw = 0, moving = false, motion = !reducedMotion, paused = false;
   let last = null, wasVisible = false, time = 0, running = false, disposed = false, raf = 0;
@@ -82,6 +84,7 @@ export function createBedroomScene(canvas, {low = false, reducedMotion = false, 
         if (p.arrived) {moving = false; character.setPose('walk'); character.walk(p.position, p.yaw, 0); facts = withPresentationPose(facts, {pose: 'walk', position: p.position, yaw: p.yaw}); if (activity) finishActivity();}
       }
       character.update?.(dt);
+      readability.update(character,dt,{immediate: reducedMotion || !motion});
       lights.update(time, motion && !paused);
       room.curtains.forEach((curtain, n) => {
         const attr = curtain.geometry.attributes.position, base = curtain.userData.base;
@@ -125,7 +128,7 @@ export function createBedroomScene(canvas, {low = false, reducedMotion = false, 
       drawCalls: renderer.info.render.calls, triangles: renderer.info.render.triangles,
       geometries: renderer.info.memory.geometries, textures: renderer.info.memory.textures,
       jsHeapBytes: performance.memory?.usedJSHeapSize ?? null, gpuMemoryBytes: null,
-      viewport: [canvas.width, canvas.height], phase: lights.phase, camera: rig.active, moving, activity,
+      viewport: [canvas.width, canvas.height], phase: lights.phase, camera: rig.active, moving, activity, fadedOccluders:readability.fadedCount,
       motion, paused, character: {identity: facts.identity.id, pose: facts.pose, health: facts.health.stage, hair: facts.hair}, quality: low ? 'low' : 'standard', error};
   }
   return {start, stop, dispose, resize, setSnapshot, enter, telemetry, requestActivity,

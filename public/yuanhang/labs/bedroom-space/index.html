@@ -1,8 +1,8 @@
 <!doctype html>
 <html lang="zh-CN">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="color-scheme" content="dark"><title>知遥寝居 · 寝居交互 R2</title><link rel="stylesheet" href="./preview.css"></head>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="color-scheme" content="dark"><title>知遥寝居 · 寝居质感 R2.1</title><link rel="stylesheet" href="./preview.css"></head>
 <body>
-<header><div><small>远航 · 问道 / 空间研究 01</small><h1>竹窗以内<span>知遥寝居</span></h1></div><p>寝居交互 R2 <i></i> 空间与行动样板</p></header>
+<header><div><small>远航 · 问道 / 空间研究 01</small><h1>竹窗以内<span>知遥寝居</span></h1></div><p>寝居质感 R2.1 <i></i> 材质与人物可读性</p></header>
 <main>
 <section class="stage" aria-label="实时三维寝居">
   <canvas id="scene" aria-label="真实几何寝居灰盒，可用下方按钮切换三个摄像机与昼夜"></canvas>
@@ -16,6 +16,7 @@
   <div class="control-row"><span class="legend">窗外时辰</span><nav aria-label="光照"><button data-phase="dawn" aria-pressed="false">晨</button><button data-phase="day" aria-pressed="true">昼</button><button data-phase="dusk" aria-pressed="false">暮</button><button data-phase="night" aria-pressed="false">夜</button><button id="lamp" aria-pressed="true">灯火开</button></nav></div>
   <div class="control-row"><span class="legend">空间关系</span><nav aria-label="人物与路径"><button id="enter">从屏风后入场</button><button data-pose="seated">床面半坐</button><button data-pose="reclined">卧姿代理</button><button id="demo">45 秒空间巡览</button></nav></div>
   <div class="control-row"><span class="legend">日常行动</span><nav aria-label="日常行动"><button data-activity="walk">走到榻边</button><button data-activity="sit">书案坐下</button><button data-activity="read">看书</button><button data-activity="medicine">取药服药</button><button data-activity="lie">卧床</button><button data-activity="rest">休息</button></nav></div>
+  <p class="note">屏风已缩窄并靠右；挡住人物的前景会暂时淡化，离开遮挡后恢复。新增木纹、织物、家具圆角与生活陈设，仍使用功能占位角色。</p>
   <p class="note">人物为无面容的体积代理，仅验证比例、床面接触、路径与遮挡；步态和姿势切换均不是正式人物演出。</p>
 </section>
 <section class="review"><div><small>本轮看什么</small><h2>从一幅画，到一个房间。</h2><p>换机位时留意床柱与屏风的前后关系。入场时，代理沿门边绕过屏风；切到夜间，再关灯，观察桌面和地板附近的受光变化。</p></div><div class="checks"><span>真实摄像机</span><span>几何深度遮挡</span><span>局部灯光投影</span><span>同一房间的四种时辰</span></div></section>

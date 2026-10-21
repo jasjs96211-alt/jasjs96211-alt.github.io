@@ -1,4 +1,5 @@
 import * as THREE from './vendor/three.module.min.js';
+import {makeSurfaces,softenedBox} from './surface-materials.js';
 // Editable R1 geometry, metres, Y up, +Z faces the open side of the room.
 // Original geometric study. No reference screenshots, textures or game art are embedded.
 export function buildBedroom() {
@@ -8,15 +9,16 @@ export function buildBedroom() {
     wood: material(0x684638), edge: material(0x392f2a), paleWood: material(0x93745b),
     wall: material(0x345350), plaster: material(0xaaa58e), cloth: material(0x688e86),
     linen: material(0xc5c4ae), paper: material(0xd4c5a1), gold: material(0x9f8457, {metalness: .35}),
-    ceramic: material(0x718d84, {roughness: .35}), tea: material(0x30201a), leaf: material(0x3a6153),
+    ceramic: material(0x999e8d, {roughness: .42}), tea: material(0x30201a), leaf: material(0x5d6651),
     lamp: material(0xe4c696, {emissive: 0xffb65e, emissiveIntensity: 0}), stone: material(0x707d77)
   };
+  Object.assign(m,makeSurfaces());
   function mesh(geometry, mat, p, name, parent = root) {
     const obj = new THREE.Mesh(geometry, mat); obj.position.set(...p);
     obj.castShadow = true; obj.receiveShadow = true; obj.name = name; parent.add(obj); return obj;
   }
-  const box = (name, p, size, mat = m.wood, parent = root) => mesh(new THREE.BoxGeometry(...size), mat, p, name, parent);
-  const cylinder = (name, p, top, bottom, h, mat = m.wood, parent = root) => mesh(new THREE.CylinderGeometry(top, bottom, h, 12), mat, p, name, parent);
+  const box = (name, p, size, mat = m.wood, parent = root) => mesh(softenedBox(size), mat, p, name, parent);
+  const cylinder = (name, p, top, bottom, h, mat = m.wood, parent = root) => mesh(new THREE.CylinderGeometry(top, bottom, h, 24), mat, p, name, parent);
   // Open front/right walls are an intentional cutaway, not a 2D painted room.
   box('foundation', [0, -.16, 0], [9, .28, 6.9], m.edge);
   for (let i = 0; i < 30; i++) {
@@ -44,7 +46,7 @@ export function buildBedroom() {
   }
   box('rear-beam', [0, 3.16, -3.25], [8.9, .18, .2]);
   // Bed surface y=.73 is shared by the seated proxy's root and its contact shadows.
-  box('bed-frame', [-1.4, .47, -1.25], [2.65, .33, 3], m.edge);
+  box('bed-frame', [-1.4, .47, -1.25], [2.65, .22, 3], m.edge);
   for (const x of [-2.6, -.2]) for (const z of [-2.6, .1]) box('bed-foot', [x, .2, z], [.14, .4, .14]);
   box('mattress', [-1.4, .68, -1.25], [2.46, .1, 2.85], m.linen);
   box('headboard', [-1.4, 1.05, -2.72], [2.65, 1.12, .13]);
@@ -57,13 +59,17 @@ export function buildBedroom() {
   for (const x of [-2.68, -.12]) box('canopy-side', [x, 3.07, -1.25], [.09, .09, 2.9]);
   const pillow = mesh(new THREE.SphereGeometry(1, 16, 10), m.linen, [-1.4, .81, -2.15], 'pillow');
   pillow.scale.set(.82, .19, .39);
-  const blanket = box('folded-quilt', [-1.4, .805, -.72], [2.35, .15, 1.58], m.cloth);
-  box('quilt-border', [-1.4, .886, -.04], [2.37, .012, .09], m.gold);
+  const quiltGeometry=new THREE.BoxGeometry(2.35,.13,1.65,34,2,28),qp=quiltGeometry.attributes.position;
+  for(let i=0;i<qp.count;i++) {const x=qp.getX(i),z=qp.getZ(i);qp.setY(i,qp.getY(i)+.018*Math.sin(z*15+x*2)+.012*Math.cos(x*12+z*3));}
+  quiltGeometry.computeVertexNormals();
+  const blanket=mesh(quiltGeometry,m.cloth,[-1.4,.81,-.72],'folded-quilt');
+  const turnedEdge=box('quilt-turned-edge',[-1.4,.9,-1.48],[2.28,.08,.22],m.linen);turnedEdge.rotation.x=.08;
   // Curtains have actual depth/triangles and can occlude a character.
   const curtains = [];
   for (const x of [-2.6, -.2]) {
     const g = new THREE.PlaneGeometry(.35, 2.25, 5, 14);
-    const curtain = mesh(g, material(0xc4c6b0, {side: THREE.DoubleSide}), [x, 1.9, .1], 'bed-curtain');
+    const curtain = mesh(g, m.linen.clone(), [x, 1.9, .1], 'bed-curtain');
+    curtain.material.side=THREE.DoubleSide;
     curtain.userData.base = Array.from(g.attributes.position.array); curtains.push(curtain);
   }
   // Bedside table and both props share explicit world positions.
@@ -77,11 +83,11 @@ export function buildBedroom() {
   cylinder('medicine-liquid', [.73, .95, -1.73], .08, .08, .006, m.tea);
   // Three opaque panels. Depth testing, not DOM visibility, hides the walking proxy.
   for (let i = 0; i < 3; i++) {
-    const x = 1.48 + i * .88;
-    box('screen-panel-' + i, [x, 1.21, -.25], [.82, 2.12, .09], m.paper);
-    for (const dx of [-.44, .44]) box('screen-frame', [x + dx, 1.25, -.25], [.045, 2.4, .14], m.edge);
-    for (const y of [.15, .6, 2.29]) box('screen-rail', [x, y, -.25], [.88, .045, .14]);
-    for (let j = 0; j < 4; j++) box('screen-slat', [x - .3 + j * .2, 1.75, -.183], [.024, .85, .02], m.paleWood);
+    const x = 2.2 + i * .58;
+    box('screen-panel-' + i, [x, 1.02, -.25], [.53, 1.62, .055], m.paper);
+    for (const dx of [-.285, .285]) box('screen-frame', [x + dx, 1.04, -.25], [.035, 1.96, .09], m.edge);
+    for (const y of [.16, .53, 1.84]) box('screen-rail', [x, y, -.25], [.58, .035, .09]);
+    for (let j = 0; j < 3; j++) box('screen-slat', [x - .19 + j * .19, 1.38, -.213], [.018, .73, .015], m.paleWood);
   }
   box('rug', [-1.2, .015, 1.02], [3.5, .018, 1.22], m.cloth);
   // Functional study and medicine stations; character clearance stays in the centre aisle.
@@ -97,6 +103,22 @@ export function buildBedroom() {
     box('medicine-drawer', [x, y, -2.69], [.3, .36, .06], m.paleWood);
     box('drawer-label', [x, y, -2.65], [.12, .06, .015], m.paper);
   }
+  // Quiet signs of daily use: stitched booklets, brush, medicine jars and a folded cloth.
+  for(let i=0;i<3;i++) {const b=box('stacked-book-'+i,[-3.84,.91+i*.045,2.1],[.35,.04,.26],i%2?m.paper:m.cloth);b.rotation.y=.06*i;}
+  const brush=cylinder('writing-brush',[-3.45,.9,1.85],.009,.014,.34,m.edge);brush.rotation.z=Math.PI/2;brush.rotation.y=.22;
+  box('desk-apron',[-3.65,.72,2.36],[1.08,.12,.045],m.wood);
+  for(let i=0;i<3;i++) {
+    const x=1.22+i*.32;
+    mesh(new THREE.LatheGeometry([new THREE.Vector2(.06,0),new THREE.Vector2(.1,.04),new THREE.Vector2(.105,.17),new THREE.Vector2(.065,.22),new THREE.Vector2(.065,.25)],24),m.ceramic,[x,2.11,-2.95],'medicine-jar');
+    cylinder('jar-lid',[x,2.38,-2.95],.075,.075,.025,m.wood);
+  }
+  for(let row=0;row<5;row++)for(let col=0;col<3;col++){
+    const handle=mesh(new THREE.TorusGeometry(.025,.005,6,12),m.gold,[1.22+col*.33,.14+row*.4,-2.64],'drawer-ring');
+  }
+  box('folded-towel',[.65,.94,-2.04],[.22,.055,.17],m.linen);
+  // Give the window-side lamp a real stand, rather than a floating base.
+  cylinder('window-lamp-stand',[-3.55,.4,.55],.07,.1,.8,m.wood);
+  cylinder('window-lamp-foot',[-3.55,.035,.55],.24,.27,.07,m.edge);
   // A near foreground table supplies a second distinct depth/occlusion plane.
   box('foreground-console', [2.7, .75, 2.65], [2.25, .09, .55]);
   for (const x of [1.68, 3.72]) box('console-leg', [x, .36, 2.65], [.1, .72, .4], m.edge);
@@ -121,6 +143,6 @@ export function buildBedroom() {
       leaf.scale.set(.38, .03, .13); leaf.rotation.z = .4 - j * .3;
     }
   }
-  root.userData = {units: 'metres', up: '+Y', status: 'greybox', source: 'bedroom-model.js', referenceUse: 'composition-only'};
+  root.userData = {units: 'metres', up: '+Y', status: 'material-refinement-r2.1', source: 'bedroom-model.js', referenceUse: 'composition-only'};
   return {root, lamps, curtains, blanket};
 }

@@ -14,7 +14,7 @@ export const COLLIDERS = Object.freeze([
   Object.freeze({id: 'cabinet', minX: 1.02, maxX: 2.08, minZ: -3.23, maxZ: -2.71}),
   Object.freeze({id: 'console', minX: 1.57, maxX: 3.83, minZ: 2.37, maxZ: 2.93}),
   Object.freeze({id: 'bed', minX: -2.78, maxX: -.02, minZ: -2.82, maxZ: .32}),
-  Object.freeze({id: 'screen', minX: 1.02, maxX: 3.7, minZ: -.37, maxZ: -.13}),
+  Object.freeze({id: 'screen', minX: 1.9, maxX: 3.7, minZ: -.37, maxZ: -.13}),
   Object.freeze({id: 'table', minX: .04, maxX: 1.04, minZ: -2.2, maxZ: -1.42})
 ]);
 export function blocked(position, radius = .32) {

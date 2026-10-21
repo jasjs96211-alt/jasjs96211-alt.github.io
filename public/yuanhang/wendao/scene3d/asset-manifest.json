@@ -80,8 +80,8 @@
     },
     {
       "path": "bedroom-model.js",
-      "bytes": 8494,
-      "sha256": "42bcb475d2f623235d282bb7146d17125c958ab7308e8f63f5181df07fe19799",
+      "bytes": 10117,
+      "sha256": "48c400b802a2000bf2b4af009ac4c6edccbcbac47962beb3d487a06ee71c63bd",
       "source": "original editable R1 geometry/code",
       "license": "project-original",
       "status": "greybox-not-visually-approved"
@@ -104,24 +104,24 @@
     },
     {
       "path": "lighting.js",
-      "bytes": 2408,
-      "sha256": "88f7502866e870bd634f1756b917f907c55f129d959af07d3177d35316ce9ef1",
+      "bytes": 2427,
+      "sha256": "3d7bde3e0040ee34536f68f0bd0964afdfd473b55eede26d0d23a7cb88347bb4",
       "source": "original editable R1 geometry/code",
       "license": "project-original",
       "status": "greybox-not-visually-approved"
     },
     {
       "path": "scene-manager.js",
-      "bytes": 10137,
-      "sha256": "501c7d0eb3bf50068ba0fde464b62ac0c6e895de3d428d9de78f7264b9feb8a7",
+      "bytes": 10364,
+      "sha256": "6914a2a5390648cf62621b88aea0831ab3d51eedb5625cd2cc7414345f0b7906",
       "source": "original editable R1 geometry/code",
       "license": "project-original",
       "status": "greybox-not-visually-approved"
     },
     {
       "path": "contract.js",
-      "bytes": 3582,
-      "sha256": "32061c4520e156ccc07dcb444063ca6ae61ca29193b906af6b84631e29bf97cc",
+      "bytes": 3581,
+      "sha256": "98595361baa574423e9c50fa8536b06aee907d999d5b3a14af697be651de89f4",
       "source": "original editable R1 geometry/code",
       "license": "project-original",
       "status": "greybox-not-visually-approved"
