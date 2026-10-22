@@ -1,4 +1,4 @@
-import {blocked, ANCHORS} from './contract.js';
+import {blocked, ANCHORS, COLLIDERS} from './contract.js';
 // All requests are presentation-only. The game remains the authority for outcomes.
 export const ACTIVITIES = Object.freeze({
   walk: {approach: ANCHORS.bedside, pose: 'walk', yaw: -Math.PI / 2},
@@ -14,8 +14,17 @@ export function allowsActivity(facts, id) {
   return facts.canMove && (!['sit', 'read'].includes(id) || facts.canSit);
 }
 export function clearSegment(a, b) {
-  const steps = Math.max(1, Math.ceil(Math.hypot(b[0]-a[0], b[2]-a[2])/.04));
-  for (let i=0;i<=steps;i++) if (blocked([a[0]+(b[0]-a[0])*i/steps,0,a[2]+(b[2]-a[2])*i/steps])) return false;
+  if(blocked(a)||blocked(b))return false;
+  // Exact segment vs body-expanded rectangles; sampling alone can miss narrow corners.
+  for(const c of COLLIDERS){
+    let near=0,far=1,hit=true;
+    for(const [axis,min,max] of [[0,c.minX-.32,c.maxX+.32],[2,c.minZ-.32,c.maxZ+.32]]){
+      const d=b[axis]-a[axis];
+      if(Math.abs(d)<1e-12){if(a[axis]<=min||a[axis]>=max){hit=false;break;}}
+      else {const t1=(min-a[axis])/d,t2=(max-a[axis])/d;near=Math.max(near,Math.min(t1,t2));far=Math.min(far,Math.max(t1,t2));}
+    }
+    if(hit&&near<far-1e-10)return false;
+  }
   return true;
 }
 // Small bounded grid: stable paths on mobile, no mesh raycast or remote services.

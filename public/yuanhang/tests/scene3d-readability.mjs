@@ -6,12 +6,14 @@ import {createProxy} from '../wendao/scene3d/character-adapter.js';
 import {createReadability} from '../wendao/scene3d/visibility.js';
 import {surfaceTexture} from '../wendao/scene3d/surface-materials.js';
 
-test('screen obstruction fades locally, restores when clear, and leaves ordinary furniture opaque',()=>{
+test('screen remains opaque with unchanged depth/shadows even under sustained obstruction',()=>{
  const room=buildBedroom(),proxy=createProxy(),camera=new THREE.PerspectiveCamera(42,1,.1,50);
- camera.position.set(3.2,1.6,4);camera.lookAt(3.2,1.4,-1.05);
- proxy.walk([3.2,0,-1.05],0,0);proxy.root.visible=true;
+ camera.position.set(3.2,1.6,4);camera.lookAt(3.2,1.4,-2.65);
+ proxy.walk([3.2,0,-2.65],0,0);proxy.root.visible=true;
  const view=createReadability(room.root,camera);view.update(proxy,.2,{immediate:true});
- assert.ok(view.fadedCount>0);assert.ok(room.root.getObjectByName('screen-panel-2').material.opacity<1 || room.root.getObjectByName('screen-panel-1').material.opacity<1);
+ for(let i=0;i<60;i++)view.update(proxy,.1);
+ assert.ok(view.blockedCount>0);assert.equal(view.fadedCount,0);
+ for(const name of ['screen-panel-1','screen-frame']){const m=room.root.getObjectByName(name);assert.equal(m.material.opacity,1);assert.equal(m.material.transparent,false);assert.equal(m.castShadow,true);}
  assert.equal(room.root.getObjectByName('medicine-cabinet').material.opacity,1);
  proxy.walk([.52,0,.85],0,0);view.update(proxy,1,{immediate:true});
  assert.equal(view.fadedCount,0);

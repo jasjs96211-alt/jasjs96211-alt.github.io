@@ -3,7 +3,7 @@ import {ANCHORS} from './contract.js';
 // Intentionally faceless, articulated volume proxy. It is NOT a Zhiyao character asset.
 export function createProxy() {
   const root = new THREE.Group(); root.name = 'temporary-volume-proxy';
-  const robe = new THREE.MeshStandardMaterial({color: 0x729b92, roughness: .95});
+  const robe = new THREE.MeshStandardMaterial({color: 0x858b7d, roughness: .95});
   const neutral = new THREE.MeshStandardMaterial({color: 0xc9c7b1, roughness: .95});
   const joints = new THREE.Group(); root.add(joints);
   function part(geometry, material, p, parent = joints) {
@@ -28,7 +28,10 @@ export function createProxy() {
   const heldBowl = part(new THREE.SphereGeometry(.09,12,8), neutral, [0,1.4,.25]);
   heldBowl.scale.y=.5; heldBook.visible=false;heldBowl.visible=false;
   function activity(id) {
-    heldBook.visible=id==='read'; heldBowl.visible=id==='medicine';
+    heldBook.visible=id==='read'; heldBowl.visible=['hold-bowl','medicine'].includes(id);heldBowl.position.y=id==='hold-bowl'?1.12:1.4;
+    if(['stool','reach-book','read'].includes(id)) {legs.forEach(l=>{l.pivot.rotation.x=-.55;});skirt.position.z=.06;}
+    if(id==='reach-book'||id==='reach-medicine') arms.forEach(a=>a.rotation.x=-1.25);
+    if(id==='hold-bowl') arms.forEach(a=>a.rotation.x=-1.05);
     if(id==='read') arms.forEach(a=>a.rotation.x=-.9);
     if(id==='medicine') arms.forEach(a=>a.rotation.x=-1.8);
   }
@@ -63,6 +66,14 @@ export function createProxy() {
     legs.forEach((l, i) => {l.pivot.rotation.x = Math.sin(cycle + i * Math.PI) * .32;});
     arms.forEach((a, i) => {a.rotation.x = Math.sin(cycle + i * Math.PI) * -.17;});
   }
+  // Capture and blend the existing proxy joints; these are kinematic placeholders, not animation clips.
+  function capture() {const values=[];root.traverse(o=>values.push({o,p:o.position.clone(),q:o.quaternion.clone(),s:o.scale.clone(),visible:o.visible}));return values;}
+  function transitionTo(target) {
+    const from=capture();setPose(target.pose);root.position.set(...target.position);root.rotation.y=target.yaw;activity(target.gesture);
+    const to=capture();
+    function sample(t) {from.forEach((a,i)=>{const b=to[i];a.o.position.lerpVectors(a.p,b.p,t);a.o.quaternion.slerpQuaternions(a.q,b.q,t);a.o.scale.lerpVectors(a.s,b.s,t);a.o.visible=t<.5?a.visible:b.visible;});}
+    sample(0);return sample;
+  }
   setPose('reclined');
-  return {root, setPose, walk, head, activity, get pose() {return pose;}};
+  return {root, setPose, walk, head, activity, transitionTo, get pose() {return pose;}};
 }
