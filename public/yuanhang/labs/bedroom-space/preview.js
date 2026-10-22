@@ -1,3 +1,4 @@
+import {allowsActivity} from '../../wendao/scene3d/interactions.js';
 import {adaptCharacterVisualState, selectNarrativeArt} from '../../wendao/scene3d/character-visual-state.js';
 const artURLs = globalThis.WENDAO_REVIEW_ART || {};
 const artSource = name => artURLs[name] || new URL('../../wendao/scene3d/art/reference/' + name, location.href).href;
@@ -32,9 +33,10 @@ function showCharacterState(visual) {
 function apply() {
   const f = stage && !failed ? stage.setSnapshot(snapshot()) : adaptCharacterVisualState(snapshot()); showCharacterState(f);
   if (!stage || failed) return;
-  $('enter').disabled = !f.canMove || !$('motion').checked || reduced.matches;
+  all('[data-activity]').forEach(b => b.disabled = !f.canMove || !allowsActivity(f, b.dataset.activity));
+  $('enter').disabled = !f.canMove;
   document.querySelector('[data-pose="seated"]').disabled = !f.canSit;
-  document.querySelector('[data-pose="reclined"]').disabled = !f.present;
+  document.querySelector('[data-pose="reclined"]').disabled = !f.canMove;
   $('phase-label').textContent = phaseNames[phase]; mark('[data-phase]', 'phase', phase);
   $('status').textContent = !f.present ? '人物地点在别处，寝居保持空景。' : f.sleeping ? '睡眠只读模拟：代理卧床，不触发唤醒。' : f.severe ? '重伤只读模拟：禁止起身和走动。' : f.weak ? '病中只读模拟：本灰盒保守卧床。' : f.clockHold ? '时间待核对：停止自主动作。' : '代理用于检查体积和接触；正式人物美术尚未接入。';
 }
@@ -43,16 +45,22 @@ function setPhase(id) {phase = id; apply();}
 function failure(message) {
   failed = true; stopDemo(); $('fallback').hidden = false;
   const visual = stage?.visualState || adaptCharacterVisualState(snapshot()), art = selectNarrativeArt(visual);
-  const fallbackImage = document.querySelector('#fallback img');
-  fallbackImage.hidden = !art.visible;
-  if (art.path) fallbackImage.src = artSource(art.path);
   showCharacterState(visual);
-  $('failure-text').textContent = (art.visible ? '三维试验未能运行，当前为同一状态对应的原画。' : '三维试验未能运行，人物不在寝居。') + '可重新加载。原因：' + message;
+  $('failure-text').textContent = 'WebGL 未能启动，本页没有显示替代图片。可重新加载。原因：' + message;
+  $('metrics').textContent=JSON.stringify({status:'failed',fps:null,error:message},null,2);
   $('status').textContent = '三维尚未验证成功。';
   all('.controls button, .technical button, .technical input, .technical select').forEach(b => b.disabled = true);
 }
-function onFrame({time, visualState}) {
+let lastActionStatus='';
+function onFrame({time, visualState, activity, phase:actionPhase, busy, cancelling}) {
   showCharacterState(visualState);
+  $('cancel-action').disabled=!busy||cancelling;
+  all('[data-activity], [data-pose], #enter').forEach(b=>b.disabled=busy||!visualState.canMove||(b.dataset.activity&&!allowsActivity(visualState,b.dataset.activity)));
+  const key=activity+':'+actionPhase+':'+cancelling;
+  if(key!==lastActionStatus && activity) {
+    lastActionStatus=key;
+    $('status').textContent=cancelling?'正在安全停稳，随后取消。':actionPhase==='complete'?'动作已完成，可以继续下一项。占位演示不结算游戏效果。':actionPhase==='cancelled'?'行动已取消，可以重新选择。':'当前：'+actionPhase+' · 占位动作演示';
+  }
   if (demo) {
     const elapsed = time - demo.start;
     while (demo && demo.index < demo.cues.length && elapsed >= demo.cues[demo.index][0]) {
@@ -75,10 +83,12 @@ async function boot() {
     apply(); camera('wide'); stage.start();
   } catch (e) {if (current === generation) failure(String(e.message || e));}
 }
+all('[data-activity]').forEach(b => b.addEventListener('click', () => {stopDemo(); camera('wide'); if (stage?.requestActivity(b.dataset.activity)) $('status').textContent = b.textContent + '：开始连续行动，不结算游戏效果。';}));
 all('[data-camera]').forEach(b => b.addEventListener('click', () => {stopDemo(); camera(b.dataset.camera);}));
 all('[data-phase]').forEach(b => b.addEventListener('click', () => {stopDemo(); setPhase(b.dataset.phase);}));
-all('[data-pose]').forEach(b => b.addEventListener('click', () => {stopDemo(); if (stage?.pose(b.dataset.pose)) $('status').textContent = '静态体位代理：瞬时切换用于接触检查，不是卧坐过渡动画。';}));
+all('[data-pose]').forEach(b => b.addEventListener('click', () => {stopDemo(); if (stage?.pose(b.dataset.pose)) $('status').textContent = '开始床边过渡；当前仍为占位关节演示。';}));
 $('enter').addEventListener('click', () => {stopDemo(); camera('wide'); if (stage?.enter()) $('status').textContent = '门后 → 屏风后 → 绕行 → 床侧；临时运动代理，正式步态待制作。';});
+$('cancel-action').addEventListener('click',()=>{stopDemo();stage?.cancelActivity();});
 $('condition').addEventListener('change', event => {stopDemo(); condition = event.target.value; apply();});
 $('lamp').addEventListener('click', () => {stopDemo(); lamp = !lamp; stage?.lamp(lamp); $('lamp').setAttribute('aria-pressed', String(lamp)); $('lamp').textContent = lamp ? '灯火开' : '灯火关';});
 $('motion').addEventListener('change', () => {stopDemo(); stage?.motion($('motion').checked); apply();});
@@ -90,8 +100,8 @@ $('demo').addEventListener('click', () => {
   condition = 'healthy'; $('condition').value = condition; phase = 'day'; lamp = true; $('lamp').textContent = '灯火开'; $('lamp').setAttribute('aria-pressed', 'true');
   $('pause').checked = false; stage.pause(false); stage.lamp(true); apply(); camera('wide');
   const cues = [
-    [2, () => {if (stage.enter()) $('status').textContent = '屏风后的运动代理：真实深度遮挡，非正式人物步态。';}],
-    [19, () => {stage.pose('seated'); camera('bedside'); $('status').textContent = '床面半坐代理；本次体位瞬切只为检查接触。';}],
+    [2, () => {stage.requestActivity('lie');}],
+    [19, () => camera('bedside')],
     [25, () => camera('front')], [31, () => {setPhase('night'); camera('bedside');}],
     [36, () => {stage.lamp(false); $('status').textContent = '暖灯已关闭：观察近处桌面与地板受光。';}],
     [39, () => {stage.lamp(true); $('status').textContent = '暖灯恢复：同一几何房间中的局部照明。';}],
@@ -111,5 +121,6 @@ reduced.addEventListener('change', () => {stopDemo(); $('motion').checked = !red
 window.addEventListener('pagehide', () => {stopDemo(); stage?.stop();});
 window.addEventListener('pageshow', event => {if (event.persisted) stage?.start();});
 if (reduced.matches) {$('motion').checked = false; $('motion').disabled = true;}
+$('low').checked = matchMedia('(max-width: 700px)').matches;
 apply();
 boot();

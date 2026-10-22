@@ -1,3 +1,7 @@
+> **R2.1 体验修订**：屏风避让与前景淡化、材质和家具细节、低饱和夜景；见 [REFINEMENT_R21.md](REFINEMENT_R21.md)。
+
+> **2026-10-21 范围变更生效：AI 人物建模与生成已停止，人物由用户制作，原资产保留。以 [NEXT_SCOPE_20261021.md](NEXT_SCOPE_20261021.md) 为准；下文人物制作计划为历史记录。场景开发不等待人物。**
+
 > **人物融合 S0 更新**：已加入转面设定候选、原画对照、共享只读 CharacterVisualState；详见 [CHARACTER_PROGRESS.md](CHARACTER_PROGRESS.md)。原型仍无正式人物模型。当前新增离线页 `bedroom-space-s0.html`，下文 R1 为历史基线记录。
 
 # 知遥寝居：R0 审计与 R1 空间灰盒

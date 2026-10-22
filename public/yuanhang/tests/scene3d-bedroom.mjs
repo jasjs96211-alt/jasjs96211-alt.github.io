@@ -34,11 +34,11 @@ test('entire entry route clears the screen, bed, table and room boundaries with 
   for (let distance = 0; distance <= length; distance += .015) assert.equal(blocked(samplePath(distance).position), false, 'collision at ' + distance);
   assert.deepEqual(samplePath(length + 10).position, ANCHORS.bedside);
   assert.equal(samplePath(length + 10).arrived, true);
-  assert.equal(blocked([2, 0, -.25]), true); assert.equal(blocked([-1.4, 0, -1]), true);
+  assert.equal(blocked([2, 0, -2.1]), true); assert.equal(blocked([-1.4, 0, -1]), true);
 });
 test('screen is genuine 3D occlusion: a ray toward proxy behind it first hits opaque panels', () => {
   const room = buildBedroom(); room.root.updateMatrixWorld(true);
-  const origin = new THREE.Vector3(3.2, 1.4, 4), target = new THREE.Vector3(3.2, 1.4, -1.05);
+  const origin = new THREE.Vector3(3.2, 1.4, 4), target = new THREE.Vector3(3.2, 1.4, -2.65);
   const ray = new THREE.Raycaster(origin, target.clone().sub(origin).normalize(), 0, origin.distanceTo(target));
   const hits = ray.intersectObject(room.root, true);
   assert.ok(hits.length); assert.match(hits[0].object.name, /^screen-panel/);
@@ -107,7 +107,7 @@ test('every shipped 3D asset has matching bytes/hash, and third-party reference 
   }
 });
 test('isolated 3D module cannot import business code or write persistent game data', () => {
-  for (const name of ['contract.js', 'bedroom-model.js', 'character-adapter.js', 'camera-rig.js', 'lighting.js', 'scene-manager.js']) {
+  for (const name of ['contract.js', 'bedroom-model.js', 'character-adapter.js', 'camera-rig.js', 'lighting.js', 'scene-manager.js', 'action-flow.js', 'interactions.js']) {
     const text = readFileSync(new URL(name, base), 'utf8');
     assert.doesNotMatch(text, /localStorage|sessionStorage|indexedDB|fetch\(|WendaoEngine|\.setItem\(|\.writeView\(|transport\.js|engine\.js/);
   }

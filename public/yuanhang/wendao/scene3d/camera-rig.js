@@ -1,6 +1,6 @@
 import * as THREE from './vendor/three.module.min.js';
 export const PRESETS = Object.freeze({
-  wide: {position: [7.5, 4.4, 9.5], target: [-.25, 1.15, -.65], fov: 42},
+  wide: {position: [.4, 4.1, 12.5], target: [-.25, 1.15, -.65], fov: 42},
   bedside: {position: [2.8, 2.25, 4.9], target: [-1, 1.32, -1.38], fov: 39},
   front: {position: [-.8, 2.03, 2.8], target: [-.8, 1.48, -1.72], fov: 36}
 });

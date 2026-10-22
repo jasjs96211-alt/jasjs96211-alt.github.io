@@ -1,5 +1,5 @@
 {
-  "version": "bedroom-space-r1-20261018",
+  "version": "bedroom-space-r2.2-20261022",
   "units": "metres",
   "up": "+Y",
   "forward": "+Z",
@@ -11,8 +11,10 @@
     "models/bedroom-r1.three.json"
   ],
   "exportCommand": "node scripts/wendao-export-bedroom-space.mjs",
-  "textures": [],
-  "textureReason": "R1 solid-material greybox; R2 textures and formal art pending",
+  "textures": [
+    "runtime procedural DataTextures; no external downloads"
+  ],
+  "textureReason": "Local deterministic wood, weave, paper, plaster and roughness DataTextures, 128 square",
   "thirdPartyReferencePixelsEmbedded": false,
   "character": "faceless temporary volume proxy; not Zhiyao art",
   "acceptance": {
@@ -80,8 +82,8 @@
     },
     {
       "path": "bedroom-model.js",
-      "bytes": 7568,
-      "sha256": "cdafc5923506e3a3f5d06c3f135cfcfb27509c9b9ac6da9d3943ad78c457b575",
+      "bytes": 11506,
+      "sha256": "712e5cb140ee558e4f76ee57d59f65199c5b3905ba0940fdd6d50671ba95ae41",
       "source": "original editable R1 geometry/code",
       "license": "project-original",
       "status": "greybox-not-visually-approved"
@@ -89,39 +91,39 @@
     {
       "path": "camera-rig.js",
       "bytes": 1799,
-      "sha256": "58fe78312d4cc1b946d8a9844063ba96b078a640835f5795167c4d96ce530f01",
+      "sha256": "39c162629632700d543ac95bce4dc9aaf3fadaf0ec49680c184dedcc88d185f5",
       "source": "original editable R1 geometry/code",
       "license": "project-original",
       "status": "greybox-not-visually-approved"
     },
     {
       "path": "character-adapter.js",
-      "bytes": 3428,
-      "sha256": "7828083b0bdf355486085e453330d7cd488b21c2f379d69bc1d70f0ac2d1c257",
+      "bytes": 4965,
+      "sha256": "4d12f05b3a93f43de57f38d33388e205299fab71d17823cbe77148b9e902c324",
       "source": "original editable R1 geometry/code",
       "license": "project-original",
       "status": "greybox-not-visually-approved"
     },
     {
       "path": "lighting.js",
-      "bytes": 2408,
-      "sha256": "88f7502866e870bd634f1756b917f907c55f129d959af07d3177d35316ce9ef1",
+      "bytes": 2505,
+      "sha256": "33ebb802122d904b28326a494285a0e3ab9e30bc967e1adeffd129ebbbaa67a1",
       "source": "original editable R1 geometry/code",
       "license": "project-original",
       "status": "greybox-not-visually-approved"
     },
     {
       "path": "scene-manager.js",
-      "bytes": 8179,
-      "sha256": "65078e1d018786fe69968d36c90cb6807ff3d15e3b8b349dfad8aa7a1a3e7768",
+      "bytes": 8020,
+      "sha256": "bfdef841bfc6e404af61b583f38f28c17b89db28abdcb12d49da059ac3776904",
       "source": "original editable R1 geometry/code",
       "license": "project-original",
       "status": "greybox-not-visually-approved"
     },
     {
       "path": "contract.js",
-      "bytes": 3254,
-      "sha256": "10748e324f687f4b4ea44df50ba1181b83b605738c61004fae692121b2157d55",
+      "bytes": 3584,
+      "sha256": "455408ddaf8e81f2803ec0e8ea45737f1c5ceffa764cf250402a6237ced58d68",
       "source": "original editable R1 geometry/code",
       "license": "project-original",
       "status": "greybox-not-visually-approved"
@@ -133,6 +135,48 @@
       "source": "original editable R1 geometry/code",
       "license": "project-original",
       "status": "greybox-not-visually-approved"
+    },
+    {
+      "path": "surface-materials.js",
+      "source": "original editable R2 source",
+      "license": "project-original",
+      "status": "pending-user-visual-review",
+      "bytes": 3149,
+      "sha256": "ec998c2f4cb9dcdb3ee516973a832e3bb39ce8992b99ba76ade21f2335780b5f"
+    },
+    {
+      "path": "visibility.js",
+      "source": "original editable R2 source",
+      "license": "project-original",
+      "status": "pending-user-visual-review",
+      "bytes": 1357,
+      "sha256": "4ac06f75bdc3b2c1c9f1a1374cacb36ca44fec10d84d1da141059144ee5c10f6"
+    },
+    {
+      "path": "action-flow.js",
+      "source": "original editable R2 source",
+      "license": "project-original",
+      "status": "pending-user-visual-review",
+      "bytes": 6817,
+      "sha256": "551f03410e3810044f6836fe010dd79f21fd0276c1518cff84ccf9081bf406f6"
+    },
+    {
+      "path": "interactions.js",
+      "source": "original editable R2 source",
+      "license": "project-original",
+      "status": "pending-user-visual-review",
+      "bytes": 3297,
+      "sha256": "486b8cd1ea375c931068475a796b147b344c80907e798d4944b542cddb53ab0d"
+    },
+    {
+      "path": "glb-character.js",
+      "source": "original editable R2 source",
+      "license": "project-original",
+      "status": "pending-user-visual-review",
+      "bytes": 2316,
+      "sha256": "c2caa2db3b1ec4cb77cd300dc19c385dbab5c52c1bc05c210ad6f9cc1d86f949"
     }
-  ]
+  ],
+  "scopeUpdate": "NEXT_SCOPE_20261021.md",
+  "historicalExports": "models/*-r1.* remain unchanged R1 exports; current runtime includes R2 furniture"
 }

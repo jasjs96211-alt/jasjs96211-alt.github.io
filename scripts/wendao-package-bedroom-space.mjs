@@ -17,5 +17,5 @@ for (const name of names) {html = html.replaceAll('../../wendao/assets/' + name,
 const turn = 'data:image/webp;base64,' + readFileSync(new URL('../public/yuanhang/wendao/scene3d/art/zhiyao-turnaround-s0.webp', import.meta.url)).toString('base64');
 html = html.replaceAll('../../wendao/scene3d/art/zhiyao-turnaround-s0.png', turn).replaceAll('../../wendao/scene3d/art/zhiyao-turnaround-s0.webp', turn);
 html = html.replace(/[\t ]+$/gm, '');
-writeFileSync(new URL('bedroom-space-s0.html', dir), html);
+writeFileSync(process.env.WENDAO_PACKAGE_OUTPUT || new URL('bedroom-space-s0.html', dir), html);
 console.log('Self-contained character review page: ' + Buffer.byteLength(html) + ' bytes. No CDN or storage access.');
