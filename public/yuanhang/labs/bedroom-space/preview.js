@@ -1,3 +1,5 @@
+import {createLifeSceneBridge} from '../../wendao/scene3d/life-bridge.js';
+import {createRoutineDemo} from './routine-demo.js';
 import {allowsActivity} from '../../wendao/scene3d/interactions.js';
 import {adaptCharacterVisualState, selectNarrativeArt} from '../../wendao/scene3d/character-visual-state.js';
 const artURLs = globalThis.WENDAO_REVIEW_ART || {};
@@ -5,6 +7,7 @@ const artSource = name => artURLs[name] || new URL('../../wendao/scene3d/art/ref
 const $ = id => document.getElementById(id);
 const all = selector => [...document.querySelectorAll(selector)];
 const reduced = matchMedia('(prefers-reduced-motion: reduce)');
+let lifeBridge=null,routine=null;
 let stage = null, factory = null, failed = false, lamp = true, generation = 0;
 let phase = 'day', condition = 'healthy', demo = null, lastMetrics = 0;
 const phaseNames = {dawn: '晨曦 · 低窗光', day: '白日 · 窗光', dusk: '薄暮 · 点灯', night: '夜深 · 月光与暖灯'};
@@ -31,7 +34,7 @@ function showCharacterState(visual) {
   if (fact !== lastFact) {$('identity-state').textContent = fact; lastFact = fact;}
 }
 function apply() {
-  const f = stage && !failed ? stage.setSnapshot(snapshot()) : adaptCharacterVisualState(snapshot()); showCharacterState(f);
+  const f = stage && !failed ? lifeBridge.setSnapshot(snapshot()) : adaptCharacterVisualState(snapshot()); showCharacterState(f);
   if (!stage || failed) return;
   all('[data-activity]').forEach(b => b.disabled = !f.canMove || !allowsActivity(f, b.dataset.activity));
   $('enter').disabled = !f.canMove;
@@ -53,6 +56,11 @@ function failure(message) {
 }
 let lastActionStatus='';
 function onFrame({time, visualState, activity, phase:actionPhase, busy, cancelling}) {
+  lifeBridge.tick({paused:$('pause').checked});routine.update(time);
+  const routineState=routine.state;
+  $('routine').textContent=routineState.active?'停止日常排演':'日常生活排演';
+  $('routine').disabled=!routineState.active&&(!visualState.canMove||busy);
+  $('routine-status').textContent=routineState.active?`示例 ${routineState.step}/${routineState.total} · ${routineState.label}${routineState.phase==='dwelling'?' · 稍作停留':''}`:routineState.phase==='complete'?'这一段日常已结束。':routineState.phase==='idle'?'自动串联看书、取药演示与回榻休息；不影响正式游戏。':'排演已停下，重新开始才会继续。';
   showCharacterState(visualState);
   $('cancel-action').disabled=!busy||cancelling;
   all('[data-activity], [data-pose], #enter').forEach(b=>b.disabled=busy||!visualState.canMove||(b.dataset.activity&&!allowsActivity(visualState,b.dataset.activity)));
@@ -69,27 +77,31 @@ function onFrame({time, visualState, activity, phase:actionPhase, busy, cancelli
     $('demo-progress').style.width = Math.min(100, elapsed / 45 * 100) + '%';
     if (elapsed >= 45) stopDemo();
   }
-  if (performance.now() - lastMetrics > 1000) {lastMetrics = performance.now(); $('metrics').textContent = JSON.stringify(stage.telemetry(), null, 2);}
+  if (performance.now() - lastMetrics > 1000) {lastMetrics = performance.now(); $('metrics').textContent = JSON.stringify({...stage.telemetry(),lifeScene:lifeBridge.observation()}, null, 2);}
 }
 async function boot() {
-  const current = ++generation; stopDemo();
+  const current = ++generation; stopDemo();routine?.stop();
   if (stage) {stage.dispose(); const old = $('scene'); old.replaceWith(old.cloneNode(false));}
   stage = null; failed = false;
   try {
     factory ||= (await import('../../wendao/scene3d/scene-manager.js')).createBedroomScene;
     if (current !== generation) return;
     stage = factory($('scene'), {low: $('low').checked, reducedMotion: reduced.matches, onFailure: failure});
+    lifeBridge=createLifeSceneBridge(stage);routine=createRoutineDemo(lifeBridge);
+    lifeBridge.setVisible(!document.hidden);
     stage.motion($('motion').checked); stage.pause($('pause').checked); stage.lamp(lamp); stage.onFrame(onFrame);
     apply(); camera('wide'); stage.start();
   } catch (e) {if (current === generation) failure(String(e.message || e));}
 }
-all('[data-activity]').forEach(b => b.addEventListener('click', () => {stopDemo(); camera('wide'); if (stage?.requestActivity(b.dataset.activity)) $('status').textContent = b.textContent + '：开始连续行动，不结算游戏效果。';}));
+all('[data-activity]').forEach(b => b.addEventListener('click', () => {stopDemo(); camera('wide'); if (lifeBridge?.manualRequest(b.dataset.activity)) $('status').textContent = b.textContent + '：开始连续行动，不结算游戏效果。';}));
 all('[data-camera]').forEach(b => b.addEventListener('click', () => {stopDemo(); camera(b.dataset.camera);}));
 all('[data-phase]').forEach(b => b.addEventListener('click', () => {stopDemo(); setPhase(b.dataset.phase);}));
-all('[data-pose]').forEach(b => b.addEventListener('click', () => {stopDemo(); if (stage?.pose(b.dataset.pose)) $('status').textContent = '开始床边过渡；当前仍为占位关节演示。';}));
-$('enter').addEventListener('click', () => {stopDemo(); camera('wide'); if (stage?.enter()) $('status').textContent = '门后 → 屏风后 → 绕行 → 床侧；临时运动代理，正式步态待制作。';});
-$('cancel-action').addEventListener('click',()=>{stopDemo();stage?.cancelActivity();});
-$('condition').addEventListener('change', event => {stopDemo(); condition = event.target.value; apply();});
+all('[data-pose]').forEach(b => b.addEventListener('click', () => {stopDemo(); if (lifeBridge?.manualRequest('lie',{bedSeat:b.dataset.pose==='seated'})) $('status').textContent = '开始床边过渡；当前仍为占位关节演示。';}));
+$('enter').addEventListener('click', () => {stopDemo(); camera('wide'); if (lifeBridge?.manualRequest('walk',{entry:true})) $('status').textContent = '门后 → 屏风后 → 绕行 → 床侧；临时运动代理，正式步态待制作。';});
+$('cancel-action').addEventListener('click',()=>{stopDemo();routine?.stop();stage?.cancelActivity();});
+$('condition').addEventListener('change', event => {stopDemo(); routine?.stop();condition = event.target.value; apply();});
+$('routine').addEventListener('click',()=>{stopDemo();camera('wide');if(routine.state.active)routine.stop();else routine.start();});
+document.addEventListener('visibilitychange',()=>{lifeBridge?.setVisible(!document.hidden);});
 $('lamp').addEventListener('click', () => {stopDemo(); lamp = !lamp; stage?.lamp(lamp); $('lamp').setAttribute('aria-pressed', String(lamp)); $('lamp').textContent = lamp ? '灯火开' : '灯火关';});
 $('motion').addEventListener('change', () => {stopDemo(); stage?.motion($('motion').checked); apply();});
 $('pause').addEventListener('change', () => stage?.pause($('pause').checked));
@@ -97,10 +109,11 @@ $('low').addEventListener('change', boot);
 $('retry').addEventListener('click', () => location.reload());
 $('demo').addEventListener('click', () => {
   if (demo) {stopDemo(); return;}
+  routine?.stop();
   condition = 'healthy'; $('condition').value = condition; phase = 'day'; lamp = true; $('lamp').textContent = '灯火开'; $('lamp').setAttribute('aria-pressed', 'true');
   $('pause').checked = false; stage.pause(false); stage.lamp(true); apply(); camera('wide');
   const cues = [
-    [2, () => {stage.requestActivity('lie');}],
+    [2, () => {lifeBridge.manualRequest('lie');}],
     [19, () => camera('bedside')],
     [25, () => camera('front')], [31, () => {setPhase('night'); camera('bedside');}],
     [36, () => {stage.lamp(false); $('status').textContent = '暖灯已关闭：观察近处桌面与地板受光。';}],
@@ -113,13 +126,13 @@ $('download').addEventListener('click', () => {
   if (!stage) return;
   const report = {capturedAt: new Date().toISOString(), userAgent: navigator.userAgent, actualBrowserRun: true,
     screenshot: false, recording: false, iPhoneVerified: /iPhone/.test(navigator.userAgent) ? 'user-run, visual review still required' : false,
-    measurements: stage.telemetry(), note: 'Actual device telemetry, not a visual acceptance or screen recording.'};
+    measurements: {...stage.telemetry(),lifeScene:lifeBridge.observation()}, note: 'Actual device telemetry, not a visual acceptance or screen recording.'};
   const url = URL.createObjectURL(new Blob([JSON.stringify(report, null, 2)], {type: 'application/json'}));
   const a = document.createElement('a'); a.href = url; a.download = 'bedroom-space-device-report.json'; a.click(); setTimeout(() => URL.revokeObjectURL(url), 1000);
 });
 reduced.addEventListener('change', () => {stopDemo(); $('motion').checked = !reduced.matches; $('motion').disabled = reduced.matches; boot();});
-window.addEventListener('pagehide', () => {stopDemo(); stage?.stop();});
-window.addEventListener('pageshow', event => {if (event.persisted) stage?.start();});
+window.addEventListener('pagehide', () => {stopDemo();lifeBridge?.setVisible(false);stage?.stop();});
+window.addEventListener('pageshow', event => {if (event.persisted) {lifeBridge?.setVisible(!document.hidden);stage?.start();}});
 if (reduced.matches) {$('motion').checked = false; $('motion').disabled = true;}
 $('low').checked = matchMedia('(max-width: 700px)').matches;
 apply();

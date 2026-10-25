@@ -1,5 +1,5 @@
 {
-  "version": "bedroom-space-r2.2-20261022",
+  "version": "bedroom-space-r2.3-20261022",
   "units": "metres",
   "up": "+Y",
   "forward": "+Z",
@@ -114,8 +114,8 @@
     },
     {
       "path": "scene-manager.js",
-      "bytes": 8020,
-      "sha256": "bfdef841bfc6e404af61b583f38f28c17b89db28abdcb12d49da059ac3776904",
+      "bytes": 8073,
+      "sha256": "0b01d52691a36207b5fed0f9d2e3220f42f798429162bc41750ef1b1e1341e29",
       "source": "original editable R1 geometry/code",
       "license": "project-original",
       "status": "greybox-not-visually-approved"
@@ -175,8 +175,17 @@
       "status": "pending-user-visual-review",
       "bytes": 2316,
       "sha256": "c2caa2db3b1ec4cb77cd300dc19c385dbab5c52c1bc05c210ad6f9cc1d86f949"
+    },
+    {
+      "path": "life-bridge.js",
+      "source": "original read-only scene intent consumer",
+      "license": "project-original",
+      "status": "placeholder-integration",
+      "bytes": 4047,
+      "sha256": "b03e8cfc4606a7a792f51abd650ee23589f7d665c4d329b2a83271094c45ce34"
     }
   ],
   "scopeUpdate": "NEXT_SCOPE_20261021.md",
-  "historicalExports": "models/*-r1.* remain unchanged R1 exports; current runtime includes R2 furniture"
+  "historicalExports": "models/*-r1.* remain unchanged R1 exports; current runtime includes R2 furniture",
+  "iterationFeedback": "R2.2 accepted by user for continued development on 2026-10-22; not formal character or device performance acceptance"
 }

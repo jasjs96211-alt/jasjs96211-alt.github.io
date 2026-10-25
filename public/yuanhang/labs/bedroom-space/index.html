@@ -1,8 +1,8 @@
 <!doctype html>
 <html lang="zh-CN">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="color-scheme" content="dark"><title>知遥寝居 · 寝居质感 R2.2</title><link rel="stylesheet" href="./preview.css"></head>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="color-scheme" content="dark"><title>知遥寝居 · 寝居质感 R2.3</title><link rel="stylesheet" href="./preview.css"></head>
 <body>
-<header><div><small>远航 · 问道 / 空间研究 01</small><h1>竹窗以内<span>知遥寝居</span></h1></div><p>寝居质感 R2.2 <i></i> 实体屏风 · 日常行动衔接</p></header>
+<header><div><small>远航 · 问道 / 空间研究 01</small><h1>竹窗以内<span>知遥寝居</span></h1></div><p>寝居质感 R2.3 <i></i> 自主生活调度 · 手动接管</p></header>
 <main>
 <section class="stage" aria-label="实时三维寝居">
   <canvas id="scene" aria-label="实时三维寝居，可用下方按钮切换三个摄像机与昼夜"></canvas>
@@ -16,6 +16,8 @@
   <div class="control-row"><span class="legend">窗外时辰</span><nav aria-label="光照"><button data-phase="dawn" aria-pressed="false">晨</button><button data-phase="day" aria-pressed="true">昼</button><button data-phase="dusk" aria-pressed="false">暮</button><button data-phase="night" aria-pressed="false">夜</button><button id="lamp" aria-pressed="true">灯火开</button></nav></div>
   <div class="control-row"><span class="legend">空间关系</span><nav aria-label="人物与路径"><button id="enter">从屏风后入场</button><button data-pose="seated">床沿落座</button><button data-pose="reclined">缓慢卧下</button><button id="demo">45 秒空间巡览</button></nav></div>
   <div class="control-row"><span class="legend">日常行动</span><nav aria-label="日常行动"><button data-activity="walk">走到榻边</button><button data-activity="sit">书案坐下</button><button data-activity="read">看书</button><button data-activity="medicine">取药服药</button><button data-activity="lie">卧床</button><button data-activity="rest">休息</button><button id="cancel-action" disabled>取消行动</button></nav></div>
+  <div class="control-row"><span class="legend">连贯生活</span><nav aria-label="生活排演"><button id="routine">日常生活排演</button></nav></div>
+  <p id="routine-status" class="note" role="status">自动串联看书、取药演示与回榻休息；不影响正式游戏。</p>
   <p class="note">屏风移至入口，保留不透明材质与投影。日常行动会依次经过起身、行走、转向和交互；取消时会先停稳或完成当前坐卧过渡。</p>
   <p class="note">人物为无面容的体积代理，仅验证比例、床面接触、路径与遮挡；步态、关节插值与道具接触仍是占位演出，尚未接入正式动画与脚底、手部约束。</p>
 </section>

@@ -117,6 +117,7 @@ export function createBedroomScene(canvas, {low = false, reducedMotion = false, 
     motion: value => {motion = value && !reducedMotion;},
     lamp: value => lights.toggle(value),
     pose: id => id==='seated'?requestActivity('lie',{bedSeat:true}):id==='reclined'?requestActivity('lie'):false,
+    get activityStatus() {return {...flow.status};},
     get visualState() {return facts;},
     onFrame: handler => {frameHandler = handler;}, get time() {return time;}
   };
