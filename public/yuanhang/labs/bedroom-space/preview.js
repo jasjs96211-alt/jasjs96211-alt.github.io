@@ -52,7 +52,7 @@ function failure(message) {
   $('failure-text').textContent = 'WebGL 未能启动，本页没有显示替代图片。可重新加载。原因：' + message;
   $('metrics').textContent=JSON.stringify({status:'failed',fps:null,error:message},null,2);
   $('status').textContent = '三维尚未验证成功。';
-  all('.controls button, .technical button, .technical input, .technical select').forEach(b => b.disabled = true);
+  all('.controls button, .controls input, .technical button, .technical input, .technical select').forEach(b => b.disabled = true);
 }
 let lastActionStatus='';
 function onFrame({time, visualState, activity, phase:actionPhase, busy, cancelling}) {
@@ -89,7 +89,7 @@ async function boot() {
     stage = factory($('scene'), {low: $('low').checked, reducedMotion: reduced.matches, onFailure: failure});
     lifeBridge=createLifeSceneBridge(stage);routine=createRoutineDemo(lifeBridge);
     lifeBridge.setVisible(!document.hidden);
-    stage.motion($('motion').checked); stage.pause($('pause').checked); stage.lamp(lamp); stage.onFrame(onFrame);
+    stage.motion($('motion').checked); stage.pause($('pause').checked); stage.lamp(lamp); stage.brightness(Number($('brightness').value)); stage.onFrame(onFrame);
     apply(); camera('wide'); stage.start();
   } catch (e) {if (current === generation) failure(String(e.message || e));}
 }
@@ -103,6 +103,9 @@ $('condition').addEventListener('change', event => {stopDemo(); routine?.stop();
 $('routine').addEventListener('click',()=>{stopDemo();camera('wide');if(routine.state.active)routine.stop();else routine.start();});
 document.addEventListener('visibilitychange',()=>{lifeBridge?.setVisible(!document.hidden);});
 $('lamp').addEventListener('click', () => {stopDemo(); lamp = !lamp; stage?.lamp(lamp); $('lamp').setAttribute('aria-pressed', String(lamp)); $('lamp').textContent = lamp ? '灯火开' : '灯火关';});
+function setBrightness(value) { const n=Math.min(150,Math.max(80,Number(value)||100)); $('brightness').value=String(n); $('brightness-value').textContent=n+'%'; stage?.brightness(n); }
+$('brightness').addEventListener('input',event=>setBrightness(event.target.value));
+$('brightness-reset').addEventListener('click',()=>setBrightness(100));
 $('motion').addEventListener('change', () => {stopDemo(); stage?.motion($('motion').checked); apply();});
 $('pause').addEventListener('change', () => stage?.pause($('pause').checked));
 $('low').addEventListener('change', boot);

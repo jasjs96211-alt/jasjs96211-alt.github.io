@@ -1,5 +1,5 @@
 {
-  "version": "bedroom-space-r2.3-20261022",
+  "version": "bedroom-space-r2.4-20261025",
   "units": "metres",
   "up": "+Y",
   "forward": "+Z",
@@ -106,16 +106,16 @@
     },
     {
       "path": "lighting.js",
-      "bytes": 2505,
-      "sha256": "33ebb802122d904b28326a494285a0e3ab9e30bc967e1adeffd129ebbbaa67a1",
+      "bytes": 2755,
+      "sha256": "c46c429bca9c3e84f54f0b3cedc408733eff3d2dbfb80277277f7b6a57e9ef8e",
       "source": "original editable R1 geometry/code",
       "license": "project-original",
       "status": "greybox-not-visually-approved"
     },
     {
       "path": "scene-manager.js",
-      "bytes": 8073,
-      "sha256": "0b01d52691a36207b5fed0f9d2e3220f42f798429162bc41750ef1b1e1341e29",
+      "bytes": 8413,
+      "sha256": "264fc99bf93d3a5c5cefc4e3cb3e25839ccc518474b797e750291f612616d935",
       "source": "original editable R1 geometry/code",
       "license": "project-original",
       "status": "greybox-not-visually-approved"
@@ -183,6 +183,14 @@
       "status": "placeholder-integration",
       "bytes": 4047,
       "sha256": "b03e8cfc4606a7a792f51abd650ee23589f7d665c4d329b2a83271094c45ce34"
+    },
+    {
+      "path": "ledger-source.js",
+      "source": "read-only existing ledger projection",
+      "license": "project-original",
+      "status": "isolated-integration-not-production",
+      "bytes": 2736,
+      "sha256": "590d2fcf381c91e3767fa8b79cca37792497108e6b14d0119912bbf30695ed3f"
     }
   ],
   "scopeUpdate": "NEXT_SCOPE_20261021.md",

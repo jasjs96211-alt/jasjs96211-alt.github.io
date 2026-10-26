@@ -1,10 +1,15 @@
 import * as THREE from './vendor/three.module.min.js';
 export const LIGHT_PHASES = Object.freeze({
-  dawn: {sky: 0xa3bcc0, ground: 0x493d37, ambient: 1.1, sun: 0xffddae, power: 2.3, position: [-8, 4, -4], lamp: 7, background: 0x526b71},
-  day: {sky: 0xe4e1d8, ground: 0x655749, ambient: .95, sun: 0xfff1d6, power: 2.6, position: [-7, 6, 1], lamp: 0, background: 0x93958d},
-  dusk: {sky: 0x9c9eac, ground: 0x443428, ambient: .65, sun: 0xffb272, power: 2, position: [-9, 3, -3], lamp: 11, background: 0x605966},
-  night: {sky: 0xb2b6bd, ground: 0x39332b, ambient: .18, sun: 0xc8d4e0, power: .52, position: [-7, 4, 1], lamp: 12, background: 0x24282d}
+  dawn: {sky: 0xc3ceca, ground: 0x807466, ambient: 1.35, sun: 0xffddae, power: 2.3, position: [-8, 4, -4], lamp: 8, background: 0x687b7d},
+  day: {sky: 0xe4e1d8, ground: 0x938777, ambient: 1.4, sun: 0xfff1d6, power: 2.6, position: [-7, 6, 1], lamp: 3, background: 0xa0a197},
+  dusk: {sky: 0xc2bbb5, ground: 0x776756, ambient: 1.05, sun: 0xffb272, power: 2, position: [-9, 3, -3], lamp: 12, background: 0x777172},
+  night: {sky: 0xb2b6bd, ground: 0x817362, ambient: .65, sun: 0xc8d4e0, power: .65, position: [-7, 4, 1], lamp: 14, background: 0x343b40}
 });
+// User display adjustment only. No CSS wash or changes to material opacity.
+export function exposureForBrightness(value = 100) {
+  const percent = Number.isFinite(value) ? Math.min(150, Math.max(80, value)) : 100;
+  return 1.12 * percent / 100;
+}
 export function createLighting(scene, lampMeshes, {low = false} = {}) {
   const fill = new THREE.HemisphereLight(), sun = new THREE.DirectionalLight();
   sun.position.set(-7, 6, 1); sun.target.position.set(-.5, .2, -.6);
@@ -13,9 +18,9 @@ export function createLighting(scene, lampMeshes, {low = false} = {}) {
   sun.shadow.normalBias = .018; sun.shadow.bias = -.0004;
   scene.add(fill, sun, sun.target);
   const lamps = lampMeshes.map((mesh, i) => {
-    const l = new THREE.PointLight(0xffd6ad, 0, 4.4, 2); l.position.copy(mesh.position);
+    const l = new THREE.PointLight(0xffd6ad, 0, 5.5, 2); l.position.copy(mesh.position);
     // Only bedside lamp casts local shadows: six shadow faces per point light are expensive.
-    l.castShadow = i === 0 && !low; l.shadow.mapSize.set(256, 256); l.shadow.normalBias = .008; l.shadow.bias = -.0001; l.shadow.camera.near = .08; l.shadow.camera.far = 4.4;
+    l.castShadow = i === 0 && !low; l.shadow.mapSize.set(256, 256); l.shadow.normalBias = .008; l.shadow.bias = -.0001; l.shadow.camera.near = .08; l.shadow.camera.far = 5.5;
     scene.add(l); return l;
   });
   let active = 'day', enabled = true, base = 0;

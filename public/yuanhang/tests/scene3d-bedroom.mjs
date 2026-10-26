@@ -107,7 +107,7 @@ test('every shipped 3D asset has matching bytes/hash, and third-party reference 
   }
 });
 test('isolated 3D module cannot import business code or write persistent game data', () => {
-  for (const name of ['contract.js', 'bedroom-model.js', 'character-adapter.js', 'camera-rig.js', 'lighting.js', 'scene-manager.js', 'action-flow.js', 'interactions.js', 'life-bridge.js']) {
+  for (const name of ['contract.js', 'bedroom-model.js', 'character-adapter.js', 'camera-rig.js', 'lighting.js', 'scene-manager.js', 'action-flow.js', 'interactions.js', 'life-bridge.js', 'ledger-source.js']) {
     const text = readFileSync(new URL(name, base), 'utf8');
     assert.doesNotMatch(text, /localStorage|sessionStorage|indexedDB|fetch\(|WendaoEngine|\.setItem\(|\.writeView\(|transport\.js|engine\.js/);
   }

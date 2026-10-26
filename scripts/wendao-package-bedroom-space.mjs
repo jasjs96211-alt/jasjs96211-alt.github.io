@@ -1,12 +1,14 @@
-// npm exec --yes --package=esbuild@0.25.12 -- node scripts/wendao-package-bedroom-space.mjs
-import {execFileSync} from 'node:child_process';
+// node scripts/wendao-package-bedroom-space.mjs (uses the existing Vite toolchain)
+import {rolldown} from 'rolldown';
 import {readFileSync, writeFileSync} from 'node:fs';
 import {fileURLToPath} from 'node:url';
 const repo = fileURLToPath(new URL('../', import.meta.url));
 const dir = new URL('../public/yuanhang/labs/bedroom-space/', import.meta.url);
-const js = execFileSync(process.env.WENDAO_ESBUILD_BIN || 'esbuild', [
-  'public/yuanhang/labs/bedroom-space/preview.js', '--bundle', '--format=iife', '--minify', '--legal-comments=inline', '--target=safari16'
-], {cwd: repo, encoding: 'utf8', maxBuffer: 10 * 1024 * 1024});
+const bundle = await rolldown({input: repo + 'public/yuanhang/labs/bedroom-space/preview.js'});
+const {output} = await bundle.generate({format:'iife', codeSplitting:false, minify:true});
+await bundle.close();
+if (output.length !== 1 || output[0].type !== 'chunk') throw new Error('Preview must contain exactly one inline JavaScript chunk');
+const js = output[0].code;
 const css = readFileSync(new URL('preview.css', dir), 'utf8');
 const names = ['sister-calm.webp', 'sister-tired.webp', 'sister-ill.webp', 'sister-injured.webp', 'sister-concerned.webp', 'sister-relieved.webp', 'zhiyao-recovery-cg.webp'];
 const art = Object.fromEntries(names.map(name => [name, 'data:image/webp;base64,' + readFileSync(new URL('../public/yuanhang/wendao/scene3d/art/reference/' + name, import.meta.url)).toString('base64')]));

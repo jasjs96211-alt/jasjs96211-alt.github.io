@@ -2,7 +2,7 @@ import * as THREE from './vendor/three.module.min.js';
 import {buildBedroom} from './bedroom-model.js';
 import {createProxy} from './character-adapter.js';
 import {createCameraRig} from './camera-rig.js';
-import {createLighting} from './lighting.js';
+import {createLighting, exposureForBrightness} from './lighting.js';
 import {visualDelta} from './contract.js';
 import {createReadability} from './visibility.js';
 import {createGLBCharacter} from './glb-character.js';
@@ -13,7 +13,8 @@ export function createBedroomScene(canvas, {low = false, reducedMotion = false, 
   const renderer = new THREE.WebGLRenderer({canvas, antialias: !low, alpha: false, powerPreference: 'low-power'});
   renderer.setPixelRatio(Math.min(globalThis.devicePixelRatio || 1, low ? 1 : 1.5));
   renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-  renderer.outputColorSpace = THREE.SRGBColorSpace; renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1;
+  let brightness = 100;
+  renderer.outputColorSpace = THREE.SRGBColorSpace; renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = exposureForBrightness(brightness);
   const scene = new THREE.Scene(), camera = new THREE.PerspectiveCamera(42, 1, .1, 65);
   const room = buildBedroom(); let character = createProxy(); const retired = []; scene.add(room.root, character.root);
   const readability = createReadability(room.root,camera);
@@ -102,6 +103,7 @@ export function createBedroomScene(canvas, {low = false, reducedMotion = false, 
       geometries: renderer.info.memory.geometries, textures: renderer.info.memory.textures,
       jsHeapBytes: performance.memory?.usedJSHeapSize ?? null, gpuMemoryBytes: null,
       viewport: [canvas.width, canvas.height], ...flow.status, actionPhase:flow.status.phase, phase: lights.phase, camera: rig.active, fadedOccluders:readability.fadedCount, blockedForegroundMeshes:readability.blockedCount,
+      brightness, exposure: renderer.toneMappingExposure, lampEnabled: lights.enabled,
       motion, paused, character: {identity: facts.identity.id, pose: facts.pose, health: facts.health.stage, hair: facts.hair}, quality: low ? 'low' : 'standard', error};
   }
   return {start, stop, dispose, resize, setSnapshot, enter, telemetry, requestActivity, cancelActivity:()=>flow.cancel(),
@@ -116,6 +118,7 @@ export function createBedroomScene(canvas, {low = false, reducedMotion = false, 
     pause: value => {paused = value;},
     motion: value => {motion = value && !reducedMotion;},
     lamp: value => lights.toggle(value),
+    brightness: value => {brightness = Number.isFinite(value) ? Math.min(150, Math.max(80, value)) : 100; renderer.toneMappingExposure = exposureForBrightness(brightness);},
     pose: id => id==='seated'?requestActivity('lie',{bedSeat:true}):id==='reclined'?requestActivity('lie'):false,
     get activityStatus() {return {...flow.status};},
     get visualState() {return facts;},
