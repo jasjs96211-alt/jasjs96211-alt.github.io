@@ -1,0 +1,12 @@
+import {rolldown} from 'rolldown';
+import {readFileSync,writeFileSync} from 'node:fs';
+import {fileURLToPath} from 'node:url';
+const dir=new URL('../public/yuanhang/labs/life-journal/',import.meta.url);
+const bundle=await rolldown({input:fileURLToPath(new URL('preview.js',dir))});
+const {output}=await bundle.generate({format:'iife',codeSplitting:false,minify:true});await bundle.close();
+if(output.length!==1||output[0].type!=='chunk')throw new Error('Expected one inline script');
+let html=readFileSync(new URL('index.html',dir),'utf8');
+html=html.replace('<link rel="stylesheet" href="./preview.css">',()=>'<style>'+readFileSync(new URL('preview.css',dir),'utf8')+'</style>');
+html=html.replace('<script type="module" src="./preview.js"></script>',()=>'<script>'+output[0].code.replace(/<\/script/gi,'<\\/script')+'</script>');
+const destination=process.env.WENDAO_PACKAGE_OUTPUT;if(!destination)throw new Error('Set WENDAO_PACKAGE_OUTPUT to an absolute output file');
+writeFileSync(destination,html);console.log('Self-contained life journal: '+Buffer.byteLength(html)+' bytes.');
