@@ -16,7 +16,7 @@ export function createBedroomScene(canvas, {low = false, reducedMotion = false, 
   let brightness = 100;
   renderer.outputColorSpace = THREE.SRGBColorSpace; renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = exposureForBrightness(brightness);
   const scene = new THREE.Scene(), camera = new THREE.PerspectiveCamera(42, 1, .1, 65);
-  const room = buildBedroom(); let character = createProxy(); const retired = []; scene.add(room.root, character.root);
+  const room = buildBedroom(); let character = createProxy(); const retired = []; scene.add(room.root, character.root, character.propsRoot);
   const readability = createReadability(room.root,camera);
   const rig = createCameraRig(camera), lights = createLighting(scene, room.lamps, {low});
   let facts = adaptCharacterVisualState(), motion = !reducedMotion, paused = false;
@@ -110,6 +110,7 @@ export function createBedroomScene(canvas, {low = false, reducedMotion = false, 
     attachGLB: gltf => {
       const next = createGLBCharacter(gltf);
       character.dispose?.(); retired.push(character.root); scene.remove(character.root);
+      if(character.propsRoot){retired.push(character.propsRoot);scene.remove(character.propsRoot);}
       character = next; scene.add(character.root); character.root.visible = facts.present;
       flow.reset(facts); presentPose();
       return true;

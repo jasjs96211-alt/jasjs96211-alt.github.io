@@ -1,5 +1,5 @@
 {
-  "version": "bedroom-space-r2.4-20261025",
+  "version": "bedroom-space-r2.5-20261026",
   "units": "metres",
   "up": "+Y",
   "forward": "+Z",
@@ -82,8 +82,8 @@
     },
     {
       "path": "bedroom-model.js",
-      "bytes": 11506,
-      "sha256": "712e5cb140ee558e4f76ee57d59f65199c5b3905ba0940fdd6d50671ba95ae41",
+      "bytes": 11577,
+      "sha256": "242a6cd0e9a323bc973081b1759c1c029b87a54550c7a7e3386df1946492990f",
       "source": "original editable R1 geometry/code",
       "license": "project-original",
       "status": "greybox-not-visually-approved"
@@ -98,8 +98,8 @@
     },
     {
       "path": "character-adapter.js",
-      "bytes": 4965,
-      "sha256": "4d12f05b3a93f43de57f38d33388e205299fab71d17823cbe77148b9e902c324",
+      "bytes": 8184,
+      "sha256": "a922fb7103b4824cf2c2e769a2e99fbcd31f187e3bb6a37f37c112f2638a2003",
       "source": "original editable R1 geometry/code",
       "license": "project-original",
       "status": "greybox-not-visually-approved"
@@ -114,8 +114,8 @@
     },
     {
       "path": "scene-manager.js",
-      "bytes": 8413,
-      "sha256": "264fc99bf93d3a5c5cefc4e3cb3e25839ccc518474b797e750291f612616d935",
+      "bytes": 8534,
+      "sha256": "d6c7ffd9f472c36fd41bb263e7892233b64417d06be31cf37bc55e1fd078f9ba",
       "source": "original editable R1 geometry/code",
       "license": "project-original",
       "status": "greybox-not-visually-approved"
@@ -157,8 +157,8 @@
       "source": "original editable R2 source",
       "license": "project-original",
       "status": "pending-user-visual-review",
-      "bytes": 6817,
-      "sha256": "551f03410e3810044f6836fe010dd79f21fd0276c1518cff84ccf9081bf406f6"
+      "bytes": 7606,
+      "sha256": "09ef5ece9244092d6adb8c3d44500faabf408a38e9ceb6f38cecf1be7e0b80e3"
     },
     {
       "path": "interactions.js",

@@ -110,6 +110,7 @@ export function buildBedroom() {
   box('medicine-cabinet', [1.55, 1.1, -2.97], [1.05, 2, .52], m.wood);
   box('cabinet-cornice',[1.55,2.1,-2.97],[1.12,.055,.56],m.edge);
   box('cabinet-plinth',[1.55,.12,-2.97],[1.08,.1,.54],m.edge);
+  box('medicine-contact-shelf',[1.55,1.12,-2.6],[.45,.05,.24],m.wood);
   for(const x of [1.1,2])box('cabinet-foot',[x,.06,-2.97],[.095,.12,.42],m.edge);
   for (let row = 0; row < 5; row++) for (let col = 0; col < 3; col++) {
     const x = 1.22 + col * .33, y = .23 + row * .4;

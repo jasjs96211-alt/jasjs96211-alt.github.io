@@ -9,6 +9,13 @@ export function createActionFlow(driver) {
   let state={pose:'reclined',position:[...ANCHORS.reclined],yaw:0,gesture:null};
   let approach=[...ANCHORS.bedside], travelled=0;
   const transition=(label,duration,target)=>({kind:'transition',label,duration,target});
+  function releaseSteps(base) {
+    const steps=[],gesture=base.gesture;
+    if(gesture==='read')steps.push(transition('放回书册',.9,{...base,gesture:'return-book'}));
+    if(['hold-bowl','medicine'].includes(gesture))steps.push(transition('放回药碗',.9,{...base,gesture:'return-bowl'}));
+    if(gesture&&gesture!=='stool')steps.push(transition('松手收回',.65,{...base,gesture:base.pose==='seated'?'stool':null}));
+    return steps;
+  }
   function reset(presentation) {
     queue=[];current=null;sampler=null;id=null;phase='idle';cancelled=false;
     state={pose:presentation.pose,position:[...(presentation.worldPosition||ANCHORS.reclined)],yaw:presentation.facing,gesture:null};
@@ -21,7 +28,7 @@ export function createActionFlow(driver) {
     const a=ACTIVITIES[next],origin=state.pose==='walk'?state.position:approach;
     let path=planRoute(origin,entry?ANCHORS.door:a.approach);if(!path)return false;
     if(entry)path=path.concat(WALK_PATH.slice(1));
-    id=next;cancelled=false;queue=[];
+    id=next;cancelled=false;queue=releaseSteps(state);
     if(state.pose==='reclined')queue.push(transition('起身坐稳',1.4,{pose:'seated',position:[-.42,.73,-.72],yaw:0,gesture:null}));
     else if(state.pose==='seated'&&state.gesture===null&&Math.hypot(state.position[0]+.42,state.position[2]+.72)>.15)queue.push(transition('移向床沿',1.1,{pose:'seated',position:[-.42,.73,-.72],yaw:0,gesture:null}));
     if(state.pose!=='walk') queue.push(transition('起身',1.45,{pose:'walk',position:origin,yaw:state.yaw,gesture:null}));
@@ -47,7 +54,7 @@ export function createActionFlow(driver) {
       queue.push(transition('伸手取药',.8,{...standing,gesture:'reach-medicine'}));
       queue.push(transition('持碗停顿',.6,{...standing,gesture:'hold-bowl'}));
       queue.push(transition('服药演示',1.3,{...standing,gesture:'medicine'}));
-      queue.push(transition('放回药碗',.9,{...standing,gesture:'hold-bowl'}));
+      queue.push(transition('放回药碗',.9,{...standing,gesture:'return-bowl'}));
       queue.push(transition('收手',.65,{...standing,gesture:null}));
     }
     if(next==='lie'||next==='rest') {
@@ -57,7 +64,7 @@ export function createActionFlow(driver) {
         queue.push(transition(next==='rest'?'安静休息':'调整卧姿',.8,{pose:'reclined',position:a.position,yaw:0,gesture:null}));
       }
     }
-    approach=[...a.approach];phase='queued';advance();return true;
+    phase='queued';advance();return true;
   }
   function advance() {
     current=queue.shift()||null;elapsed=0;sampler=null;
@@ -70,7 +77,11 @@ export function createActionFlow(driver) {
     }
   }
   function cancel() {
-    if(!current)return false;
+    if(cancelled&&current)return true;
+    if(!current){
+      queue=releaseSteps(state);if(!queue.length)return false;
+      cancelled=true;advance();return true;
+    }
     cancelled=true;queue=[];
     if(current.kind==='walk') {
       // Ease the last gait into a balanced stand without moving to an anchor.
@@ -78,7 +89,7 @@ export function createActionFlow(driver) {
     }
     // A transfer already started settles onto its current support before stopping.
     else if(current.target.gesture && current.target.gesture!=='stool') {
-      queue=[transition('收手取消',.45,{...current.target,gesture:current.target.pose==='seated'?'stool':null})];
+      queue=releaseSteps(current.target);
     }
     return true;
   }
@@ -102,9 +113,13 @@ export function createActionFlow(driver) {
         const s=ease(t),a=current.from,b=current.target;sampler(s);
         state={...b,position:a.position.map((v,i)=>v+(b.position[i]-v)*s),yaw:angle(a.yaw,b.yaw,s)};
       }
-      if(t>=1)advance();else break;
+      if(t>=1){
+        // The next departure starts at the support actually reached, including after cancellation.
+        if(state.pose!=='walk')approach=[...(state.gesture?ACTIVITIES.sit.approach:ANCHORS.bedside)];
+        advance();
+      }else break;
     }
   }
   return {request,cancel,update,reset,get presentation(){return {...state,position:[...state.position]};},
-    get status(){return {activity:id,phase,busy:!!current,cancelling:cancelled&&!!current,moving:current?.kind==='walk',distance:travelled};}};
+    get status(){return {activity:id,phase,busy:!!current,canCancel:!!current||!!state.gesture&&state.gesture!=='stool',cancelling:cancelled&&!!current,moving:current?.kind==='walk',distance:travelled};}};
 }

@@ -55,19 +55,19 @@ function failure(message) {
   all('.controls button, .controls input, .technical button, .technical input, .technical select').forEach(b => b.disabled = true);
 }
 let lastActionStatus='';
-function onFrame({time, visualState, activity, phase:actionPhase, busy, cancelling}) {
+function onFrame({time, visualState, activity, phase:actionPhase, busy, canCancel, cancelling}) {
   lifeBridge.tick({paused:$('pause').checked});routine.update(time);
   const routineState=routine.state;
   $('routine').textContent=routineState.active?'停止日常排演':'日常生活排演';
   $('routine').disabled=!routineState.active&&(!visualState.canMove||busy);
   $('routine-status').textContent=routineState.active?`示例 ${routineState.step}/${routineState.total} · ${routineState.label}${routineState.phase==='dwelling'?' · 稍作停留':''}`:routineState.phase==='complete'?'这一段日常已结束。':routineState.phase==='idle'?'自动串联看书、取药演示与回榻休息；不影响正式游戏。':'排演已停下，重新开始才会继续。';
   showCharacterState(visualState);
-  $('cancel-action').disabled=!busy||cancelling;
+  $('cancel-action').disabled=!canCancel||cancelling;
   all('[data-activity], [data-pose], #enter').forEach(b=>b.disabled=busy||!visualState.canMove||(b.dataset.activity&&!allowsActivity(visualState,b.dataset.activity)));
   const key=activity+':'+actionPhase+':'+cancelling;
   if(key!==lastActionStatus && activity) {
     lastActionStatus=key;
-    $('status').textContent=cancelling?'正在安全停稳，随后取消。':actionPhase==='complete'?'动作已完成，可以继续下一项。占位演示不结算游戏效果。':actionPhase==='cancelled'?'行动已取消，可以重新选择。':'当前：'+actionPhase+' · 占位动作演示';
+    $('status').textContent=cancelling?'正在停稳并放回手中道具，随后取消。':actionPhase==='complete'?'动作已完成，可以继续下一项。占位演示不结算游戏效果。':actionPhase==='cancelled'?'行动已取消，可以重新选择。':'当前：'+actionPhase+' · 占位动作演示';
   }
   if (demo) {
     const elapsed = time - demo.start;

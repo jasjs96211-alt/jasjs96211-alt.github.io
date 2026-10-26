@@ -1,8 +1,8 @@
 <!doctype html>
 <html lang="zh-CN">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="color-scheme" content="dark"><title>知遥寝居 · 寝居质感 R2.4</title><link rel="stylesheet" href="./preview.css"></head>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="color-scheme" content="dark"><title>知遥寝居 · 寝居质感 R2.5</title><link rel="stylesheet" href="./preview.css"></head>
 <body>
-<header><div><small>远航 · 问道 / 空间研究 01</small><h1>竹窗以内<span>知遥寝居</span></h1></div><p>寝居质感 R2.4 <i></i> 明暗层次 · 生活事件衔接</p></header>
+<header><div><small>远航 · 问道 / 空间研究 01</small><h1>竹窗以内<span>知遥寝居</span></h1></div><p>寝居质感 R2.5 <i></i> 道具接触 · 取放衔接</p></header>
 <main>
 <section class="stage" aria-label="实时三维寝居">
   <canvas id="scene" aria-label="实时三维寝居，可用下方按钮切换三个摄像机与昼夜"></canvas>
@@ -19,8 +19,8 @@
   <div class="control-row"><span class="legend">日常行动</span><nav aria-label="日常行动"><button data-activity="walk">走到榻边</button><button data-activity="sit">书案坐下</button><button data-activity="read">看书</button><button data-activity="medicine">取药服药</button><button data-activity="lie">卧床</button><button data-activity="rest">休息</button><button id="cancel-action" disabled>取消行动</button></nav></div>
   <div class="control-row"><span class="legend">连贯生活</span><nav aria-label="生活排演"><button id="routine">日常生活排演</button></nav></div>
   <p id="routine-status" class="note" role="status">自动串联看书、取药演示与回榻休息；不影响正式游戏。</p>
-  <p class="note">屏风移至入口，保留不透明材质与投影。日常行动会依次经过起身、行走、转向和交互；取消时会先停稳或完成当前坐卧过渡。</p>
-  <p class="note">人物为无面容的体积代理，仅验证比例、床面接触、路径与遮挡；步态、关节插值与道具接触仍是占位演出，尚未接入正式动画与脚底、手部约束。</p>
+  <p class="note">屏风移至入口，保留不透明材质与投影。日常行动会依次经过起身、行走、转向和交互；取消时会先停稳、完成当前坐卧过渡，并把手中书碗放回。</p>
+  <p class="note">人物为无面容的体积代理，仅验证比例、床面接触、路径与遮挡；双手与书碗接触已加入占位约束；步态、坐卧、翻页及手袖细节仍待正式模型和动画校准。</p>
 </section>
 <section class="review"><div><small>本轮看什么</small><h2>从一幅画，到一个房间。</h2><p>换机位时留意床柱与屏风的前后关系。入场时，代理沿门边绕过屏风；切到夜间，再关灯，观察桌面和地板附近的受光变化。</p></div><div class="checks"><span>真实摄像机</span><span>几何深度遮挡</span><span>局部灯光投影</span><span>同一房间的四种时辰</span></div></section>
 <section hidden class="identity-review" aria-labelledby="identity-title">
