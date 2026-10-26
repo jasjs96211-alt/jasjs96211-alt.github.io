@@ -1,12 +1,12 @@
 <!doctype html>
 <html lang="zh-CN">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="color-scheme" content="dark"><title>知遥寝居 · 人物融合 S0</title><link rel="stylesheet" href="./preview.css"></head>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="color-scheme" content="dark"><title>知遥寝居 · 寝居质感 R2.5</title><link rel="stylesheet" href="./preview.css"></head>
 <body>
-<header><div><small>远航 · 问道 / 空间研究 01</small><h1>竹窗以内<span>知遥寝居</span></h1></div><p>人物融合 S0 <i></i> 原画与空间对照</p></header>
+<header><div><small>远航 · 问道 / 空间研究 01</small><h1>竹窗以内<span>知遥寝居</span></h1></div><p>寝居质感 R2.5 <i></i> 道具接触 · 取放衔接</p></header>
 <main>
 <section class="stage" aria-label="实时三维寝居">
-  <canvas id="scene" aria-label="真实几何寝居灰盒，可用下方按钮切换三个摄像机与昼夜"></canvas>
-  <div id="fallback" hidden><img src="../../wendao/assets/zhiyao-recovery-cg.webp" alt="WebGL 不可用时显示的原静态寝居 CG"><p id="failure-text">三维场景未启动，当前为原静态画面。</p><button id="retry">重新加载</button></div>
+  <canvas id="scene" aria-label="实时三维寝居，可用下方按钮切换三个摄像机与昼夜"></canvas>
+  <div id="fallback" hidden><p id="failure-text">WebGL 三维场景未启动。</p><button id="retry">重新加载</button></div>
   <div class="stage-label"><span id="phase-label">白日 · 窗光</span><span>1 m 为一单位 / 实时渲染</span></div>
   <div class="caption"><small id="shot-index">01 / SPACE</small><h2 id="shot-title">空间全景</h2><p id="status" role="status">正在搭起房间…</p></div>
   <div id="demo-progress" hidden></div>
@@ -14,21 +14,26 @@
 <section class="controls" aria-label="空间检视">
   <div class="control-row"><span class="legend">观察位置</span><nav aria-label="镜头"><button data-camera="wide" aria-pressed="true">全景</button><button data-camera="bedside" aria-pressed="false">榻边</button><button data-camera="front" aria-pressed="false">正面微俯</button></nav></div>
   <div class="control-row"><span class="legend">窗外时辰</span><nav aria-label="光照"><button data-phase="dawn" aria-pressed="false">晨</button><button data-phase="day" aria-pressed="true">昼</button><button data-phase="dusk" aria-pressed="false">暮</button><button data-phase="night" aria-pressed="false">夜</button><button id="lamp" aria-pressed="true">灯火开</button></nav></div>
-  <div class="control-row"><span class="legend">空间关系</span><nav aria-label="人物与路径"><button id="enter">从屏风后入场</button><button data-pose="seated">床面半坐</button><button data-pose="reclined">卧姿代理</button><button id="demo">45 秒空间巡览</button></nav></div>
-  <p class="note">人物为无面容的体积代理，仅验证比例、床面接触、路径与遮挡；步态和姿势切换均不是正式人物演出。</p>
+  <div class="control-row brightness-row"><label class="legend" for="brightness">画面亮度</label><input id="brightness" type="range" min="80" max="150" step="5" value="100"><output id="brightness-value" for="brightness">100%</output><button id="brightness-reset">恢复默认</button></div>
+  <div class="control-row"><span class="legend">空间关系</span><nav aria-label="人物与路径"><button id="enter">从屏风后入场</button><button data-pose="seated">床沿落座</button><button data-pose="reclined">缓慢卧下</button><button id="demo">45 秒空间巡览</button></nav></div>
+  <div class="control-row"><span class="legend">日常行动</span><nav aria-label="日常行动"><button data-activity="walk">走到榻边</button><button data-activity="sit">书案坐下</button><button data-activity="read">看书</button><button data-activity="medicine">取药服药</button><button data-activity="lie">卧床</button><button data-activity="rest">休息</button><button id="cancel-action" disabled>取消行动</button></nav></div>
+  <div class="control-row"><span class="legend">连贯生活</span><nav aria-label="生活排演"><button id="routine">日常生活排演</button></nav></div>
+  <p id="routine-status" class="note" role="status">自动串联看书、取药演示与回榻休息；不影响正式游戏。</p>
+  <p class="note">屏风移至入口，保留不透明材质与投影。日常行动会依次经过起身、行走、转向和交互；取消时会先停稳、完成当前坐卧过渡，并把手中书碗放回。</p>
+  <p class="note">人物为无面容的体积代理，仅验证比例、床面接触、路径与遮挡；双手与书碗接触已加入占位约束；步态、坐卧、翻页及手袖细节仍待正式模型和动画校准。</p>
 </section>
 <section class="review"><div><small>本轮看什么</small><h2>从一幅画，到一个房间。</h2><p>换机位时留意床柱与屏风的前后关系。入场时，代理沿门边绕过屏风；切到夜间，再关灯，观察桌面和地板附近的受光变化。</p></div><div class="checks"><span>真实摄像机</span><span>几何深度遮挡</span><span>局部灯光投影</span><span>同一房间的四种时辰</span></div></section>
-<section class="identity-review" aria-labelledby="identity-title">
-  <div class="identity-heading"><div><small>WEN ZHIYAO / CHARACTER STUDY 01</small><h2 id="identity-title">让房间里的她，仍然是她。</h2></div><p>原立绘是人物依据。新转面图用于建模校准，尚待确认；三维场景中仍为体积代理。</p></div>
+<section hidden class="identity-review" aria-labelledby="identity-title">
+  <div class="identity-heading"><div><small>WEN ZHIYAO / CHARACTER STUDY 01</small><h2 id="identity-title">让房间里的她，仍然是她。</h2></div><p>原立绘是人物依据。人物由用户自行制作；历史参考仅存档，三维场景中仍为体积代理。</p></div>
   <div class="identity-grid">
     <figure class="canonical"><img id="canonical-art" src="../../wendao/scene3d/art/reference/sister-calm.webp" alt="温知遥原始日常立绘"><figcaption>原立绘 · 人物外观依据</figcaption></figure>
     <figure class="current-art"><img id="narrative-art" src="../../wendao/scene3d/art/reference/sister-calm.webp" alt="与三维代理共享状态的温知遥原画"><p id="art-absence" hidden>她现在不在寝居。</p><figcaption id="art-caption">当前状态对应原画</figcaption></figure>
   </div>
   <p id="identity-state" role="status">人物状态尚未读取。</p>
   <figure class="turnaround"><a href="../../wendao/scene3d/art/zhiyao-turnaround-s0.png" target="_blank" rel="noopener"><img src="../../wendao/scene3d/art/zhiyao-turnaround-s0.webp" loading="lazy" alt="温知遥四角度转面及神态设定候选；是绘制概念图，尚非三维模型"></a><figcaption>新转面设定候选 · 点击放大 · 侧面、背面为依据原立绘推演，尚待确认</figcaption></figure>
-  <details><summary>模型制作进度</summary><p>已完成：原图依据整理、转面设定候选、人物与 CG 共用状态接口。待完成：符合原画的可编辑角色模型、骨骼、表情及自然动作；当前不以无脸代理替代正式人物。</p><p>三维人物上线前仍需检查：是不是温知遥、是否脚底着地、是否穿床穿衣、病中是否按规则休息。此次未进行浏览器与手机视觉实测。</p></details>
+  <details><summary>历史人物参考（AI 制作已停止）</summary><p>已完成：原图依据整理、转面设定候选、人物与 CG 共用状态接口。待完成：符合原画的可编辑角色模型、骨骼、表情及自然动作；当前不以无脸代理替代正式人物。</p><p>三维人物上线前仍需检查：是不是温知遥、是否脚底着地、是否穿床穿衣、病中是否按规则休息。此次未进行浏览器与手机视觉实测。</p></details>
 </section>
 <details><summary>试验条件与性能记录</summary><div class="technical"><label>只读模拟状态 <select id="condition"><option value="healthy">清醒健康（可走动）</option><option value="ill">病中（本试验保守卧床）</option><option value="injured">急性重伤（卧床）</option><option value="sleep">睡眠（卧床）</option><option value="absent">人物不在寝居</option><option value="clock">时间待核对</option></select></label><label><input id="motion" type="checkbox" checked> 环境微动</label><label><input id="pause" type="checkbox"> 暂停巡览与动作</label><label><input id="low" type="checkbox"> 低性能模式（重建场景）</label><button id="download">导出本机性能记录</button><pre id="metrics">等待第一帧。</pre><p>FPS 为本浏览器实测；GPU 内存不可直接获取。导出 JSON 不会被当作录屏或 iPhone 验收。</p></div></details>
-<footer>独立空间试验 · 不读取或写入游戏存档 · 原画与三维共用状态 · 正式人物模型待制作</footer>
+<footer>独立空间试验 · 不读取或写入游戏存档 · 原画与三维共用状态 · 正式人物由用户制作；AI 人物建模已停止</footer>
 </main><script type="module" src="./preview.js"></script>
 </body></html>

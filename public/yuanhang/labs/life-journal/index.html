@@ -1,0 +1,12 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>灯下小记 · 问道自主生活 L1</title><link rel="stylesheet" href="./preview.css"></head>
+<body><div class="shell">
+<aside><a class="brand" href="#journal">远航 <span>／</span> 问道</a><div class="side-copy"><small>她也有自己的一日</small><h1>灯下<br>小记<span>日子缓缓流过，<br>不必每一刻都在场。</span></h1><p>你去读书的时候，她会继续手边的事。回来时，案上便多了一页可读的近况。</p></div><div class="edition">自主生活与纪事 · L1<br><span>独立体验 / 示例进度</span></div></aside>
+<main id="journal"><header><div><span class="eyebrow">知遥的日常</span><h2 id="chapter-title">一日的起笔</h2></div><div class="date"><span id="date"></span><strong id="clock"></strong><small>北京时间 · 示例时钟</small></div></header>
+<section class="controls" aria-label="体验设置"><label for="scenario">从哪段日常看起</label><select id="scenario"><option value="day">平常的一日</option><option value="night">疗养中的一夜</option><option value="letter">一次催问之后</option></select><button id="restart" class="text-button">重新开始这段</button><p>切换会重开示例；正式游戏存档不会被读取或改动。</p></section>
+<section class="present" aria-label="最近近况"><div><span class="eyebrow" id="place">尚未落笔</span><h3 id="latest-title">日常正要开始</h3><p id="latest-text">让时间向前走一会儿，看看她会留下什么。</p></div><span class="seal" aria-hidden="true">知<br>遥</span></section>
+<div class="time-actions"><button id="quarter">过一刻钟 <span>＋15 分钟</span></button><button id="hour">专心读一小时 <span>＋1 小时</span></button><button id="overnight" class="primary">离开，到明早再来 <span>翌日 08:00</span></button></div>
+<p id="notice" class="notice" role="status" aria-live="polite">这里的时间可以快进；每条小记都在相应时刻才会出现。</p>
+<section class="journal"><div class="journal-head"><div><span class="eyebrow">那些没有错过的片刻</span><h2>日常纪事 <small id="count">0 则</small></h2></div><button id="export" class="text-button">保存这段纪事 ↗</button></div><div class="filters" role="group" aria-label="纪事范围"><button data-filter="all" aria-pressed="true">这段日常</button><button data-filter="today" aria-pressed="false">今日</button><button data-filter="night" aria-pressed="false">昨夜</button></div><div id="timeline"></div></section>
+<footer>研习有时，休养有时。你不在时，她也继续自己的生活。<details><summary>关于这份体验</summary><p>本页使用独立示例状态和既有作息规则。细节依照已发生的来源、身体状态和时刻生成；不调用在线 AI，不读写正式存档。关闭页面后可重新体验，也可先保存文字纪事。</p><p>本轮新增摘记、收卷、整理问询与休息的分钟级衔接；更复杂的失眠、求援与剧情事件仍待后续。本页没有正式角色动画。</p></details></footer>
+</main></div><script type="module" src="./preview.js"></script></body></html>
