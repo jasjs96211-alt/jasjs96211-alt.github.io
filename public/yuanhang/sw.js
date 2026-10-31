@@ -1,12 +1,12 @@
 /* Offline app shell first. Large portraits must not prevent the updated code
    from installing over mobile data. No API responses or user data are cached. */
-const CACHE='yuanhang-static-v32-life-t1-20261031';
+const CACHE='yuanhang-static-v33-life-t2-20261031';
 const SHELL=[
  './','./index.html','./manifest.webmanifest','./icon.svg',
  './usage.js','./cloud.js?v=20261016-sync-r4',
  './wendao/novel.js?v=20261016-v15','./wendao/story.js?v=20261017-live1','./wendao/transport.js',
- './wendao/engine.js?v=20261031-life-t1','./wendao/app.js?v=20261031-life-t1','./wendao/life-journal.js?v=20261031-life-t1',
- './wendao/world.js?v=20261017-live1','./wendao/interaction.js?v=20261017-live1',
+ './wendao/engine.js?v=20261031-life-t1','./wendao/app.js?v=20261031-life-t2','./wendao/life-journal.js?v=20261031-life-t1',
+ './wendao/life-projection.js?v=20261031-life-t2','./wendao/world.js?v=20261031-life-t2','./wendao/interaction.js?v=20261017-live1',
  './wendao/motion.js?v=20261017-v16-review-fix','./wendao/companion.js?v=20261017-live1',
  './wendao/bedroom-behavior.js?v=20261018-chronicle-breath1','./wendao/bedroom-renderer.js?v=20261018-gestures3','./wendao/bedroom-live.css?v=20261017-live1',
  './wendao/style.css?v=20261018-chronicle-breath1','./wendao/companion.css?v=20261016-v15',
@@ -52,7 +52,7 @@ self.addEventListener('fetch',event=>{
  const req=event.request,url=new URL(req.url);
  if(req.method!=='GET'||url.origin!==self.location.origin||
     !url.pathname.startsWith(new URL(self.registration.scope).pathname)||
-    !/(?:\/wendao\/(?:novel\.js|engine\.js|life-journal\.js|story\.js|app\.js|transport\.js|companion\.js|world\.js|motion\.js|bedroom-behavior\.js|bedroom-renderer\.js|bedroom-live\.css|ui-mobile-polish\.css|interaction\.js|style\.css|companion\.css|world\.css|motion\.css|night-lighting\.css|scene-shortcuts\.css|ui-v16\.css|assets\/[a-z0-9-]+\.webp)$|\/(?:cloud\.js|usage\.js|index\.html|manifest\.webmanifest|icon\.svg)?$)/.test(url.pathname))return;
+    !/(?:\/wendao\/(?:novel\.js|engine\.js|life-journal\.js|life-projection\.js|story\.js|app\.js|transport\.js|companion\.js|world\.js|motion\.js|bedroom-behavior\.js|bedroom-renderer\.js|bedroom-live\.css|ui-mobile-polish\.css|interaction\.js|style\.css|companion\.css|world\.css|motion\.css|night-lighting\.css|scene-shortcuts\.css|ui-v16\.css|assets\/[a-z0-9-]+\.webp)$|\/(?:cloud\.js|usage\.js|index\.html|manifest\.webmanifest|icon\.svg)?$)/.test(url.pathname))return;
  event.respondWith(fetch(req).then(response=>{
   if(response.ok){
    const copy=response.clone();

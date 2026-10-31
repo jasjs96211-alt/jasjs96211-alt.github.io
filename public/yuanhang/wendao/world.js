@@ -28,6 +28,15 @@ function injury(state){
  return label==='injured'||label==='ill'||state?.vitals?.acuteInjury===true||state?.vitals?.seriousInjury===true;
 }
 function scheduleActivity(state,at,focus){
+ // Production supplies an authoritative, read-only life projection. Never fall
+ // back to independent 20-minute actions when that projection is unresolved.
+ if(state.lifeProjection){
+  const projected=state.lifeProjection;
+  if(!projected.valid)return {place:'bedroom',title:'生活日程待核对',text:'暂无可核对的当前活动，不生成新行动。',spot:'榻边',uncertain:true};
+  if(injury(state)||state?.vitals?.acuteInjury===true||state?.vitals?.seriousInjury===true)
+   return {place:'bedroom',title:'卧榻静养',text:'她按照伤势继续静养。',spot:'榻边',sourceEventId:projected.sourceEventId,eventId:projected.eventId};
+  return {place:projected.location,title:projected.title,text:projected.text,spot:projected.spot,eventId:projected.eventId,sourceEventId:projected.sourceEventId};
+ }
  const p=parts(at),v=state?.vitals||{},label=state?.portrait?.state||'normal';
  const ill=injury(state),low=(Number.isFinite(v.stamina)&&v.stamina<32)||(Number.isFinite(v.mp)&&v.mp<=10)||label==='tired';
  const recent=state?.schedule;
@@ -66,17 +75,17 @@ function scheduleActivity(state,at,focus){
 function derive({at=Date.now(),state={},focus={},playerPlace='study',following=false}={}){
  const clockDispute=state?.vitals?.clockDispute===true;if(clockDispute)at=Number.isFinite(state.validAt)?state.validAt:0;
  const player=byId[playerPlace]?playerPlace:'study';
- const base=scheduleActivity(state,at,focus),unwell=injury(state),p=parts(at),v=state?.vitals||{};
- const busy=state.schedule?.kind==='pressure'&&Number.isFinite(state.schedule.at)&&at>=state.schedule.at&&at-state.schedule.at<90*60000;
- const canFollow=!clockDispute&&!busy&&!unwell&&p.hour>=7&&p.hour<22&&!(Number.isFinite(v.stamina)&&v.stamina<32)&&!(Number.isFinite(v.mp)&&v.mp<=10);
+ const base=scheduleActivity(state,at,focus),unwell=injury(state),uncertain=base.uncertain===true,p=parts(at),v=state?.vitals||{};
+ const busy=state.lifeProjection?.valid?state.lifeProjection.kind==='pressure':state.schedule?.kind==='pressure'&&Number.isFinite(state.schedule.at)&&at>=state.schedule.at&&at-state.schedule.at<90*60000;
+ const canFollow=!clockDispute&&!uncertain&&!busy&&!unwell&&(!state.lifeProjection||state.lifeProjection.location===player)&&p.hour>=7&&p.hour<22&&!(Number.isFinite(v.stamina)&&v.stamina<32)&&!(Number.isFinite(v.mp)&&v.mp<=10);
  const follows=!!following&&canFollow;
  const sister=follows?player:base.place;
  return {
   player,sister,following:follows,canFollow,
-  together:sister===player,activity:follows?{...base,place:player,title:'与妹妹同行',text:'她放下手边事情，与你一道走走。'}:base,
+  together:!uncertain&&sister===player,activity:follows?{...base,place:player,title:'与妹妹同行',text:'她放下手边事情，与你一道走走。'}:base,
   phase:phase(at),phaseName:phaseNames[phase(at)],
   location:byId[player],sisterLocation:byId[sister],locations:LOCATIONS,
-  unwell,clockDispute,busy
+  unwell,clockDispute,busy,uncertain
  };
 }
 const UI_KEY='yuanhang_wendao_world_view_v1';

@@ -30,7 +30,7 @@ test('exploration mode keeps map and wayfinding, hides study-only controls',()=>
   assert.match(companion,/\$\('wcMapToggle'\)\.setAttribute\('aria-expanded',String\(exploring\)\)/);
 });
 test('cache/version includes main map, companion and both new styles',()=>{
-  for(const path of ['scene-shortcuts.css?v=20261017-scene-shortcuts-1','night-lighting.css?v=20261017-night-lighting-1','app.js?v=20261031-life-t1','companion.js?v=20261017-live1']){
+  for(const path of ['scene-shortcuts.css?v=20261017-scene-shortcuts-1','night-lighting.css?v=20261017-night-lighting-1','app.js?v=20261031-life-t2','companion.js?v=20261017-live1']){
     assert.ok(html.includes(path),path+' in html');
     assert.ok(sw.includes(path),path+' in offline shell');
   }

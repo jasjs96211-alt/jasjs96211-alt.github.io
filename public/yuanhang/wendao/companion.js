@@ -141,8 +141,8 @@ function update(){
   backdrop.dataset.location=world.player;backdrop.dataset.phase=world.phase;
   $('wcSkyPlace').textContent=world.location.name;
   $('wcSkyDaypart').textContent=world.phaseName+' · 北京时间';
-  $('wcSisterWhere').textContent=world.together?'姐姐也在这里 · '+act.title:'姐姐此刻在'+world.sisterLocation.name+' · '+act.title;
-  $('wcFindSister').hidden=world.together;
+  $('wcSisterWhere').textContent=world.uncertain?'姐姐的当前位置与活动待核对':world.together?'姐姐也在这里 · '+act.title:'姐姐此刻在'+world.sisterLocation.name+' · '+act.title;
+  $('wcFindSister').hidden=world.together||world.uncertain;
   renderDirections(world);$('wcHeroVitals').hidden=!world.together;layer.classList.toggle('wc-sister-away',!world.together);
   $('wcFollow').textContent=worldView.following?'结束同行':'邀姐姐同行';
   $('wcActor').hidden=!world.together;
