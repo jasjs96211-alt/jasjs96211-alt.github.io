@@ -37,6 +37,6 @@ test('engine merge retains journal metadata and validates its monotone cursor',(
 });
 test('legacy save without detailState remains valid and old recap keeps original text',()=>{
  const s=E.fresh(t);assert.equal(s.life.detailState,undefined);assert.ok(E.validate(s));
- s.rhythmState.recaps.push({id:'recap:legacy',date:'2026-10-30',at:t+M,text:'旧式概述',eventIds:[]});
+ s.rhythmState.recaps.push({id:'recap:2026-10-30',date:'2026-10-30',at:t+M,text:'旧式概述',eventIds:[]});
  assert.equal(E.nightRecap(s,at('2026-10-31T00:00:00')).text,'旧式概述');
 });
