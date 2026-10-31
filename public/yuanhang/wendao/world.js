@@ -77,7 +77,7 @@ function derive({at=Date.now(),state={},focus={},playerPlace='study',following=f
  const player=byId[playerPlace]?playerPlace:'study';
  const base=scheduleActivity(state,at,focus),unwell=injury(state),uncertain=base.uncertain===true,p=parts(at),v=state?.vitals||{};
  const busy=state.lifeProjection?.valid?state.lifeProjection.kind==='pressure':state.schedule?.kind==='pressure'&&Number.isFinite(state.schedule.at)&&at>=state.schedule.at&&at-state.schedule.at<90*60000;
- const canFollow=!clockDispute&&!uncertain&&!busy&&!unwell&&p.hour>=7&&p.hour<22&&!(Number.isFinite(v.stamina)&&v.stamina<32)&&!(Number.isFinite(v.mp)&&v.mp<=10);
+ const canFollow=!clockDispute&&!uncertain&&!busy&&!unwell&&(!state.lifeProjection||state.lifeProjection.location===player)&&p.hour>=7&&p.hour<22&&!(Number.isFinite(v.stamina)&&v.stamina<32)&&!(Number.isFinite(v.mp)&&v.mp<=10);
  const follows=!!following&&canFollow;
  const sister=follows?player:base.place;
  return {
