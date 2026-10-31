@@ -35,7 +35,7 @@ const YuanhangCloud = (()=>{
  }
  function mergeWendao(base,local,remote,conflicts){
   const E=typeof window!=='undefined'?window.WendaoEngine:null;if(!E){conflicts.push({field:'wendao',id:'engine-unavailable'});return local}
-  const n=E.merge(local,remote),b=base||{};
+  const n=(window.WendaoLifeJournal?.merge?window.WendaoLifeJournal.merge(local,remote):E.merge(local,remote)),b=base||{};
   // Derived values, device timers and monotone ledgers do not conflict. Decisions do.
   function pick(bv,lv,rv,path){
    if(equal(lv,rv))return lv;if(equal(lv,bv))return rv;if(equal(rv,bv))return lv;
@@ -74,7 +74,8 @@ const YuanhangCloud = (()=>{
   else if(lw&&rw){out.wendao=mergeWendao(bw,lw,rw,conflicts)}
   else{conflicts.push({field:'wendao',id:'story-state'});out.wendao=lw||undefined}
   if(out.wendao&&typeof window!=='undefined'&&window.WendaoEngine)window.WendaoEngine.derive(out.wendao,out,Math.max(local.wendao?.supervision?.deadlines?.lastCheck||0,remote.wendao?.supervision?.deadlines?.lastCheck||0,Date.now()));
-  if(out.wendao)out.wendao=cleanWendao(out.wendao); // Engine derives device-only deadline review state; never cloud-store it.
+  if(out.wendao&&typeof window!=='undefined')window.WendaoLifeJournal?.reconcile?.(out.wendao);
+   if(out.wendao)out.wendao=cleanWendao(out.wendao); // Engine derives device-only deadline review state; never cloud-store it.
   return {data:out,conflicts};
  }
 
@@ -303,7 +304,7 @@ function startYuanhangCloud(){
     const lw=local.wendao,rw=row?.data.wendao;
     if(lw&&rw){
      const localFirst=$('accountFirstConflict').value==='local';
-     next.wendao=window.WendaoEngine.merge(localFirst?lw:rw,localFirst?rw:lw);next.wendao.revision=0;
+     next.wendao=(window.WendaoLifeJournal?.merge||window.WendaoEngine.merge)(localFirst?lw:rw,localFirst?rw:lw);next.wendao.revision=0;
     }else if(lw||rw)next.wendao=lw||rw;
    }else{
     if(!cfg.base||!validBackup(cfg.base))throw Error('缺少同步基准，请停止同步后重新登录开启。');
