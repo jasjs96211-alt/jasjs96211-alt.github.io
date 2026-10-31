@@ -9,6 +9,7 @@ if(root.WendaoContent)for(const a of [...backgroundAssets,{id:'recovery-bed',kin
 const clamp=n=>Math.max(0,Math.min(1,n));
 function injury(world,state){return world?.unwell||state?.vitals?.seriousInjury||['injured','ill'].includes(state?.portrait?.state)}
 function transition(previous,next,at,state={}){
+ if(state.schedule?.projection)return null; // No replay or improvised walking between recorded locations.
  if(!previous||!next||!Number.isFinite(at)||at<previous.at||at-previous.at>90000||injury(next,state)||state.vitals?.clockDispute)return null;
  const old=previous.world;if(old.player!==next.player)return next.following&&next.together?{type:'enter',at,duration:6000}:null;
  if(old.together&&!next.together)return {type:'leave',at,duration:6000};
@@ -17,6 +18,12 @@ function transition(previous,next,at,state={}){
 }
 function plan({world,state={},at=Date.now(),transit=null,enabled=true,reduced=false,hidden=false,saveData=false}={}){
  const animate=enabled&&!reduced&&!hidden&&!saveData,unwell=injury(world,state);
+ if(state.schedule?.projection){
+  if(!world?.together)return {mode:'absent',action:'absent',animate:false};
+  if(world.sister==='bedroom'&&state.recoveryCGAllowed===true)return {mode:'cg',action:'recover',src:CG,cgId:'recovery-bed',animate:false};
+  const reading=state.schedule.valid&&!state.schedule.blocked&&!unwell&&state.schedule.activity==='reading';
+  return {mode:'actor',action:reading?'read':'idle',src:reading?ACTIONS.read.poster:state.portrait?.src,x:50,animate:false,flip:false};
+ }
  if(!world)return {mode:'actor',action:'idle',src:state.portrait?.src,x:50,animate:false,flip:false};
  if(state.vitals?.clockDispute)return {mode:world.together?'actor':'absent',action:'idle',src:state.portrait?.src,x:50,animate:false,flip:false};
  const progress=transit&&animate&&!unwell?clamp((at-transit.at)/transit.duration):1;
@@ -51,7 +58,7 @@ function renderer({actor,photo,bed,hint,onArtSeen=()=>{}}){
   if(p.mode==='cg'){
    if(!source(bed,p.src,null)){bed.hidden=true;actor.hidden=false;photo.hidden=!source(photo,options.state.portrait?.src,null);hint.hidden=false;hint.textContent='卧床CG未能加载，暂显示原状态立绘。'}
    else if(bed.dataset.ready==='1'&&!seen.has(p.cgId)&&!options.hidden)recordSeen(p.cgId);
-  }else if(p.mode==='actor'){const okay=source(photo,p.src,p.poster||options.state.portrait?.src);photo.hidden=!okay;if(!okay){photo.hidden=!source(photo,options.state.portrait?.src,null);actor.dataset.motion='fallback';hint.hidden=false;hint.textContent='动作图片未缓存，暂显示原状态立绘。';photo.alt='温知遥 · 原状态立绘';return {...p,action:'fallback'};}photo.alt='温知遥 · '+({read:'坐姿翻书',herbs:'分拣药草',meditate:'坐姿调息',walk:'步行动作',rest:'榻边歇息',idle:options.state.portrait?.label||'当前状态'}[p.action]);}
+  }else if(p.mode==='actor'){const okay=source(photo,p.src,p.poster||options.state.portrait?.src);photo.hidden=!okay;if(!okay){photo.hidden=!source(photo,options.state.portrait?.src,null);actor.dataset.motion='fallback';hint.hidden=false;hint.textContent='动作图片未缓存，暂显示原状态立绘。';photo.alt='温知遥 · 原状态立绘';return {...p,action:'fallback'};}if(photo.dataset.artSource!==p.src){actor.dataset.motion='fallback';photo.alt='温知遥 · 原状态立绘';return {...p,action:'fallback',animate:false};}photo.alt='温知遥 · '+({read:'坐姿翻书',herbs:'分拣药草',meditate:'坐姿调息',walk:'步行动作',rest:'榻边歇息',idle:options.state.portrait?.label||'当前状态'}[p.action]);}
   return p;
  }
  return {render,resetFailures:()=>failed.clear()};

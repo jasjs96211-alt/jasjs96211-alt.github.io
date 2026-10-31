@@ -56,3 +56,7 @@ const merged = journal.merge(local, remote); // 原 E.merge 后重新核对细�
 1. 接入原游戏的日常控制器与来信/纪事 UI，统一持久化、合并和当前活动来源后，再进入正式体验；依旧不擅自合并 main。
 2. 扩充生活差异与持续上下文，控制重复和密度。旧伤失眠、真正求援、温家新事件须有单独条件与因果，不用定时模板擅自制造主线事件。
 3. 用户作息、睡眠保护、DDL、学习成长和原有夜间纪事保持现有规则。人物与场景继续停在 R2.5，待后续反馈再细磨。
+
+## 2026-10-31 接线更新
+
+上述“未接生产”是10-26的历史状态。本轮在独立开发分支的正式入口加载 production-life.js（由原 life-journal、life-projection、life-presentation 生成）。E.advanceLife 统一推进，E.merge/migrateLegacySave 复核，cloudApply 保留单调游标及快照替换语义。原算法不重写，只补缺前置事件核验。详见 requirements-audit-production-life.md；未合并main，未发布生产，未宣称新增角色动画。

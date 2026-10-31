@@ -31,6 +31,7 @@ function scheduleActivity(state,at,focus){
  const p=parts(at),v=state?.vitals||{},label=state?.portrait?.state||'normal';
  const ill=injury(state),low=(Number.isFinite(v.stamina)&&v.stamina<32)||(Number.isFinite(v.mp)&&v.mp<=10)||label==='tired';
  const recent=state?.schedule;
+ if(recent?.projection)return {place:recent.location,title:recent.title,text:recent.text,spot:byId[recent.location]?.spot||'榻边',eventId:recent.eventId,sleeping:recent.sleeping,valid:recent.valid};
  if(ill){
   return {place:'bedroom',title:label==='injured'?'卧榻静养':'卧榻休养',text:'她留在榻上安静歇息，不勉强走动。',spot:'榻边'};
  }
@@ -45,7 +46,6 @@ function scheduleActivity(state,at,focus){
  }
  if(Number.isFinite(v.mood)&&v.mood<25&&p.hour>=8&&p.hour<19)return {place:'garden',title:'独自在竹庭静心',text:'她心事有些重，暂时到庭中安静片刻。',spot:'竹窗'};
  if(p.hour>=22||p.hour<6)return {place:'bedroom',title:'夜间安寝',text:'烛火已低，姐姐也有自己的休息时间。',spot:'榻边'};
- if(focus?.running&&p.hour>=7&&p.hour<22&&p.hour%3===0)return {place:'study',title:'抄录医理',text:'你专注时，她也在书房整理自己的心得。',spot:'书案'};
  const activities=p.hour<9?[
    {place:'garden',title:'看晨间竹色',text:'她在庭中停了一会儿，看看新叶。',spot:'竹窗'},
    {place:'herbs',title:'晨起检药',text:'她核对晒好的药材，整理一日的药单。',spot:'药架'}
@@ -64,11 +64,11 @@ function scheduleActivity(state,at,focus){
  return activities[Math.floor(at/1200000+p.day)%activities.length];
 }
 function derive({at=Date.now(),state={},focus={},playerPlace='study',following=false}={}){
- const clockDispute=state?.vitals?.clockDispute===true;if(clockDispute)at=Number.isFinite(state.validAt)?state.validAt:0;
+ const clockDispute=state?.vitals?.clockDispute===true||state.schedule?.blocked===true;if(clockDispute)at=Number.isFinite(state.validAt)?state.validAt:0;
  const player=byId[playerPlace]?playerPlace:'study';
  const base=scheduleActivity(state,at,focus),unwell=injury(state),p=parts(at),v=state?.vitals||{};
  const busy=state.schedule?.kind==='pressure'&&Number.isFinite(state.schedule.at)&&at>=state.schedule.at&&at-state.schedule.at<90*60000;
- const canFollow=!clockDispute&&!busy&&!unwell&&p.hour>=7&&p.hour<22&&!(Number.isFinite(v.stamina)&&v.stamina<32)&&!(Number.isFinite(v.mp)&&v.mp<=10);
+ const canFollow=!state.schedule?.projection&&!clockDispute&&!busy&&!unwell&&p.hour>=7&&p.hour<22&&!(Number.isFinite(v.stamina)&&v.stamina<32)&&!(Number.isFinite(v.mp)&&v.mp<=10);
  const follows=!!following&&canFollow;
  const sister=follows?player:base.place;
  return {
