@@ -12,7 +12,7 @@ const lifeJournalReady=import('./life-journal.js?v=20261031-life-t1').then(({cre
   if(s.life?.detailState)lifeJournal.reconcile(s);
   advanceLife(now());commit();render();
  }
-}).catch(err=>{console.error('Wendao LifeJournal failed to load',err);B.toast?.('自主生活细节模块加载失败，已保留原有游戏规则。');});
+}).catch(err=>{if(err?.code==='ERR_VM_DYNAMIC_IMPORT_CALLBACK_MISSING')return;console.error('Wendao LifeJournal failed to load',err);B.toast?.('自主生活细节模块加载失败，已保留原有游戏规则。');});
 const now=()=>Date.now(),date=()=>E.day(now()),study=()=>B.get(),uid=()=>crypto.randomUUID();
 try{const old=JSON.parse(localStorage.getItem(KEY)||'null');if(old&&!E.validate(old))throw Error('问道存档格式无法识别，请先导出原始存档');knownRevision=old?.revision||0;if(old&&!localStorage.getItem(KEY+'_before_v1_5'))localStorage.setItem(KEY+'_before_v1_5',JSON.stringify(old));if(old&&!localStorage.getItem(KEY+'_before_v1_4_rhythm'))localStorage.setItem(KEY+'_before_v1_4_rhythm',JSON.stringify(old));if(old&&!localStorage.getItem(KEY+'_before_v1_3'))localStorage.setItem(KEY+'_before_v1_3',JSON.stringify(old));s=old?E.migrateLegacySave(old):E.baseline(E.fresh(),study());if(!old){s.supervision.mode='awake';s.supervision.modeStart=s.supervision.cursor;localStorage.setItem(KEY+'_study_snapshot',JSON.stringify(study()))}}catch(err){persistError=err.message;}
 function commit(){if(s)E.vitals(s,study(),now());if(persistError)throw Error(persistError);const latest=JSON.parse(localStorage.getItem(KEY)||'null');if(latest&&latest.revision!==knownRevision){localStorage.setItem(KEY+'_conflict_snapshot',JSON.stringify(s));throw Error('另一窗口已更新问道；本次改动保存在冲突快照，请重新打开后导出核对')}s.revision=knownRevision+1;localStorage.setItem(KEY,JSON.stringify(s));knownRevision=s.revision;window.yuanhangMarkDirty?.()}
