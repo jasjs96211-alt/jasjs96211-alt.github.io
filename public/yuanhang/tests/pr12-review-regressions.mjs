@@ -57,24 +57,24 @@ test('two devices with different local maps keep one whole frozen letter snapsho
  const ma=E.proactive(a,d,t,{worldView:{player:'terrace',following:true}}),mb=E.proactive(b,d,t,{worldView:{player:'herbs',following:true}}),before=[clone(ma),clone(mb)];
  const ab=clone(E.merge(a,b)),ba=clone(E.merge(b,a));assert.deepEqual(ab.messages,ba.messages);assert.equal(ab.messages.length,1);assert.ok(before.some(x=>JSON.stringify(x)===JSON.stringify(ab.messages[0])));assert.equal(E.proactive(ab,d,t+H,{worldView:{player:'garden',following:true}}),null);assert.deepEqual(ab.messages,ba.messages);
 });
-test('app save while following uses the current view; closing restores explicit autonomous snapshot source',()=>{
- const a=open();configure(a,"f.supervision.mode='awake';f.settings.dailyMessages=false;f.settings.wakeReminders=false;f.proactiveState.lastAt=0;f.messages=[];f.proactiveState.seen=[];f.life.ledger=[{id:'life:study',at:Date.now()-1,kind:'study',activity:'医理'}]");
- a.get('wcFindSister').onclick();a.get('wcFollow').onclick();travel(a,'terrace');assert.equal(a.run('window.WendaoCompanion.getWorldView().following'),true);
+test('app save while exploring preserves her independent location; closing restores explicit autonomous snapshot source',()=>{
+ const a=open();configure(a,"f.supervision.mode='awake';f.settings.dailyMessages=false;f.settings.wakeReminders=false;f.proactiveState.lastAt=0;f.messages=[];f.proactiveState.seen=[];f.life.ledger=[{id:'life:v4:test:study',chapter:'chapter-9-preparation',bodyState:'normal',at:Date.now()-1,kind:'study',activity:'医理'}]");
+ a.get('wcFindSister').onclick();a.get('wcFollow').onclick();travel(a,'terrace');assert.equal(a.run('window.WendaoCompanion.getWorldView().following'),false);
  a.run("state.sessions.push({id:'new-view-record',date:'2026-10-17',minutes:30,subject:'622',at:new Date(Date.now()-1).toISOString()});save()");
- let row=a.snapshot().messages.find(m=>m.evidenceId==='study:new-view-record');assert.equal(row.contextSnapshot.locationId,'terrace');assert.equal(row.contextSnapshot.following,true);
+ let row=a.snapshot().messages.find(m=>m.evidenceId==='study:new-view-record');assert.equal(row.contextSnapshot.locationId,'study');assert.equal(row.contextSnapshot.following,false);
  const frozen=clone(row),receiver=open();travel(receiver,'herbs');receiver.run('window.Wendao.cloudApply('+JSON.stringify(a.run('window.Wendao.cloudRead()'))+')');assert.equal(receiver.get('wcBackdrop').dataset.location,'herbs');assert.deepEqual(receiver.snapshot().messages.find(m=>m.id===frozen.id),frozen);
- receiver.get('wcLetters').onclick();assert.match(receiver.get('wdInbox').innerHTML,/留笺于 望星台 · 与妹妹同行/);
+ receiver.get('wcLetters').onclick();assert.match(receiver.get('wdInbox').innerHTML,/留笺于 学宫书房/);
  a.get('wcClose').onclick();assert.equal(a.run('window.WendaoCompanion.getWorldView()'),null);
  a.clock.set(t+H);a.run("state.sessions.push({id:'after-close',date:'2026-10-17',minutes:30,subject:'822',at:new Date(Date.now()-1).toISOString()});save()");
  row=a.snapshot().messages.find(m=>m.evidenceId==='study:after-close');assert.equal(row.contextSnapshot.locationSource,'autonomous-schedule');assert.equal(row.contextSnapshot.following,false);
 });
-test('AI enrichment after leaving companion still receives the original following location',async()=>{
+test('AI enrichment after leaving companion still receives the original independent location',async()=>{
  let payload;
- const fetcher=async(url,opts)=>{payload=JSON.parse(opts.body);return {ok:true,json:async()=>({reply:'方才与你同行，到望星台歇了片刻。'})}};
+ const fetcher=async(url,opts)=>{payload=JSON.parse(opts.body);return {ok:true,json:async()=>({reply:'我仍在书房整理医理笔记。'})}};
  const a=boot(new Map(),fetcher,{at:t});a.get('wdEnter').onclick();a.get('wdCompanion').onclick();
- configure(a,"f.supervision.mode='awake';f.settings.dailyMessages=false;f.settings.wakeReminders=false;f.proactiveState.lastAt=0;f.messages=[];f.proactiveState.seen=[];f.life.ledger=[{id:'life:study',at:Date.now()-1,kind:'study',activity:'医理'}]");
+ configure(a,"f.supervision.mode='awake';f.settings.dailyMessages=false;f.settings.wakeReminders=false;f.proactiveState.lastAt=0;f.messages=[];f.proactiveState.seen=[];f.life.ledger=[{id:'life:v4:test:study',chapter:'chapter-9-preparation',bodyState:'normal',at:Date.now()-1,kind:'study',activity:'医理'}]");
  a.get('wcFindSister').onclick();a.get('wcFollow').onclick();travel(a,'terrace');
  a.run("state.sessions.push({id:'ai-follow',date:'2026-10-17',minutes:30,subject:'622',at:new Date(Date.now()-1).toISOString()});save()");
  configure(a,"f.supervision.mode='awake';f.settings.online=true;f.settings.autoAI=true;f.settings.chatEndpoint=window.WendaoEngine.fresh(Date.now()).settings.chatEndpoint");a.run("window.YuanhangAccount={token:async()=> 'test-only-jwt'}");a.get('wcClose').onclick();a.run('window.Wendao.sync()');await new Promise(setImmediate);
- assert.equal(payload.context.proactiveEvent.creationContext.locationId,'terrace');assert.equal(payload.context.proactiveEvent.creationContext.following,true);assert.match(payload.messages.at(-1).content,/创建时的快照为准/);assert.equal(a.snapshot().messages.find(m=>m.evidenceId==='study:ai-follow').contextSnapshot.locationId,'terrace');
+ assert.equal(payload.context.proactiveEvent.creationContext.locationId,'study');assert.equal(payload.context.proactiveEvent.creationContext.following,false);assert.match(payload.messages.at(-1).content,/创建时的快照为准/);assert.equal(a.snapshot().messages.find(m=>m.evidenceId==='study:ai-follow').contextSnapshot.locationId,'study');
 });

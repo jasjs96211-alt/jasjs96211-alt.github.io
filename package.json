@@ -8,12 +8,13 @@
   },
   "scripts": {
     "dev": "vite",
-    "build": "npm run content:validate && vite build",
+    "build": "npm run build:life && npm run content:validate && vite build",
     "preview": "vite preview",
     "content:validate": "node scripts/validate-content.mjs",
     "content:import": "node scripts/import-obsidian.mjs",
     "deploy": "tcb deploy",
-    "deploy:direct": "npm run build && tcb hosting deploy ./dist -e yinxin-fenghuo-beta-d7bm0cd14d29"
+    "deploy:direct": "npm run build && tcb hosting deploy ./dist -e yinxin-fenghuo-beta-d7bm0cd14d29",
+    "build:life": "node scripts/build-production-life.mjs"
   },
   "dependencies": {
     "react": "19.2.6",

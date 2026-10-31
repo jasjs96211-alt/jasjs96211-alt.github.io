@@ -17,6 +17,7 @@ function reduced(){return !!root.matchMedia?.('(prefers-reduced-motion: reduce)'
 let bedroomArt=null,bedroomBehavior=null,bedroomSnapshot=null,bedroomIntent=null,lastBedContext=null,lastBedFacts=0,bedFocus={},bedSessions=[],bedFrame=null;
 const BED_LINES=['你来了。','我在这儿。','别担心，我只是有些乏。','过来坐一会儿吧。','方才歇着，倒教你惦记了。'];
 let lineIndex=0,lastReactionKey='',bedLine='',bedSavedPhase='',bedArtSeen=false;
+let lifePresentation=null,lifeObservation=null;
 const BED_KEY='yuanhang_wendao_bedroom_presentation_v1';
 function readBed(){try{return JSON.parse(root.sessionStorage?.getItem(BED_KEY)||'null')}catch{return null}}
 function saveBed(){try{if(bedroomBehavior)root.sessionStorage?.setItem(BED_KEY,JSON.stringify(bedroomBehavior.serialize()))}catch{/* Presentation persistence must not interrupt learning. */}}
@@ -37,8 +38,8 @@ function paintBedroom(hidden=false){
  if(!bedArtSeen&&onArtSeen?.('recovery-bed')!==false)bedArtSeen=true;
  $('wcRecovery').hidden=true;$('wcActor').hidden=true;$('wcArtHint').hidden=true;$('wcArtRetry').hidden=true;
  $('wcBedTouch').hidden=false;layer.dataset.bedroomLive='true';
- $('wcActivity').textContent=bedroomSnapshot.title;$('wcDescription').textContent=bedroomSnapshot.text;
- $('wcSisterWhere').textContent='姐姐也在这里 · '+bedroomSnapshot.title;
+ $('wcActivity').textContent=stateSnapshot.schedule?.projection?worldSnapshot.activity.title:bedroomSnapshot.title;$('wcDescription').textContent=stateSnapshot.schedule?.projection?worldSnapshot.activity.text:bedroomSnapshot.text;
+ $('wcSisterWhere').textContent='姐姐也在这里 · '+$('wcActivity').textContent;
  const r=bedroomSnapshot.reaction,key=r?r.cue+':'+r.kind:'';
  if(key&&key!==lastReactionKey){bedLine=bedroomSnapshot.severe?'':r.cue==='entry'?'你来了。':r.cue==='focus_start'||r.cue==='focus_resume'?'安心读书，我在这儿。':r.cue==='focus_pause'?'歇一歇也好。':r.cue==='focus_complete'?'今日辛苦了。':BED_LINES[lineIndex++%BED_LINES.length];}
  lastReactionKey=key;const reply=$('wcBedResponse');reply.textContent=bedLine;reply.hidden=!key||!bedLine||bedroomSnapshot.motion.smileWeight<.12;
@@ -132,6 +133,7 @@ function update(){
  if(active){activeID=timer.id;finished=false}else if(activeID){finished=(bridge.get?.().sessions||[]).some(x=>x.id===activeID&&x.source==='timer');activeID=null}
  const W=root.WendaoWorld;
  const world=W?.derive({at:Date.now(),state,focus:timer,playerPlace:worldView.player,following:worldView.following});
+ if(state.schedule?.projection&&root.WendaoLifePresentation){lifePresentation??=root.WendaoLifePresentation.create();lifeObservation=lifePresentation.update({state,world,live:!document.hidden});}
  stateSnapshot=state;worldSnapshot=world;if(world){const change=root.WendaoMotion?.transition(lastWorld,world,Date.now(),state);if(change)transit=change;lastWorld={world,at:Date.now()};}
  let act;
  if(world){
@@ -148,7 +150,7 @@ function update(){
   $('wcActor').hidden=!world.together;
   layer.dataset.location=world.player;layer.dataset.phase=world.phase;
  }else{
-  act=selectAction(portrait,Math.floor(Date.now()/1000),active&&!timer.running);
+  act=state.schedule?.projection?{place:state.schedule.location,title:state.schedule.title,text:state.schedule.text}:selectAction(portrait,Math.floor(Date.now()/1000),active&&!timer.running);
   $('wcActor').hidden=false;
  }
  if(state.vitals?.clockDispute){act.title='等候核对时间';act.text='设备时间需要核对，暂不推进陪伴日程。'}
@@ -213,14 +215,14 @@ function mount({stage,focusBridge,getCharacterState,onFocusPage:focusPage,onClos
  stage.append(layer);
  const BA=root.WendaoBedroomArt;
  if(BA&&root.WendaoBedroom&&$('wcBedroomLive')?.getContext){bedroomArt=BA.create({canvas:$('wcBedroomLive'),onReady:()=>{bedroomBehavior=null;if(layer&&!layer.hidden){update();startMotion()}},onError:()=>{$('wcBedroomLive').hidden=true;layer.dataset.bedroomLive='false';$('wcArtHint').hidden=false;$('wcArtHint').textContent='局部动作暂未加载，保留原卧榻画面，可重试。';$('wcArtRetry').hidden=false}});}
- $('wcBedTouch').onclick=()=>{bedroomIntent='look';paintMotion()};
+ $('wcBedTouch').onclick=()=>{lifePresentation?.suspend();bedroomIntent='look';paintMotion()};
 
  const M=root.WendaoMotion;if(M){motionEnabled=M.readPreference(viewStore());motionRenderer=M.renderer({actor:$('wcActor'),photo:$('wcPortrait'),bed:$('wcRecovery'),hint:$('wcArtHint'),onArtSeen:id=>onArtSeen?.(id)});}
  $('wcAnimation').textContent=motionEnabled?'动作：开':'动作：关';$('wcAnimation').setAttribute('aria-pressed',String(motionEnabled));
- $('wcAnimation').onclick=()=>{motionEnabled=!motionEnabled;M?.writePreference(viewStore(),motionEnabled);$('wcAnimation').textContent=motionEnabled?'动作：开':'动作：关';$('wcAnimation').setAttribute('aria-pressed',String(motionEnabled));paintMotion();startMotion()};
+ $('wcAnimation').onclick=()=>{motionEnabled=!motionEnabled;if(motionEnabled)lifePresentation?.resume();else lifePresentation?.suspend();M?.writePreference(viewStore(),motionEnabled);$('wcAnimation').textContent=motionEnabled?'动作：开':'动作：关';$('wcAnimation').setAttribute('aria-pressed',String(motionEnabled));paintMotion();startMotion()};
  $('wcArtRetry').onclick=()=>{if(bedroomArt?.failed())void bedroomArt.load();motionRenderer?.resetFailures();$('wcPortrait').dataset.artSource='';$('wcRecovery').dataset.artSource='';paintMotion()};
  $('wcLetters').onclick=()=>onCare?.('letters');
- document.addEventListener('visibilitychange',()=>{if(!layer||layer.hidden)return;if(document.hidden){clearInterval(motionTimer);if(bedFrame&&root.cancelAnimationFrame)root.cancelAnimationFrame(bedFrame);bedFrame=null;paintMotion(true);lastWorld=null;transit=null}else{update();startMotion()}});
+ document.addEventListener('visibilitychange',()=>{if(!layer||layer.hidden)return;if(document.hidden){lifePresentation?.hide();clearInterval(motionTimer);if(bedFrame&&root.cancelAnimationFrame)root.cancelAnimationFrame(bedFrame);bedFrame=null;paintMotion(true);lastWorld=null;transit=null}else{update();startMotion()}});
  root.matchMedia?.('(prefers-reduced-motion: reduce)').addEventListener?.('change',()=>{paintMotion();startMotion()});
 
  const official=$('timerSubject');const subject=$('wcSubject');
@@ -256,6 +258,7 @@ function mount({stage,focusBridge,getCharacterState,onFocusPage:focusPage,onClos
 }
 function open({mode='focus'}={}){
  if(!layer)return;
+ lifePresentation?.resume();
  const exploring=mode==='explore';
  setPanelExpanded(false);
  layer.classList.toggle('wc-explore-mode',exploring);
@@ -266,7 +269,7 @@ function open({mode='focus'}={}){
  layer.hidden=false;layer.parentElement?.classList.add('wd-companion-active');lastPortraitSrc='';const focus=focusState();if(focus.id)activeID=focus.id;
  update();startMotion();(exploring?$('wcMapToggle'):$('wcStart')).focus();clearInterval(interval);interval=setInterval(()=>{if(!document.hidden)update()},4000);
 }
-function close(){if(!layer)return;const wasExplore=layer.classList.contains('wc-explore-mode');cleanTravel();setPanelExpanded(false);clearInterval(motionTimer);if(bedFrame&&root.cancelAnimationFrame)root.cancelAnimationFrame(bedFrame);bedFrame=null;paintMotion(true);$('wcRecovery').hidden=true;lastWorld=null;transit=null;if($('wcMap'))$('wcMap').hidden=true;if($('wcMapToggle'))$('wcMapToggle').setAttribute('aria-expanded','false');layer.hidden=true;layer.classList.remove('wc-explore-mode');layer.parentElement?.classList.remove('wd-companion-active');clearInterval(interval);interval=null;onClose?.();(wasExplore?$('wdExploreQuick'):$('wdCultivateQuick'))?.focus()}
+function close(){if(!layer)return;lifePresentation?.hide();const wasExplore=layer.classList.contains('wc-explore-mode');cleanTravel();setPanelExpanded(false);clearInterval(motionTimer);if(bedFrame&&root.cancelAnimationFrame)root.cancelAnimationFrame(bedFrame);bedFrame=null;paintMotion(true);$('wcRecovery').hidden=true;lastWorld=null;transit=null;if($('wcMap'))$('wcMap').hidden=true;if($('wcMapToggle'))$('wcMapToggle').setAttribute('aria-expanded','false');layer.hidden=true;layer.classList.remove('wc-explore-mode');layer.parentElement?.classList.remove('wd-companion-active');clearInterval(interval);interval=null;onClose?.();(wasExplore?$('wdExploreQuick'):$('wdCultivateQuick'))?.focus()}
 function refresh(){if(layer&&!layer.hidden)update()}
-root.WendaoCompanion={mount,open,close,refresh,selectAction,getSceneContext,getWorldView:()=>layer&&!layer.hidden&&!document.hidden?{...worldView,bedroomScene:getSceneContext()}:null,isOpen:()=>!!layer&&!layer.hidden};
+root.WendaoCompanion={resetLifePresentation:()=>lifePresentation?.hide(),getLifeObservation:()=>lifeObservation,mount,open,close,refresh,selectAction,getSceneContext,getWorldView:()=>layer&&!layer.hidden&&!document.hidden?{...worldView,bedroomScene:getSceneContext()}:null,isOpen:()=>!!layer&&!layer.hidden};
 })(typeof window!=='undefined'?window:globalThis);

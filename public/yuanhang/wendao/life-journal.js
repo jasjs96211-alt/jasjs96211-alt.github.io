@@ -101,14 +101,15 @@ export function createLifeJournal(E){
   }
   function reconcile(s){
     const ordered=sources(s),parents=new Map(ordered.map((r,i)=>[r.id,{row:r,next:ordered[i+1]}]));
-    s.life.ledger=s.life.ledger.map(row=>{
-      if(row.detailVersion!==1||!row.id.startsWith(PREFIX))return row;
+    const verified=new Set(ordered.filter(r=>r.status!=='unresolved').map(r=>r.id));
+    s.life.ledger=E.unionRows(s.life.ledger).map(row=>{
+      if(row.kind!=='detail')return row;
       const source=parents.get(row.sourceEventId),parent=source?.row,next=parent&&[0,1].includes(row.step)?rowFor(s,parent,row.step):null;
-      if(next&&next.id===row.id&&next.at===row.at&&(!source.next||row.at<source.next.at))return next;
+      if(row.detailVersion===1&&next&&next.id===row.id&&next.at===row.at&&verified.has(next.previousEventId)&&(!source.next||row.at<source.next.at)){verified.add(next.id);return next;}
       return {...row,status:'unresolved',text:'这条日常的来源尚未核对，暂不作为已发生的记录。',delta:{autonomy:0,cultivation:0,pressure:0}};
     });
     for(const row of s.life.ledger.filter(r=>r.detailVersion===1)){
-      const note=s.chronicle.find(x=>x.id===row.id);if(note){note.text=row.text;note.title='姐姐的日常 · '+row.activity;}
+      const note=s.chronicle.find(x=>x.id===row.id);if(note){note.text=row.text;note.title='姐姐的日常 · '+row.activity;if(row.status)note.status=row.status;else delete note.status;}
     }
     return s;
   }
