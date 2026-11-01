@@ -2,7 +2,7 @@ import {adaptSnapshot} from './contract.js';
 
 // Reads source-owned ledger rows. Does not create events or derive actions from prose.
 // Call once to prime, then update while foreground/live. Resume the bridge explicitly.
-export function createLedgerSceneSource(bridge, {now = () => Date.now()} = {}) {
+export function createLedgerSceneSource(bridge, {now = () => Date.now(), adapt = adaptSnapshot, includeDetails = false} = {}) {
   let observedAt = null, known = new Set(), sequence = 0;
   const mapped = Object.freeze({study: 'read', rest: 'rest'});
   function update({ledger = [], snapshot = {}, live = false} = {}) {
@@ -11,7 +11,7 @@ export function createLedgerSceneSource(bridge, {now = () => Date.now()} = {}) {
     const rows = Array.isArray(ledger) ? ledger : [];
     const groups = new Map();
     for (const row of rows) {
-      if (!row || typeof row.id !== 'string' || !row.id.startsWith('life:v4:') || !Number.isFinite(row.at)) continue;
+      if (!row || typeof row.id !== 'string' || !(row.id.startsWith('life:v4:') || includeDetails && row.kind==='detail') || !Number.isFinite(row.at)) continue;
       const group = groups.get(row.id) || []; group.push(row); groups.set(row.id, group);
     }
     const fresh = [...groups].filter(([id]) => !known.has(id));
@@ -22,7 +22,7 @@ export function createLedgerSceneSource(bridge, {now = () => Date.now()} = {}) {
       bridge.suspend(); return result('clock-hold');
     }
     if (previous === null || !live) {bridge.suspend();return result('baseline-only');}
-    const facts = adaptSnapshot(snapshot);
+    const facts = adapt(snapshot);
     if (!facts.canMove || facts.sleeping || facts.clockHold || snapshot.world?.busy) {
       bridge.suspend(); return result('state-blocked');
     }
@@ -33,7 +33,9 @@ export function createLedgerSceneSource(bridge, {now = () => Date.now()} = {}) {
     if (!candidates.length) return result('no-fresh-event');
     const [id, group] = candidates[0], row = group[0];
     if (group.some(other => other.at !== row.at || other.kind !== row.kind || other.bodyState !== row.bodyState)) return result('conflicting-source');
-    const activity = Object.hasOwn(mapped, row.kind) ? mapped[row.kind] : null;
+    const projection=snapshot.state?.schedule;
+    const activity = row.status==='unresolved'?null:row.kind==='detail'?
+      (projection?.valid&&projection.eventId===row.id&&projection.kind==='rest'?'rest':null):Object.hasOwn(mapped, row.kind) ? mapped[row.kind] : null;
     // A healthy current snapshot cannot turn a sick historical event into a standing action.
     if (!activity || row.bodyState !== 'normal') return result('unsupported-event');
     const submission = bridge.submit({id, sequence: sequence++, source: 'autonomy', activity,

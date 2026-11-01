@@ -17,28 +17,29 @@ function reduced(){return !!root.matchMedia?.('(prefers-reduced-motion: reduce)'
 let bedroomArt=null,bedroomBehavior=null,bedroomSnapshot=null,bedroomIntent=null,lastBedContext=null,lastBedFacts=0,bedFocus={},bedSessions=[],bedFrame=null;
 const BED_LINES=['你来了。','我在这儿。','别担心，我只是有些乏。','过来坐一会儿吧。','方才歇着，倒教你惦记了。'];
 let lineIndex=0,lastReactionKey='',bedLine='',bedSavedPhase='',bedArtSeen=false;
+let lifePresentation=null,lifeObservation=null;
 const BED_KEY='yuanhang_wendao_bedroom_presentation_v1';
 function readBed(){try{return JSON.parse(root.sessionStorage?.getItem(BED_KEY)||'null')}catch{return null}}
 function saveBed(){try{if(bedroomBehavior)root.sessionStorage?.setItem(BED_KEY,JSON.stringify(bedroomBehavior.serialize()))}catch{/* Presentation persistence must not interrupt learning. */}}
 
 function paintBedroom(hidden=false){
- const at=Date.now(),eligible=worldSnapshot?.sister==='bedroom'&&worldSnapshot?.together&&stateSnapshot?.recoveryCGAllowed===true;
+ const at=Date.now(),eligible=worldSnapshot?.sister==='bedroom'&&worldSnapshot?.together&&(stateSnapshot?.recoveryCGAllowed===true||stateSnapshot?.schedule?.projection&&stateSnapshot.schedule.kind==='rest');
  const active=eligible&&!hidden&&!layer.hidden;
  if(active&&!root.navigator?.connection?.saveData&&bedroomArt&&!bedroomArt.ready()&&!bedroomArt.failed())void bedroomArt.load();
  if(!bedroomBehavior&&bedroomArt?.ready())bedroomBehavior=root.WendaoBedroom.create({manifest:bedroomArt.manifest(),snapshot:readBed()});
  if(!bedroomBehavior)return false;
  if(at-lastBedFacts>=250||at<lastBedFacts){bedFocus=focusState();bedSessions=(bridge.get?.().sessions||[]).filter(x=>x.source==='timer').map(x=>x.id);lastBedFacts=at;}
  bedroomSnapshot=bedroomBehavior.tick({at,state:stateSnapshot,world:worldSnapshot,focus:bedFocus,completedSessionIds:bedSessions,hidden:!active,
-  sisterSleeping:worldSnapshot?.activity?.title==='夜间安寝',reducedMotion:!motionEnabled||reduced(),intent:bedroomIntent});bedroomIntent=null;
+  sisterSleeping:stateSnapshot?.schedule?.projection?stateSnapshot.schedule.sleeping===true:worldSnapshot?.activity?.title==='夜间安寝',reducedMotion:!motionEnabled||reduced(),intent:bedroomIntent});bedroomIntent=null;
  if(!active){saveBed();$('wcBedroomLive').hidden=true;$('wcBedResponse').hidden=true;$('wcBedTouch').hidden=true;return false}
  if(bedSavedPhase!==bedroomSnapshot.phase){bedSavedPhase=bedroomSnapshot.phase;saveBed();}
  const ok=bedroomArt.render(bedroomSnapshot,{night:worldSnapshot.phase==='night',time:at,animate:motionEnabled&&!reduced()});
  if(!ok)return false;
- if(!bedArtSeen&&onArtSeen?.('recovery-bed')!==false)bedArtSeen=true;
+ if(stateSnapshot.recoveryCGAllowed&&!bedArtSeen&&onArtSeen?.('recovery-bed')!==false)bedArtSeen=true;
  $('wcRecovery').hidden=true;$('wcActor').hidden=true;$('wcArtHint').hidden=true;$('wcArtRetry').hidden=true;
  $('wcBedTouch').hidden=false;layer.dataset.bedroomLive='true';
- $('wcActivity').textContent=bedroomSnapshot.title;$('wcDescription').textContent=bedroomSnapshot.text;
- $('wcSisterWhere').textContent='姐姐也在这里 · '+bedroomSnapshot.title;
+ $('wcActivity').textContent=stateSnapshot.schedule?.projection?worldSnapshot.activity.title:bedroomSnapshot.title;$('wcDescription').textContent=stateSnapshot.schedule?.projection?worldSnapshot.activity.text:bedroomSnapshot.text;
+ $('wcSisterWhere').textContent='姐姐也在这里 · '+$('wcActivity').textContent;
  const r=bedroomSnapshot.reaction,key=r?r.cue+':'+r.kind:'';
  if(key&&key!==lastReactionKey){bedLine=bedroomSnapshot.severe?'':r.cue==='entry'?'你来了。':r.cue==='focus_start'||r.cue==='focus_resume'?'安心读书，我在这儿。':r.cue==='focus_pause'?'歇一歇也好。':r.cue==='focus_complete'?'今日辛苦了。':BED_LINES[lineIndex++%BED_LINES.length];}
  lastReactionKey=key;const reply=$('wcBedResponse');reply.textContent=bedLine;reply.hidden=!key||!bedLine||bedroomSnapshot.motion.smileWeight<.12;
@@ -61,7 +62,7 @@ function startMotion(){clearInterval(motionTimer);if(bedFrame&&root.cancelAnimat
 function getSceneContext(){
  if(!lastBedContext)return null;
  const at=Date.now(),state=getCharacter?.()||{},world=root.WendaoWorld?.derive({at,state,focus:focusState(),playerPlace:worldView.player,following:worldView.following});
- if(!state.recoveryCGAllowed||world?.sister!=='bedroom'||world?.player!=='bedroom'||at-lastBedContext.observedAt>300000||at<lastBedContext.observedAt)return null;
+ if(!(state.recoveryCGAllowed||state.schedule?.projection&&state.schedule.kind==='rest')||world?.sister!=='bedroom'||world?.player!=='bedroom'||at-lastBedContext.observedAt>300000||at<lastBedContext.observedAt)return null;
  const current=!!layer&&!layer.hidden&&!document.hidden;
  return {...lastBedContext,current,claimVisibleAction:current&&lastBedContext.claimVisibleAction,
   instruction:current?lastBedContext.instruction:'Last observed scene, not a new action. Do not claim she has moved, woken, read or taken medicine since this observation.'};
@@ -125,6 +126,42 @@ function focusState(){
 function clock(sec){
  const n=Math.max(0,Math.ceil(Number(sec)||0));return String(Math.floor(n/60)).padStart(2,'0')+':'+String(n%60).padStart(2,'0');
 }
+// Read-only recognition: receipts come from existing study/mastery records, never rewards.
+function effortView({sessions=[],mastery=[],timer={},at=Date.now(),world={}}={}){
+ const day=t=>new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Shanghai',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date(t));
+ const today=day(at),seen=new Set(),rows=[];
+ for(const x of sessions){
+  if(!x.id||seen.has('s:'+x.id)||!(Number(x.minutes)>0)||!Number.isFinite(Number(x.minutes)))continue;
+  const stamp=Date.parse(x.at||x.endedAt||'');
+  if(Number.isFinite(stamp)&&stamp>at)continue;
+  if(x.date!==today)continue;
+  seen.add('s:'+x.id);rows.push({id:'s:'+x.id,at:Number.isFinite(stamp)?stamp:0,minutes:Number(x.minutes),text:(x.subject||'功课')+' · '+Number(x.minutes)+' 分钟',source:x.source==='timer'?'计时完成':'自行记录',kind:'study'});
+ }
+ const stages={recall:'能复述',dictation:'闭卷默写',review:'七日复习通过'};
+ for(const x of mastery){
+  if(!x.id||seen.has('m:'+x.id)||!stages[x.level]||!Number.isFinite(x.at)||x.at>at||day(x.at)!==today)continue;
+  seen.add('m:'+x.id);rows.push({id:'m:'+x.id,at:x.at,minutes:0,text:x.title+' · '+stages[x.level],source:'你已自行确认',kind:x.level});
+ }
+ rows.sort((a,b)=>b.at-a.at||a.id.localeCompare(b.id));
+ const minutes=rows.reduce((sum,x)=>sum+x.minutes,0),count=rows.filter(x=>x.kind==='study').length,latest=rows[0];
+ const active=!!timer.id,elapsed=active?Math.max(0,Math.floor((timer.total-timer.remaining)/60)):0;
+ let text=latest?(latest.kind==='study'?'这一段'+latest.text+'，已经留下了。不是只有最后的结果才值得记下，你花在这里的时间也算数。':latest.kind==='dictation'?'你记下了「'+latest.text+'」。闭卷落笔的这一步，和只是看过一遍不同；这一笔留着，往后可以回来温习。':'你记下了「'+latest.text+'」。今天又把这部分向前推进了一步，先把这一步稳稳留下。'):'这一轮先从眼前的一小段开始。不必一口气把所有功课做完。';
+ if(active)text=timer.running?'这一轮留给'+(timer.subject||'眼前的功课')+'。不必时时回应，按自己的节奏往下做。': '先停一停也可以。计时已经暂停，之前完成的功课还在，不会因这一刻歇息而消失。';
+ const quiet=world.unwell||world.busy||world.clockDispute||world.sister==='bedroom'||!world.together;
+ return {rows,minutes,count,text,heading:quiet?'功课留痕':'温知遥 · 功课回笺',context:quiet?'她继续自己的安排；这里保留你的功课记录，不表示她此刻起身或回话。':'依学习记录写下的回笺 · 她继续手边的事',progress:active?'本轮已专注 '+elapsed+' 分钟 · '+(timer.running?'进行中':'已暂停'):'今日已记 '+minutes+' 分钟 · '+count+' 段功课'};
+}
+function renderEffort(timer,state,world){
+ const view=effortView({sessions:bridge.get?.().sessions||[],mastery:state.mastery||[],timer,world:world||{},at:Date.now()});
+ const set=(id,text)=>{if($(id).textContent!==text)$(id).textContent=text};
+ set('wcEffortHeading',view.heading);set('wcEffortText',view.text);set('wcEffortProgress',view.progress);set('wcEffortContext',view.context);
+ set('wcEffortTotal','今日已留下 '+view.minutes+' 分钟，'+view.count+' 段功课；复述／默写 '+view.rows.filter(x=>x.kind!=='study').length+' 项。');
+ const signature=JSON.stringify(view.rows);
+ if($('wcEffortRows').dataset.signature!==signature){
+  $('wcEffortRows').dataset.signature=signature;$('wcEffortRows').textContent='';
+  if(!view.rows.length)$('wcEffortRows').textContent='完成计时或记录掌握后，会在这里留下具体的一笔。';
+  for(const row of view.rows){const li=document.createElement('li');li.textContent=(row.at?new Intl.DateTimeFormat('zh-CN',{timeZone:'Asia/Shanghai',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).format(new Date(row.at))+' · ':'')+row.text+'（'+row.source+'）';$('wcEffortRows').append(li)}
+ }
+}
 function update(){
  if(!layer||layer.hidden)return;
  const state=getCharacter?.()||{},portrait=state.portrait||{state:'normal',label:'日常'};
@@ -132,6 +169,7 @@ function update(){
  if(active){activeID=timer.id;finished=false}else if(activeID){finished=(bridge.get?.().sessions||[]).some(x=>x.id===activeID&&x.source==='timer');activeID=null}
  const W=root.WendaoWorld;
  const world=W?.derive({at:Date.now(),state,focus:timer,playerPlace:worldView.player,following:worldView.following});
+ if(state.schedule?.projection&&root.WendaoLifePresentation){lifePresentation??=root.WendaoLifePresentation.create();lifeObservation=lifePresentation.update({state,world,live:!document.hidden});}
  stateSnapshot=state;worldSnapshot=world;if(world){const change=root.WendaoMotion?.transition(lastWorld,world,Date.now(),state);if(change)transit=change;lastWorld={world,at:Date.now()};}
  let act;
  if(world){
@@ -148,7 +186,7 @@ function update(){
   $('wcActor').hidden=!world.together;
   layer.dataset.location=world.player;layer.dataset.phase=world.phase;
  }else{
-  act=selectAction(portrait,Math.floor(Date.now()/1000),active&&!timer.running);
+  act=state.schedule?.projection?{place:state.schedule.location,title:state.schedule.title,text:state.schedule.text}:selectAction(portrait,Math.floor(Date.now()/1000),active&&!timer.running);
   $('wcActor').hidden=false;
  }
  if(state.vitals?.clockDispute){act.title='等候核对时间';act.text='设备时间需要核对，暂不推进陪伴日程。'}
@@ -171,6 +209,7 @@ function update(){
  $('wcActivity').textContent=act.title;
  $('wcDescription').textContent=act.text;
  if(bedroomSnapshot?.visible&&layer.dataset.bedroomLive==='true'){$('wcActivity').textContent=bedroomSnapshot.title;$('wcDescription').textContent=bedroomSnapshot.text;$('wcSisterWhere').textContent='姐姐也在这里 · '+bedroomSnapshot.title;}
+ renderEffort(timer,state,world);
  $('wcTime').textContent=clock(timer.remaining);
  $('wcMiniTime').textContent=clock(timer.remaining);
  $('wcQuickFocus').textContent=active?(timer.running?'Ⅱ 暂停':'▶ 继续'):'▶ 开始修炼';
@@ -204,8 +243,8 @@ function mount({stage,focusBridge,getCharacterState,onFocusPage:focusPage,onClos
  '<div class="wc-motion-tools"><button type="button" id="wcAnimation" aria-pressed="true">动作：开</button><button type="button" id="wcLetters" hidden>来信</button><button type="button" id="wcArtRetry" hidden>重试演出图片</button></div><img id="wcRecovery" alt="温知遥卧床休养CG" hidden>' +
  '<canvas id="wcBedroomLive" width="1536" height="1024" aria-label="温知遥卧榻休养，轻触可回应" hidden></canvas><button id="wcBedTouch" class="wc-bed-touch" aria-label="轻声唤知遥" hidden></button><p id="wcBedResponse" class="wc-bed-response" aria-live="polite" hidden></p>'+
  '<div class="wc-world" aria-hidden="true"><span class="wc-spot wc-spot-window">竹窗</span><span class="wc-spot wc-spot-desk">书案</span><span class="wc-spot wc-spot-herbs">药架</span><span class="wc-spot wc-spot-bed">榻边</span>'+
- '<div id="wcActor" class="wc-actor" data-place="书案"><img id="wcPortrait" alt="温知遥立绘"><span id="wcArtHint" hidden></span></div></div>'+
- '<div class="wc-panel"><header class="wc-heading"><div><small id="wcName">温知遥</small><h2 id="wcActivity">研读医书</h2><p id="wcDescription"></p></div><div class="wc-heading-actions"><small id="wcMiniTime" aria-label="专注剩余时间">25:00</small><button type="button" id="wcQuickFocus">▶ 开始修炼</button><button type="button" id="wcExpandPanel" aria-controls="wcExpanded" aria-expanded="false">修炼设置 ▾</button><button type="button" id="wcClose" aria-label="返回剧情书房">返回书房 ×</button></div></header><div id="wcExpanded">'+
+ '<div id="wcActor" class="wc-actor" data-place="书案"><img id="wcPortrait" alt="温知遥立绘"></div></div><span id="wcArtHint" role="status" hidden></span>'+
+ '<div class="wc-panel"><header class="wc-heading"><div><small id="wcName">温知遥</small><h2 id="wcActivity">研读医书</h2><p id="wcDescription"></p></div><div class="wc-heading-actions"><small id="wcMiniTime" aria-label="专注剩余时间">25:00</small><button type="button" id="wcQuickFocus">▶ 开始修炼</button><button type="button" id="wcExpandPanel" aria-controls="wcExpanded" aria-expanded="false">修炼设置 ▾</button><button type="button" id="wcClose" aria-label="返回剧情书房">返回书房 ×</button></div></header><section class="wc-effort" aria-label="功课回笺"><div class="wc-effort-top"><small id="wcEffortHeading"></small><span id="wcEffortProgress"></span></div><p id="wcEffortText" role="status" aria-live="polite"></p><details><summary>翻看今日留下的功课</summary><p id="wcEffortTotal"></p><ul id="wcEffortRows"></ul><small id="wcEffortContext"></small><button type="button" id="wcMastery">记下复述／默写成果</button></details></section><div id="wcExpanded">'+
  '<div id="wcVitals"></div><div class="wc-timer"><strong id="wcTime">25:00</strong><span id="wcTrack">准备开始</span></div>'+
  '<div id="wcSetup" class="wc-setup"><label>修炼科目 <select id="wcSubject"></select></label><label>本轮时长 <select id="wcMinutes"><option value="25">25 分钟</option><option value="45">45 分钟</option><option value="60">60 分钟</option></select></label></div>'+
  '<div class="wc-buttons"><button type="button" id="wcStart">▶ 开始与姐姐一同修炼</button><button type="button" id="wcPause" hidden>Ⅱ 暂停</button><button type="button" id="wcReset" hidden>重置本轮</button><button type="button" id="wcCare">疗养／商议</button><button type="button" id="wcTalk">自由交谈</button><button type="button" id="wcStatus">状态／用膳</button><button type="button" id="wcGoTimer">打开原专注页</button></div>'+
@@ -213,14 +252,14 @@ function mount({stage,focusBridge,getCharacterState,onFocusPage:focusPage,onClos
  stage.append(layer);
  const BA=root.WendaoBedroomArt;
  if(BA&&root.WendaoBedroom&&$('wcBedroomLive')?.getContext){bedroomArt=BA.create({canvas:$('wcBedroomLive'),onReady:()=>{bedroomBehavior=null;if(layer&&!layer.hidden){update();startMotion()}},onError:()=>{$('wcBedroomLive').hidden=true;layer.dataset.bedroomLive='false';$('wcArtHint').hidden=false;$('wcArtHint').textContent='局部动作暂未加载，保留原卧榻画面，可重试。';$('wcArtRetry').hidden=false}});}
- $('wcBedTouch').onclick=()=>{bedroomIntent='look';paintMotion()};
+ $('wcBedTouch').onclick=()=>{lifePresentation?.suspend();bedroomIntent='look';paintMotion()};
 
  const M=root.WendaoMotion;if(M){motionEnabled=M.readPreference(viewStore());motionRenderer=M.renderer({actor:$('wcActor'),photo:$('wcPortrait'),bed:$('wcRecovery'),hint:$('wcArtHint'),onArtSeen:id=>onArtSeen?.(id)});}
  $('wcAnimation').textContent=motionEnabled?'动作：开':'动作：关';$('wcAnimation').setAttribute('aria-pressed',String(motionEnabled));
- $('wcAnimation').onclick=()=>{motionEnabled=!motionEnabled;M?.writePreference(viewStore(),motionEnabled);$('wcAnimation').textContent=motionEnabled?'动作：开':'动作：关';$('wcAnimation').setAttribute('aria-pressed',String(motionEnabled));paintMotion();startMotion()};
+ $('wcAnimation').onclick=()=>{motionEnabled=!motionEnabled;if(motionEnabled)lifePresentation?.resume();else lifePresentation?.suspend();M?.writePreference(viewStore(),motionEnabled);$('wcAnimation').textContent=motionEnabled?'动作：开':'动作：关';$('wcAnimation').setAttribute('aria-pressed',String(motionEnabled));paintMotion();startMotion()};
  $('wcArtRetry').onclick=()=>{if(bedroomArt?.failed())void bedroomArt.load();motionRenderer?.resetFailures();$('wcPortrait').dataset.artSource='';$('wcRecovery').dataset.artSource='';paintMotion()};
  $('wcLetters').onclick=()=>onCare?.('letters');
- document.addEventListener('visibilitychange',()=>{if(!layer||layer.hidden)return;if(document.hidden){clearInterval(motionTimer);if(bedFrame&&root.cancelAnimationFrame)root.cancelAnimationFrame(bedFrame);bedFrame=null;paintMotion(true);lastWorld=null;transit=null}else{update();startMotion()}});
+ document.addEventListener('visibilitychange',()=>{if(!layer||layer.hidden)return;if(document.hidden){lifePresentation?.hide();clearInterval(motionTimer);if(bedFrame&&root.cancelAnimationFrame)root.cancelAnimationFrame(bedFrame);bedFrame=null;paintMotion(true);lastWorld=null;transit=null}else{update();startMotion()}});
  root.matchMedia?.('(prefers-reduced-motion: reduce)').addEventListener?.('change',()=>{paintMotion();startMotion()});
 
  const official=$('timerSubject');const subject=$('wcSubject');
@@ -251,11 +290,13 @@ function mount({stage,focusBridge,getCharacterState,onFocusPage:focusPage,onClos
  $('wcStart').onclick=()=>{try{bridge.focusAction('start',{minutes:Number($('wcMinutes').value),subject:subject.value});finished=false;update()}catch(e){bridge.toast?.('未开始专注：'+e.message)}};
  $('wcPause').onclick=()=>{try{const state=focusState();bridge.focusAction(state.running?'pause':'resume');update()}catch(e){bridge.toast?.('未能操作计时器：'+e.message)}};
  $('wcCare').onclick=()=>onCare?.('care');$('wcTalk').onclick=()=>onCare?.('talk');$('wcStatus').onclick=()=>onCare?.('status');$('wcReset').onclick=()=>{bridge.focusAction('reset');update()};
+ $('wcMastery').onclick=()=>onCare?.('mastery');
  $('wcGoTimer').onclick=()=>{close();onFocusPage?.()};
  $('wcExploreBack').onclick=close;
 }
 function open({mode='focus'}={}){
  if(!layer)return;
+ lifePresentation?.resume();
  const exploring=mode==='explore';
  setPanelExpanded(false);
  layer.classList.toggle('wc-explore-mode',exploring);
@@ -266,7 +307,7 @@ function open({mode='focus'}={}){
  layer.hidden=false;layer.parentElement?.classList.add('wd-companion-active');lastPortraitSrc='';const focus=focusState();if(focus.id)activeID=focus.id;
  update();startMotion();(exploring?$('wcMapToggle'):$('wcStart')).focus();clearInterval(interval);interval=setInterval(()=>{if(!document.hidden)update()},4000);
 }
-function close(){if(!layer)return;const wasExplore=layer.classList.contains('wc-explore-mode');cleanTravel();setPanelExpanded(false);clearInterval(motionTimer);if(bedFrame&&root.cancelAnimationFrame)root.cancelAnimationFrame(bedFrame);bedFrame=null;paintMotion(true);$('wcRecovery').hidden=true;lastWorld=null;transit=null;if($('wcMap'))$('wcMap').hidden=true;if($('wcMapToggle'))$('wcMapToggle').setAttribute('aria-expanded','false');layer.hidden=true;layer.classList.remove('wc-explore-mode');layer.parentElement?.classList.remove('wd-companion-active');clearInterval(interval);interval=null;onClose?.();(wasExplore?$('wdExploreQuick'):$('wdCultivateQuick'))?.focus()}
+function close(){if(!layer)return;lifePresentation?.hide();const wasExplore=layer.classList.contains('wc-explore-mode');cleanTravel();setPanelExpanded(false);clearInterval(motionTimer);if(bedFrame&&root.cancelAnimationFrame)root.cancelAnimationFrame(bedFrame);bedFrame=null;paintMotion(true);$('wcRecovery').hidden=true;lastWorld=null;transit=null;if($('wcMap'))$('wcMap').hidden=true;if($('wcMapToggle'))$('wcMapToggle').setAttribute('aria-expanded','false');layer.hidden=true;layer.classList.remove('wc-explore-mode');layer.parentElement?.classList.remove('wd-companion-active');clearInterval(interval);interval=null;onClose?.();(wasExplore?$('wdExploreQuick'):$('wdCultivateQuick'))?.focus()}
 function refresh(){if(layer&&!layer.hidden)update()}
-root.WendaoCompanion={mount,open,close,refresh,selectAction,getSceneContext,getWorldView:()=>layer&&!layer.hidden&&!document.hidden?{...worldView,bedroomScene:getSceneContext()}:null,isOpen:()=>!!layer&&!layer.hidden};
+root.WendaoCompanion={effortView,resetLifePresentation:()=>lifePresentation?.hide(),getLifeObservation:()=>lifeObservation,mount,open,close,refresh,selectAction,getSceneContext,getWorldView:()=>layer&&!layer.hidden&&!document.hidden?{...worldView,bedroomScene:getSceneContext()}:null,isOpen:()=>!!layer&&!layer.hidden};
 })(typeof window!=='undefined'?window:globalThis);

@@ -1,2 +1,22 @@
 # Auto detect text files and perform LF normalization
 * text=auto
+
+public/yuanhang/wendao/scene3d/vendor/three.module.min.js text eol=lf
+public/yuanhang/wendao/scene3d/vendor/three.core.min.js text eol=lf
+public/yuanhang/wendao/scene3d/vendor/THREE-LICENSE.txt text eol=lf
+public/yuanhang/wendao/scene3d/models/bedroom-r1.three.json text eol=lf
+public/yuanhang/wendao/scene3d/anchors.json text eol=lf
+public/yuanhang/wendao/scene3d/bedroom-model.js text eol=lf
+public/yuanhang/wendao/scene3d/camera-rig.js text eol=lf
+public/yuanhang/wendao/scene3d/character-adapter.js text eol=lf
+public/yuanhang/wendao/scene3d/lighting.js text eol=lf
+public/yuanhang/wendao/scene3d/scene-manager.js text eol=lf
+public/yuanhang/wendao/scene3d/contract.js text eol=lf
+public/yuanhang/wendao/scene3d/character-visual-state.js text eol=lf
+public/yuanhang/wendao/scene3d/surface-materials.js text eol=lf
+public/yuanhang/wendao/scene3d/visibility.js text eol=lf
+public/yuanhang/wendao/scene3d/action-flow.js text eol=lf
+public/yuanhang/wendao/scene3d/interactions.js text eol=lf
+public/yuanhang/wendao/scene3d/glb-character.js text eol=lf
+public/yuanhang/wendao/scene3d/life-bridge.js text eol=lf
+public/yuanhang/wendao/scene3d/ledger-source.js text eol=lf

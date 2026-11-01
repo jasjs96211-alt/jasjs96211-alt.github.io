@@ -44,7 +44,7 @@ function render(){
   $('latest-title').textContent=last?.activity||'日常正要开始';$('latest-text').textContent=last?.text||'让时间向前走一会儿，看看她会留下什么。';
   $('count').textContent=rows.length+' 则';$('export').disabled=!all.length;
   document.querySelectorAll('[data-filter]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.filter===filter)));
-  $('timeline').innerHTML=rows.length?rows.map(row=>{
+  $('timeline').innerHTML=rows.length?rows.slice().reverse().map(row=>{
     const parent=state.life.ledger.find(r=>r.id===row.sourceEventId);
     const reason=row.cause?.rule==='health-rest'?'她的身体需要休息，这段日常因此留在寝居。':row.kind==='detail'?'这件小事承接前一段日常，没有另外发生一封来信或一场主线事件。':'这是已有作息中的一项安排。';
     return '<article class="entry"><time datetime="'+new Date(row.at).toISOString()+'"><small>'+esc(shortDate(row.at))+'</small>'+time(row.at)+'</time><div class="entry-content"><h3>'+esc(row.activity)+'</h3><p>'+esc(row.text)+'</p><div class="location">'+esc(placeOf(row))+'</div><details><summary>这则小记的前因</summary><p>'+esc(parent?time(parent.at)+' · '+parent.activity+'。':'')+esc(reason)+'</p></details></div></article>';

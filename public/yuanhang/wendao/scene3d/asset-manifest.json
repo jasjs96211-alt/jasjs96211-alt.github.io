@@ -188,9 +188,9 @@
       "path": "ledger-source.js",
       "source": "read-only existing ledger projection",
       "license": "project-original",
-      "status": "isolated-integration-not-production",
-      "bytes": 2736,
-      "sha256": "590d2fcf381c91e3767fa8b79cca37792497108e6b14d0119912bbf30695ed3f"
+      "status": "production-cg-bridge-dev-unreleased",
+      "bytes": 3010,
+      "sha256": "e2662085d24d34f2cc04b068b8acc41a772280892a0e37b7f036ef8e7494eec1"
     }
   ],
   "scopeUpdate": "NEXT_SCOPE_20261021.md",

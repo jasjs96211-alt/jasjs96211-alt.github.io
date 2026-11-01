@@ -22,6 +22,6 @@ test('provider quota classification and allowed proactive context do not grant s
 });
 test('status exposes missing configuration and auth mode, never credentials',async()=>{
  await server({key:'',base:'',model:''},async u=>{const r=await fetch(u+'/api/status',{headers:{Origin:origin}}),v=await r.json();assert.equal(v.configured,false);assert.equal(v.authMode,'loopback');assert.equal(v.missing.length,3)});
- assert.ok(environmentPath.endsWith('/.env.local'));assert.ok(!environmentPath.includes('/public/'));
+ assert.ok(environmentPath.replaceAll('\\','/').endsWith('/.env.local'));assert.ok(!environmentPath.replaceAll('\\','/').includes('/public/'));
  const launcher=readFileSync(new URL('../wendao/server/launcher.mjs',import.meta.url),'utf8');assert.ok(launcher.includes('transport\\.js'));
 });

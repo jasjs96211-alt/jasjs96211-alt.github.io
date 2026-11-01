@@ -83,7 +83,7 @@ test('existing recap includes real child timestamps and source references; proje
  const t=at('2026-10-26T23:00:00'),s=E.fresh(t);J.enable(s,t);add(s,'rest',t+M);advance(s,t+60*M);
  const recap=E.nightRecap(s,t+9*3600000),rows=E.recapTimeline(s,recap);assert.equal(rows.length,3);
  const before=JSON.stringify(s),timeline=J.timeline(s);timeline[0].text='changed';assert.equal(JSON.stringify(s),before);
- assert.ok(rows.every(r=>s.life.ledger.some(source=>source.id===r.sourceEventId&&source.at===r.occurredAt)));
+ assert.ok(rows.every(r=>s.life.ledger.some(source=>source.id===r.eventId&&source.at===r.occurredAt)));
 });
 test('later healing cannot rewrite a past injured night into healthy work',()=>{
  const s=setup();add(s);const data={sessions:[],events:[{id:'ddl',category:'ddl',end:E.day(start),dueAt:new Date(start+2*M).toISOString(),title:'fixture',done:false}]};

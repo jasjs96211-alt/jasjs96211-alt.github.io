@@ -2,12 +2,13 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import vm from 'node:vm';
+import {fileURLToPath} from 'node:url';
 import {createCanvas,loadImage} from '@napi-rs/canvas';
 
 const context=vm.createContext({});
 vm.runInContext(readFileSync(new URL('../wendao/bedroom-renderer.js',import.meta.url),'utf8'),context);
 const A=context.WendaoBedroomArt;
-const images=Object.fromEntries(await Promise.all(Object.entries(A.FILES).map(async([id,file])=>[id,await loadImage(new URL('../wendao/assets/'+file,import.meta.url).pathname)])));
+const images=Object.fromEntries(await Promise.all(Object.entries(A.FILES).map(async([id,file])=>[id,await loadImage(fileURLToPath(new URL('../wendao/assets/'+file,import.meta.url)))])));
 const painter=A.makePainter({images,makeCanvas:createCanvas});
 function imagePixels(img){const c=createCanvas(1536,1024),g=c.getContext('2d');g.drawImage(img,0,0);return g.getImageData(0,0,1536,1024).data;}
 function render(motion,night=false){const c=createCanvas(1536,1024),g=c.getContext('2d');painter.draw(g,{motion,severe:false},{night,animate:true,time:0});return g.getImageData(0,0,1536,1024).data;}
