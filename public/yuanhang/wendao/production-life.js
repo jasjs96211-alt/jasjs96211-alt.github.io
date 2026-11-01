@@ -309,7 +309,7 @@
 				eventId: row.id,
 				sourceEventId: source.id,
 				kind,
-				activity: row.kind === "detail" ? row.step === 1 ? "rest" : kind === "study" ? "notes" : kind : kind === "study" ? "reading" : kind,
+				activity: row.kind === "detail" ? kind === "rest" ? "rest" : row.step === 1 ? "hold" : kind === "study" ? "notes" : kind : kind === "study" ? "reading" : kind,
 				title: row.activity,
 				text: row.text,
 				location: row.location || locations[kind],
