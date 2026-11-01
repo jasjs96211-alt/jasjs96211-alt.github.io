@@ -26,8 +26,8 @@ test('same-day injury and next-day illness both retain the true recovery CG elig
  for(const [at,visual]of [[t,'injured'],[t+24*H,'ill']]){const body=state(s,data(),at),w=W.derive({at,state:body,playerPlace:'bedroom'}),p=M.plan({world:w,state:body,at});assert.equal(body.portrait.state,visual);assert.equal(p.cgId,'recovery-bed');}
  assert.equal(JSON.stringify(s.supervision.deadlines),before);
 });
-test('healthy night in the real companion never loads or unlocks recovery art; old unlocks stay intact',()=>{
- const a=open(night);travel(a,'bedroom');assert.equal(a.get('wcRecovery').hidden,true);assert.doesNotMatch(a.get('wcPortrait').src,/recovery-cg/);assert.equal(a.snapshot().story.unlockedCG.includes('recovery-bed'),false);
+test('healthy night in the real companion shows lying rest without unlocking recovery art; old unlocks stay intact',()=>{
+ const a=open(night);travel(a,'bedroom');assert.equal(a.get('wcRecovery').hidden,false);assert.equal(a.get('wcActor').hidden,true);a.get('wcRecovery').onload();assert.equal(a.snapshot().story.unlockedCG.includes('recovery-bed'),false);
  configure(a,"f.story.unlockedCG.push('recovery-bed')");assert.equal(a.snapshot().story.unlockedCG.filter(x=>x==='recovery-bed').length,1);assert.equal(a.snapshot().chronicle.filter(x=>x.id==='cg:recovery-bed').length,0);
 });
 test('final app gallery write rejects a stale loaded CG after injury has healed, even before repaint',()=>{
