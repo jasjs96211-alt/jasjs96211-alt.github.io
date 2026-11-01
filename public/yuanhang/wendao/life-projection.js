@@ -20,7 +20,7 @@ function get(s,at=Date.now()){
  if(!source||at-source.at>8*3600000)return base;
  const details=ledger.filter(r=>r.kind==='detail'&&r.detailVersion===1&&r.sourceEventId===source.id&&r.at>=source.at&&[0,1].includes(r.step)&&r.id==='life:detail:v1:'+source.id+':'+r.step&&ledger.some(p=>p.id===r.previousEventId&&p.at<r.at)).sort((a,b)=>a.at-b.at);
  const row=details.at(-1)||source,kind=row.bodyState!=='normal'?'rest':source.kind;
- return {...base,eventId:row.id,sourceEventId:source.id,kind,activity:row.kind==='detail'?(row.step===1?'rest':kind==='study'?'notes':kind):kind==='study'?'reading':kind,title:row.activity,text:row.text,location:row.location||locations[kind],bodyState:row.bodyState,startedAt:row.at,at:row.at,valid:true};
+ return {...base,eventId:row.id,sourceEventId:source.id,kind,activity:row.kind==='detail'?(kind==='rest'?'rest':row.step===1?'hold':kind==='study'?'notes':kind):kind==='study'?'reading':kind,title:row.activity,text:row.text,location:row.location||locations[kind],bodyState:row.bodyState,startedAt:row.at,at:row.at,valid:true};
 }
 root.WendaoLifeProjection=Object.freeze({get});
 })(typeof window!=='undefined'?window:globalThis);
