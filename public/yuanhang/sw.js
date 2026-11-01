@@ -1,6 +1,6 @@
 /* Offline app shell first. Large portraits must not prevent the updated code
    from installing over mobile data. No API responses or user data are cached. */
-const CACHE='yuanhang-static-v32-production-life-20261031';
+const CACHE='yuanhang-static-v33-rest-pose-20261031';
 const SHELL=[
  './','./index.html','./manifest.webmanifest','./icon.svg',
  './usage.js','./cloud.js?v=20261016-sync-r4',
@@ -8,7 +8,7 @@ const SHELL=[
  './wendao/novel.js?v=20261016-v15','./wendao/story.js?v=20261017-live1','./wendao/transport.js',
  './wendao/engine.js?v=20261031-life1','./wendao/app.js?v=20261031-life1',
  './wendao/world.js?v=20261031-life1','./wendao/interaction.js?v=20261031-life1',
- './wendao/motion.js?v=20261031-life1','./wendao/companion.js?v=20261031-life1',
+ './wendao/motion.js?v=20261031-rest2','./wendao/companion.js?v=20261031-life1',
  './wendao/bedroom-behavior.js?v=20261018-chronicle-breath1','./wendao/bedroom-renderer.js?v=20261018-gestures3','./wendao/bedroom-live.css?v=20261017-live1',
  './wendao/style.css?v=20261018-chronicle-breath1','./wendao/companion.css?v=20261016-v15',
  './wendao/world.css?v=20261017-v16-dynamic','./wendao/motion.css?v=20261017-v16-dynamic',
