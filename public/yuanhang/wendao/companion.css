@@ -62,3 +62,12 @@
 @media(max-width:720px){.wd-vital-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.wd-stage-vitals{max-height:32dvh}.wd-vitals{font-size:11px;padding:6px 9px}.wd-companion .wc-panel{max-height:57dvh}.wd-companion .wc-actor[data-place="榻边"]{left:65%}.wd-companion .wc-buttons button{min-height:44px}.wd-companion .wc-sky{top:max(16px,env(safe-area-inset-top))}}
 @media(max-height:560px) and (orientation:landscape){.wd-companion .wc-panel{max-height:calc(100dvh - 76px)}}
 .wd-companion-active .wd-presence,.wd-companion-active>.wd-dialog{visibility:hidden}
+.wd-companion .wc-effort{border-top:1px solid #b3c6a34d;margin-top:8px;padding-top:8px;color:#f3ead4;line-height:1.6}
+.wd-companion .wc-effort-top{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-size:12px;color:#d8dfbd}
+.wd-companion .wc-effort p{margin:6px 0;font-size:13px;color:#f3ead4}
+.wd-companion .wc-effort summary{cursor:pointer;font-size:12px;min-height:30px;color:#cbd5ba}
+.wd-companion .wc-effort ul{padding-left:20px;font-size:12px;max-height:140px;overflow:auto}
+.wd-companion .wc-effort details>small{display:block;color:#b8c7b4;font-size:11px}
+.wd-companion .wc-effort button{margin-top:8px;min-height:40px}
+.wd-companion.wc-explore-mode .wc-effort{display:none}
+.wd-companion #wcArtHint{position:absolute;top:40%;left:25%;right:25%;z-index:5;background:#16372eee;color:#f3ead4;padding:12px;text-align:center}
