@@ -80,7 +80,7 @@
       if (!present) delta = 0;
       if (isPresent && !wasHidden && !disputed && gap <= 10000) visualTime += gap;
       wasHidden = hidden;
-      const mode = !atBed ? 'absent' : disputed ? 'clock_hold' : severe ? 'severe' : sisterSleeping ? 'sleep' : 'routine';
+      const mode = !atBed ? 'absent' : disputed ? 'clock_hold' : severe ? 'severe' : sisterSleeping ? 'sleep' : state.schedule?.projection && state.schedule.kind==='rest' ? 'rest' : 'routine';
       if (previousMode !== null && mode !== previousMode) {
         // Health/location/sleep always override art. Do not invent a sitting/walking transition.
         setPhase(previousMode === 'sleep' && mode === 'routine' && canNap ? 11 : canRead && previousMode === 'absent' && mode === 'routine' ? 0 : 4);
@@ -135,10 +135,10 @@
         if (!canMedicate && index === 8) { title = '榻边温养'; text = '她留在榻上，缓缓调息。'; }
         if (index === 10 && (!canRead || !canMedicate)) text = '她安静地睡着，不打扰她。';
       } else {
-        phase = mode; actionId = mode === 'severe' ? 'bed_heavy_injury' : mode === 'sleep' ? 'bed_light_nap' : 'bed_hold';
+        phase = mode; actionId = mode === 'severe' ? 'bed_heavy_injury' : mode === 'sleep' ? 'bed_light_nap' : mode === 'rest' ? 'bed_rest_medicine' : 'bed_hold';
         clip = mode === 'severe' ? 'severe_rest' : mode === 'sleep' ? 'nap_loop' : 'rest_pillow';
-        title = { severe: '重伤卧床', sleep: '静养小憩', absent: '姐姐不在寝居', clock_hold: '等候核对时间' }[mode];
-        text = { severe: '她仍在疗养，不勉强起身。', sleep: '她正在休息，不打扰她。', absent: '人物地点以现有世界状态为准。', clock_hold: '时间尚未核对，动作暂不推进。' }[mode];
+        title = { rest: '卧榻休息', severe: '重伤卧床', sleep: '静养小憩', absent: '姐姐不在寝居', clock_hold: '等候核对时间' }[mode];
+        text = { rest: '她卧在软枕上安静歇息。', severe: '她仍在疗养，不勉强起身。', sleep: '她正在休息，不打扰她。', absent: '人物地点以现有世界状态为准。', clock_hold: '时间尚未核对，动作暂不推进。' }[mode];
       }
       const available = mode !== 'absent' && ready(clip) && ready('recline_breathe');
       if (mode === 'absent') { props.book = 'absent'; props.bowl = 'absent'; }
